@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FEFEFE"
+    tools:context="cuhk.cse.cmsc5736project.MainActivity">
+
+    <!--By default, height of Toolbar and Bottom Navigation are equal-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/fragment_square_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/bottom_navigation_height"
+        android:paddingTop="12dp"/>
+
+    <TextView
+        android:id="@+id/a"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="adasdasdasd" />
+
+</FrameLayout>
