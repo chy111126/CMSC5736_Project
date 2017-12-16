@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cuhk.cse.cmsc5736project.R;
-import cuhk.cse.cmsc5736project.objects.Dessert;
+import cuhk.cse.cmsc5736project.models.Dessert;
 
 /**
  * Created by TCC on 12/10/2017.

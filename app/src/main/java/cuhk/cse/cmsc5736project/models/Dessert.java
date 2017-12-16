@@ -1,4 +1,4 @@
-package cuhk.cse.cmsc5736project.objects;
+package cuhk.cse.cmsc5736project.models;
 
 /**
  * Created by TCC on 12/10/2017.

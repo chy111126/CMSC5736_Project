@@ -1,6 +1,10 @@
 package cuhk.cse.cmsc5736project;
 
+import android.animation.ValueAnimator;
+import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,21 +19,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cuhk.cse.cmsc5736project.adapters.SmartFragmentStatePagerAdapter;
-import cuhk.cse.cmsc5736project.fragment.DummyFragment;
-import cuhk.cse.cmsc5736project.fragment.FriendsFragment;
-import cuhk.cse.cmsc5736project.fragment.MapFragment;
-import cuhk.cse.cmsc5736project.fragment.POIFragment;
+import cuhk.cse.cmsc5736project.fragments.FriendsFragment;
+import cuhk.cse.cmsc5736project.fragments.MapFragment;
+import cuhk.cse.cmsc5736project.fragments.POIFragment;
 
 public class MainActivity extends AppCompatActivity {
+
+    // Variables
+    private Context context;
 
     // Application navigation related
     private NoSwipePager viewPager;
     private AHBottomNavigation bottomNavigation;
 
+    // ActionBar coloring
+    private int last_color;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        context = this;
 
         setupBottomNavBar();
         setupViewPager();
@@ -76,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
                 if (!wasSelected)
                     viewPager.setCurrentItem(position);
 
+                tintSystemBars(bottomNavigation.getItem(position).getColor(context), true);
+                last_color = bottomNavigation.getItem(position).getColor(context);
+
                 return true;
             }
         });
@@ -103,6 +117,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Set current item programmatically
         bottomNavigation.setCurrentItem(0);
+        tintSystemBars(item1.getColor(context), false);
+        last_color = item1.getColor(context);
     }
 
     public class BottomBarAdapter extends SmartFragmentStatePagerAdapter {
@@ -128,6 +144,54 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    private void tintSystemBars(int to_color_id, boolean isAnimated) {
+
+        // Desired final colors of each bar.
+        final int statusBarToColor = blendColors(to_color_id, 0, 0.2f);
+        final int toolbarToColor = to_color_id;
+
+        if (isAnimated) {
+            // Initial colors of each system bar.
+            final int statusBarColor = blendColors(last_color, 0, 0.2f);
+            final int toolbarColor = last_color;
+
+            ValueAnimator anim = ValueAnimator.ofFloat(0, 1);
+            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    // Use animation position to blend colors.
+                    float position = animation.getAnimatedFraction();
+
+                    // Apply blended color to the status bar.
+                    int blended = blendColors(statusBarColor, statusBarToColor, position);
+                    getWindow().setStatusBarColor(blended);
+
+                    // Apply blended color to the ActionBar.
+                    blended = blendColors(toolbarColor, toolbarToColor, position);
+                    ColorDrawable background = new ColorDrawable(blended);
+                    getSupportActionBar().setBackgroundDrawable(background);
+                }
+            });
+
+            anim.setDuration(300).start();
+        } else {
+            getWindow().setStatusBarColor(statusBarToColor);
+            ColorDrawable background = new ColorDrawable(toolbarToColor);
+            getSupportActionBar().setBackgroundDrawable(background);
+        }
+    }
+
+    private int blendColors(int from, int to, float ratio) {
+        final float inverseRatio = 1f - ratio;
+
+        final float r = Color.red(to) * ratio + Color.red(from) * inverseRatio;
+        final float g = Color.green(to) * ratio + Color.green(from) * inverseRatio;
+        final float b = Color.blue(to) * ratio + Color.blue(from) * inverseRatio;
+
+        return Color.rgb((int) r, (int) g, (int) b);
+    }
+
 
     private int fetchColor(@ColorRes int color) {
         return ContextCompat.getColor(this, color);

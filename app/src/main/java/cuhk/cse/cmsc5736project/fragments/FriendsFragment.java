@@ -1,4 +1,4 @@
-package cuhk.cse.cmsc5736project.fragment;
+package cuhk.cse.cmsc5736project.fragments;
 
 import android.graphics.Color;
 import android.os.Bundle;

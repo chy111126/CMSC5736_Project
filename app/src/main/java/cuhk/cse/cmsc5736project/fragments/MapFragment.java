@@ -1,4 +1,4 @@
-package cuhk.cse.cmsc5736project.fragment;
+package cuhk.cse.cmsc5736project.fragments;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,15 +11,15 @@ import android.view.ViewGroup;
 import cuhk.cse.cmsc5736project.R;
 
 
-public class POIFragment extends Fragment {
+public class MapFragment extends Fragment {
 
-    public static final String TAG = POIFragment.class.getSimpleName();
+    public static final String TAG = MapFragment.class.getSimpleName();
 
     // Variable for fragment coloring
     private static final String ARG_COLOR = "color";
     private int color;
 
-    public POIFragment() {
+    public MapFragment() {
         // Required empty public constructor
     }
 
@@ -36,7 +36,7 @@ public class POIFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_pois, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_map, container, false);
         rootView.setBackgroundColor(getLighterColor(color));
 
         Log.i(TAG, "onCreateView");
