@@ -44,6 +44,18 @@ public class MainActivity extends AppCompatActivity {
 
         setupBottomNavBar();
         setupViewPager();
+
+        // Select initial page
+        int initialPage = 1;
+        selectPage(initialPage);
+        bottomNavigation.setCurrentItem(initialPage);
+    }
+
+    private void selectPage(int position) {
+        // Change to page with index=position
+        viewPager.setCurrentItem(position);
+        tintSystemBars(bottomNavigation.getItem(position).getColor(context), true);
+        last_color = bottomNavigation.getItem(position).getColor(context);
     }
 
     private void setupViewPager() {
@@ -52,11 +64,14 @@ public class MainActivity extends AppCompatActivity {
 
         BottomBarAdapter pagerAdapter = new BottomBarAdapter(getSupportFragmentManager());
 
+        Bundle bundle = null;
+        Fragment fragment = null;
+
         // Map page
-        Bundle bundle = new Bundle();
+        bundle = new Bundle();
         bundle.putInt("color", fetchColor(R.color.color_tab_1));
 
-        Fragment fragment = new MapFragment();
+        fragment = new MapFragment();
         fragment.setArguments(bundle);
         pagerAdapter.addFragments(fragment);
 
@@ -68,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         fragment.setArguments(bundle);
         pagerAdapter.addFragments(fragment);
 
-        // Map page
+        // Friend page
         bundle = new Bundle();
         bundle.putInt("color", fetchColor(R.color.color_tab_3));
 
@@ -85,10 +100,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTabSelected(int position, boolean wasSelected) {
 
                 if (!wasSelected)
-                    viewPager.setCurrentItem(position);
-
-                tintSystemBars(bottomNavigation.getItem(position).getColor(context), true);
-                last_color = bottomNavigation.getItem(position).getColor(context);
+                    selectPage(position);
 
                 return true;
             }
@@ -99,9 +111,9 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
 
         // Create items
-        AHBottomNavigationItem item1 = new AHBottomNavigationItem(R.string.tab_1, R.drawable.ic_maps_place, R.color.color_tab_1);
+        AHBottomNavigationItem item1 = new AHBottomNavigationItem(R.string.tab_1, R.drawable.map, R.color.color_tab_1);
         AHBottomNavigationItem item2 = new AHBottomNavigationItem(R.string.tab_2, R.drawable.ic_maps_local_bar, R.color.color_tab_2);
-        AHBottomNavigationItem item3 = new AHBottomNavigationItem(R.string.tab_3, R.drawable.ic_maps_local_restaurant, R.color.color_tab_3);
+        AHBottomNavigationItem item3 = new AHBottomNavigationItem(R.string.tab_3, R.drawable.account_multiple, R.color.color_tab_3);
 
         // Add items
         bottomNavigation.addItem(item1);
@@ -110,6 +122,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Set background color
         bottomNavigation.setDefaultBackgroundColor(Color.parseColor("#FEFEFE"));
+
+        // Disable the translation inside the CoordinatorLayout
+        bottomNavigation.setBehaviorTranslationEnabled(false);
 
         // Use colored navigation with circle reveal effect
         bottomNavigation.setColored(true);

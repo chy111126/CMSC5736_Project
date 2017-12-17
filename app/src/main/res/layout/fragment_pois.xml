@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#FEFEFE"
     tools:context="cuhk.cse.cmsc5736project.MainActivity">
 
@@ -13,13 +14,6 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingBottom="@dimen/bottom_navigation_height"
-        android:paddingTop="12dp"/>
+        android:paddingTop="24dp"/>
 
-    <TextView
-        android:id="@+id/a"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="Fragment POIs" />
-
-</FrameLayout>
+</RelativeLayout>

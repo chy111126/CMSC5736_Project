@@ -59,7 +59,7 @@ public class POIFragment extends Fragment {
 
     private int getLighterColor(int color) {
         // Lighter color = 30% of given color hex
-        return Color.argb(30,
+        return Color.argb(10,
                 Color.red(color),
                 Color.green(color),
                 Color.blue(color)

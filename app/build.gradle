@@ -30,4 +30,5 @@ dependencies {
 
 dependencies {
     compile 'com.aurelhubert:ahbottomnavigation:2.1.0'
+    compile 'de.hdodenhof:circleimageview:2.2.0'
 }

@@ -1,16 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#FEFEFE"
     tools:context="cuhk.cse.cmsc5736project.MainActivity">
 
-    <TextView
-        android:id="@+id/a"
+    <!-- List of POIs hosted within RecyclerView -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/fragment_friends_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="Fragment Friends" />
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/bottom_navigation_height"
+        android:paddingTop="24dp"/>
 
-</FrameLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_add_friend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/ic_content_add"
+        app:backgroundTint="@color/color_tab_3_accent" />
+
+</RelativeLayout>

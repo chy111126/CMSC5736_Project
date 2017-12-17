@@ -7,9 +7,9 @@ package cuhk.cse.cmsc5736project.models;
 
 public class POI {
 
-    String name;
-    String description;
-    Beacon beacon;
+    private String name;
+    private String description;
+    private Beacon beacon;
 
     public POI(String name, String description) {
         this.name = name;
