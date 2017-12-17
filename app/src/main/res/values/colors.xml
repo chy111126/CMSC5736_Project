@@ -9,4 +9,7 @@
 
     <color name="color_tab_3">#009688</color>
     <color name="color_tab_3_accent">#6a1b9a</color>
+
+    <color name="color_delete_item">#B71C1C</color>
+
 </resources>

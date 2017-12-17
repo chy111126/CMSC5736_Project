@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    <PreferenceCategory android:title="General">
+        <ListPreference
+            android:defaultValue="3"
+            android:dialogTitle="Location update frequency"
+            android:entries="@array/pref_update_frequency_entries"
+            android:entryValues="@array/pref_update_frequency_values"
+            android:key="pref_update_frequency"
+            android:summary="Update frequency for getting location info."
+            android:title="Location update frequency" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Friend">
+
+        <EditTextPreference
+            android:defaultValue="Test"
+            android:key="pref_gallery_name"
+            android:summary="Name to be displayed when others discover you."
+            android:title="Display name" />
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_share_proximity"
+            android:summary="Share nearby location your device detected to others."
+            android:title="Share nearby location" />
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_share_proximity"
+            android:summary="Share proximity information by emulating iBeacon device."
+            android:title="Share proximity information" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

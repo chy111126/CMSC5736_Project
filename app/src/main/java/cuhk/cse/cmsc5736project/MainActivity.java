@@ -2,15 +2,17 @@ package cuhk.cse.cmsc5736project;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
@@ -22,6 +24,7 @@ import cuhk.cse.cmsc5736project.adapters.SmartFragmentStatePagerAdapter;
 import cuhk.cse.cmsc5736project.fragments.FriendsFragment;
 import cuhk.cse.cmsc5736project.fragments.MapFragment;
 import cuhk.cse.cmsc5736project.fragments.POIFragment;
+import cuhk.cse.cmsc5736project.views.NoSwipePager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,6 +52,25 @@ public class MainActivity extends AppCompatActivity {
         int initialPage = 1;
         selectPage(initialPage);
         bottomNavigation.setCurrentItem(initialPage);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.app_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            // launch settings activity
+            startActivity(new Intent(MainActivity.this, SettingsPrefActivity.class));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void selectPage(int position) {

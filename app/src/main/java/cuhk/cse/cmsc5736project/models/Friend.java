@@ -1,5 +1,7 @@
 package cuhk.cse.cmsc5736project.models;
 
+import java.util.Date;
+
 /**
  * Created by TCC on 12/16/2017.
  */
@@ -8,6 +10,7 @@ public class Friend {
 
     private String name;
     private String description;
+    private Date lastUpdatedDate;
     private String nearestLocation;
     private Beacon beacon;
 
