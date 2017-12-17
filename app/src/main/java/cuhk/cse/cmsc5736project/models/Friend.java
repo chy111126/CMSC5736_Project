@@ -8,6 +8,7 @@ public class Friend {
 
     private String name;
     private String description;
+    private String nearestLocation;
     private Beacon beacon;
 
     public Friend(String name, String description) {
