@@ -1,4 +1,4 @@
-package cuhk.cse.cmsc5736project;
+package cuhk.cse.cmsc5736project.views;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
