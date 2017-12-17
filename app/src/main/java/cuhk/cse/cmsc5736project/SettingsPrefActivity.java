@@ -4,22 +4,13 @@ package cuhk.cse.cmsc5736project;
  * Created by TCC on 12/17/2017.
  */
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.view.MenuItem;
 
 public class SettingsPrefActivity extends AppCompatActivity {
@@ -29,7 +20,8 @@ public class SettingsPrefActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setContentView(R.layout.pref_with_actionbar);
+        getSupportActionBar().setTitle("Settings");
+        setContentView(R.layout.activity_settings);
 
         // load settings fragment
         getFragmentManager().beginTransaction().replace(R.id.settings_rl, new MainPreferenceFragment()).commit();
