@@ -10,7 +10,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import cuhk.cse.cmsc5736project.LocationManager;
 import cuhk.cse.cmsc5736project.R;
+import cuhk.cse.cmsc5736project.interfaces.OnPOIResultListener;
 import cuhk.cse.cmsc5736project.models.Dessert;
 import cuhk.cse.cmsc5736project.models.POI;
 
@@ -27,7 +29,15 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
 
     public POIListAdapter(Context context) {
         this.context = context;
-        populateSampleData();
+        LocationManager.getInstance().getSimulatedPOIDefinitions(context, new OnPOIResultListener() {
+            @Override
+            public void onRetrieved(List<POI> poiList) {
+                items = poiList;
+                POIListAdapter.this.notifyDataSetChanged();
+            }
+        });
+
+        //populateSampleData();
     }
 
     private void populateSampleData() {
@@ -49,8 +59,7 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
 
     @Override
     public ItemVH onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_poi, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_poi, parent, false);
 
         return new ItemVH(v);
     }

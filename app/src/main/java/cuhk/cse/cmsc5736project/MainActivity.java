@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     public static String domain ="192.168.0.103" ;
     public static final int REQUEST_LOCATION_CODE = 99;
 
-
     // Variables
     private Context context;
 
@@ -49,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
 
     // ActionBar coloring
     private int last_color;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -2,6 +2,11 @@ package cuhk.cse.cmsc5736project.utils;
 
 import android.graphics.Color;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cuhk.cse.cmsc5736project.models.Beacon;
+
 /**
  * Created by alexchung on 16/12/2017.
  */
@@ -45,6 +50,24 @@ public class Utility {
         final float b = Color.blue(to) * ratio + Color.blue(from) * inverseRatio;
 
         return Color.rgb((int) r, (int) g, (int) b);
+    }
+
+    public static Beacon createBeaconFromJsonObject(JSONObject jsonObj) {
+        try {
+            Beacon beacon = new Beacon();
+            beacon.setUUID(jsonObj.getString("uuid"));
+            beacon.setMajor(jsonObj.getInt("major"));
+            beacon.setMinor(jsonObj.getInt("major"));
+            beacon.setPos(jsonObj.getInt("position_x"), jsonObj.getInt("position_y"));
+
+            // TODO: For RSSI, need some custom logic to reflect proximity better
+            beacon.setRSSI(jsonObj.getInt("rssi_two_m_signal"));
+
+            return beacon;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }
