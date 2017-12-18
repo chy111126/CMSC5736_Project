@@ -1,4 +1,4 @@
-package cuhk.cse.cmsc5736project;
+package cuhk.cse.cmsc5736project.utils;
 
 /**
  * Created by alexchung on 16/12/2017.
@@ -14,8 +14,9 @@ public class Utility {
         return instance;
     }
 
-    static final char[] hexArray = "0123456789ABCDEF".toCharArray();
-    static String bytesToHex(byte[] bytes) {
+    private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
+
+    public static String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
         for ( int j = 0; j < bytes.length; j++ ) {
             int v = bytes[j] & 0xFF;

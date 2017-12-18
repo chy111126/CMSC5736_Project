@@ -18,6 +18,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import cuhk.cse.cmsc5736project.models.Beacon;
+import cuhk.cse.cmsc5736project.utils.Utility;
+
+
 public class BeaconActivity extends AppCompatActivity {
 
     private BluetoothManager btManager;

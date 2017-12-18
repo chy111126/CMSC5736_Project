@@ -3,7 +3,6 @@ package cuhk.cse.cmsc5736project;
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -16,12 +15,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
@@ -33,12 +29,13 @@ import cuhk.cse.cmsc5736project.adapters.SmartFragmentStatePagerAdapter;
 import cuhk.cse.cmsc5736project.fragments.FriendsFragment;
 import cuhk.cse.cmsc5736project.fragments.MapFragment;
 import cuhk.cse.cmsc5736project.fragments.POIFragment;
+import cuhk.cse.cmsc5736project.models.RSSIModel;
 import cuhk.cse.cmsc5736project.views.NoSwipePager;
 
 public class MainActivity extends AppCompatActivity {
     //Constant
     //static String domain ="218.191.44.226" ;
-    static String domain ="192.168.0.103" ;
+    public static String domain ="192.168.0.103" ;
     public static final int REQUEST_LOCATION_CODE = 99;
 
 
@@ -74,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
             checkLocationPermission();
         }
 
-        RSSIModel.getInstance().UpdateModel(MainActivity.this);
+        RSSIModel.getInstance().updateModel(MainActivity.this);
     }
 
     public boolean checkLocationPermission()
@@ -128,8 +125,8 @@ public class MainActivity extends AppCompatActivity {
         Intent intent;
         switch (item.getItemId()) {
             case R.id.syncdata:
-                //UpdateModel
-                RSSIModel.getInstance().UpdateModel(MainActivity.this);
+                //updateModel
+                RSSIModel.getInstance().updateModel(MainActivity.this);
                 return true;
             case R.id.setup:
                 intent = new Intent(this, BeaconActivity.class);

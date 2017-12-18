@@ -21,6 +21,9 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
+import cuhk.cse.cmsc5736project.models.RSSIModel;
+import cuhk.cse.cmsc5736project.utils.Utility;
+
 import static cuhk.cse.cmsc5736project.BeaconSetupActivity.STATE.IDLE;
 import static cuhk.cse.cmsc5736project.BeaconSetupActivity.STATE.LOADDATA;
 import static cuhk.cse.cmsc5736project.BeaconSetupActivity.STATE.SAVEDATA;
@@ -204,7 +207,7 @@ public class BeaconSetupActivity extends AppCompatActivity implements AsyncRespo
         {
             case SAVEDATA:
                 Toast.makeText(this, output, Toast.LENGTH_SHORT).show();
-                RSSIModel.getInstance().UpdateModel(BeaconSetupActivity.this);
+                RSSIModel.getInstance().updateModel(BeaconSetupActivity.this);
                 break;
             case LOADDATA:
                 TextView textView;

@@ -1,10 +1,6 @@
-package cuhk.cse.cmsc5736project;
+package cuhk.cse.cmsc5736project.models;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.text.InputType;
-import android.widget.EditText;
 
 import com.kosalgeek.genasync12.AsyncResponse;
 import com.kosalgeek.genasync12.PostResponseAsyncTask;
@@ -17,11 +13,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import cuhk.cse.cmsc5736project.MainActivity;
+
 /**
  * Created by alexchung on 16/12/2017.
  */
 
 public class RSSIModel implements AsyncResponse {
+
     static public List<Beacon> beaconList =new ArrayList<Beacon>();
     static private RSSIModel instance;
 
@@ -33,10 +32,10 @@ public class RSSIModel implements AsyncResponse {
         return instance;
     }
 
-    public boolean UpdateModel(Context context)
+    public boolean updateModel(Context context)
     {
         HashMap postData = new HashMap();
-        PostResponseAsyncTask task = new PostResponseAsyncTask(context,postData,this);
+        PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData,this);
         task.execute("http://"+ MainActivity.domain+"/cmsc5736_project/get_all_beacon_data.php");
 
         return true;
