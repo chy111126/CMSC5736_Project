@@ -1,7 +1,9 @@
 package cuhk.cse.cmsc5736project.fragments;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +15,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import cuhk.cse.cmsc5736project.AddNewFriendActivity;
 import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.adapters.FriendListAdapter;
 import cuhk.cse.cmsc5736project.models.Friend;
@@ -49,6 +52,7 @@ public class FriendsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_friends, container, false);
         rootView.setBackgroundColor(getLighterColor(color));
 
+        // Friend list through RecyclerView
         recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_friends_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setBackgroundColor(getLighterColor(color));
@@ -56,7 +60,13 @@ public class FriendsFragment extends Fragment {
         adapter = new FriendListAdapter(getContext());
         recyclerView.setAdapter(adapter);
 
-        Log.i(TAG, "onCreateView");
+        // Add friend with FAB
+        FloatingActionButton myFab = (FloatingActionButton) rootView.findViewById(R.id.fab_add_friend);
+        myFab.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showAddFriendActivity();
+            }
+        });
 
         return rootView;
     }
@@ -64,6 +74,10 @@ public class FriendsFragment extends Fragment {
     {
         FriendListAdapter.curFriendList.add(friend);
         adapter.notifyDataSetChanged();
+    }
+
+    private void showAddFriendActivity() {
+        startActivity(new Intent(getContext(), AddNewFriendActivity.class));
     }
 
     private int getLighterColor(int color) {

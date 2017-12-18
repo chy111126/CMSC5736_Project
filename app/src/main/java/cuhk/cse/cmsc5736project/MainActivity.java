@@ -1,8 +1,6 @@
 package cuhk.cse.cmsc5736project;
 
-import android.Manifest;
 import android.animation.ValueAnimator;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,17 +32,17 @@ import cuhk.cse.cmsc5736project.adapters.SmartFragmentStatePagerAdapter;
 import cuhk.cse.cmsc5736project.fragments.FriendsFragment;
 import cuhk.cse.cmsc5736project.fragments.MapFragment;
 import cuhk.cse.cmsc5736project.fragments.POIFragment;
+import cuhk.cse.cmsc5736project.views.NoSwipePager;
 
 public class MainActivity extends AppCompatActivity {
     //Constant
     //static String domain ="218.191.44.226" ;
     static String domain ="192.168.0.103" ;
     public static final int REQUEST_LOCATION_CODE = 99;
-    private String myPassword = "123456";
+
 
     // Variables
     private Context context;
-    private boolean isCorrect = false;
 
     // Application navigation related
     private NoSwipePager viewPager;
@@ -78,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         int initialPage = 1;
         selectPage(initialPage);
         bottomNavigation.setCurrentItem(initialPage);
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
@@ -148,6 +147,43 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.app_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            // launch settings activity
+            startActivity(new Intent(MainActivity.this, SettingsPrefActivity.class));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.app_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            // launch settings activity
+            startActivity(new Intent(MainActivity.this, SettingsPrefActivity.class));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
     private void selectPage(int position) {
         // Change to page with index=position

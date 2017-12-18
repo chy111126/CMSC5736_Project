@@ -9,7 +9,7 @@
     tools:context="cuhk.cse.cmsc5736project.MainActivity">
 
     <!-- TODO: Fix margin bottom programmatically -->
-    <cuhk.cse.cmsc5736project.NoSwipePager
+    <cuhk.cse.cmsc5736project.views.NoSwipePager
         android:id="@+id/viewpager"
         android:layout_marginTop="?android:attr/actionBarSize"
         android:layout_width="match_parent"
@@ -23,5 +23,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"/>
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
 </android.support.design.widget.CoordinatorLayout>
