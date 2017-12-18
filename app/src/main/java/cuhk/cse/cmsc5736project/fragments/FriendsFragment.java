@@ -15,6 +15,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import cuhk.cse.cmsc5736project.AddFriendActivity;
 import cuhk.cse.cmsc5736project.AddNewFriendActivity;
 import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.adapters.FriendListAdapter;
@@ -77,7 +78,7 @@ public class FriendsFragment extends Fragment {
     }
 
     private void showAddFriendActivity() {
-        startActivity(new Intent(getContext(), AddNewFriendActivity.class));
+        startActivity(new Intent(getContext(), AddFriendActivity.class));
     }
 
     private int getLighterColor(int color) {
