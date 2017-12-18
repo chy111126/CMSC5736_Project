@@ -9,9 +9,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+
+import java.util.ArrayList;
 
 import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.adapters.FriendListAdapter;
+import cuhk.cse.cmsc5736project.models.Friend;
 
 
 public class FriendsFragment extends Fragment {
@@ -24,6 +28,7 @@ public class FriendsFragment extends Fragment {
 
     // UI elements
     private RecyclerView recyclerView;
+    static private FriendListAdapter adapter;
 
     public FriendsFragment() {
         // Required empty public constructor
@@ -48,12 +53,17 @@ public class FriendsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setBackgroundColor(getLighterColor(color));
 
-        FriendListAdapter adapter = new FriendListAdapter(getContext());
+        adapter = new FriendListAdapter(getContext());
         recyclerView.setAdapter(adapter);
 
         Log.i(TAG, "onCreateView");
 
         return rootView;
+    }
+    static public void AddFriend(Friend friend)
+    {
+        FriendListAdapter.curFriendList.add(friend);
+        adapter.notifyDataSetChanged();
     }
 
     private int getLighterColor(int color) {

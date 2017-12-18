@@ -1,16 +1,28 @@
 package cuhk.cse.cmsc5736project;
 
+import android.Manifest;
 import android.animation.ValueAnimator;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.annotation.ColorRes;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
@@ -24,9 +36,15 @@ import cuhk.cse.cmsc5736project.fragments.MapFragment;
 import cuhk.cse.cmsc5736project.fragments.POIFragment;
 
 public class MainActivity extends AppCompatActivity {
+    //Constant
+    //static String domain ="218.191.44.226" ;
+    static String domain ="192.168.0.103" ;
+    public static final int REQUEST_LOCATION_CODE = 99;
+    private String myPassword = "123456";
 
     // Variables
     private Context context;
+    private boolean isCorrect = false;
 
     // Application navigation related
     private NoSwipePager viewPager;
@@ -34,6 +52,17 @@ public class MainActivity extends AppCompatActivity {
 
     // ActionBar coloring
     private int last_color;
+
+
+    public void onClick(View v) {
+        Intent intent;
+        switch (v.getId()) {
+            case R.id.fab_add_friend:
+                intent = new Intent(this, AddFriendActivity.class);
+                startActivity(intent);
+                break;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +78,77 @@ public class MainActivity extends AppCompatActivity {
         int initialPage = 1;
         selectPage(initialPage);
         bottomNavigation.setCurrentItem(initialPage);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkLocationPermission();
+        }
+
+        RSSIModel.getInstance().UpdateModel(MainActivity.this);
     }
 
+    public boolean checkLocationPermission()
+    {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)  != PackageManager.PERMISSION_GRANTED )
+        {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION))
+            {
+                ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.ACCESS_FINE_LOCATION },REQUEST_LOCATION_CODE);
+            }
+            else
+            {
+                ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.ACCESS_FINE_LOCATION },REQUEST_LOCATION_CODE);
+            }
+            return false;
+
+        }
+        else
+            return true;
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_LOCATION_CODE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                } else {
+                    finish();
+                    System.exit(0);
+                }
+                return;
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.navigation,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        Intent intent;
+        switch (item.getItemId()) {
+            case R.id.syncdata:
+                //UpdateModel
+                RSSIModel.getInstance().UpdateModel(MainActivity.this);
+                return true;
+            case R.id.setup:
+                intent = new Intent(this, BeaconActivity.class);
+                startActivity(intent);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
     private void selectPage(int position) {
         // Change to page with index=position
         viewPager.setCurrentItem(position);
@@ -197,6 +295,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+/*
+    public boolean showPasswordDialog()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter Password");
+
+// Set up the input
+        final EditText input = new EditText(this);
+        isCorrect = false;
+// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
+
+// Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(myPassword.equals(input.getText().toString()))
+                {
+                    isCorrect = true;
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+        return isCorrect;
+    }
+*/
     private int blendColors(int from, int to, float ratio) {
         final float inverseRatio = 1f - ratio;
 

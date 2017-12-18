@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/textView_beacon_name"
+        android:layout_width="337dp"
+        android:layout_height="35dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:text="XXX"
+        android:textColor="@android:color/holo_blue_light"
+        android:textSize="24sp"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:text="MAC:" />
+
+        <TextView
+            android:id="@+id/textView_friend_mac"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/textView_beacon_name"
+            android:layout_below="@+id/textView_beacon_name"
+            android:layout_weight="1"
+            android:text="100"
+            tools:layout_editor_absoluteX="277dp"
+            tools:layout_editor_absoluteY="62dp" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

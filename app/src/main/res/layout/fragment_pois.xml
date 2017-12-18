@@ -8,12 +8,13 @@
     tools:context="cuhk.cse.cmsc5736project.MainActivity">
 
     <!-- List of POIs hosted within RecyclerView -->
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/fragment_poi_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingBottom="@dimen/bottom_navigation_height"
-        android:paddingTop="24dp"/>
+        android:paddingTop="24dp" />
 
 </RelativeLayout>

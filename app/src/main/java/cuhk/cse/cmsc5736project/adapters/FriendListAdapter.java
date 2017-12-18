@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -20,7 +21,10 @@ import cuhk.cse.cmsc5736project.models.Friend;
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.ItemVH> {
 
     //  Data
-    private List<Friend> items = new ArrayList<>();
+    static public ArrayList<Friend> curFriendList= new ArrayList<>();
+    String[] nameArray = {"Friend 1", "Friend 2", "Friend 3", "Friend 4", "Friend 5", "Friend 6", "Friend 7", "Friend 8", "Friend 9", "Friend 10"};
+    String[] descArray = {"Male/Female toilet", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!"};
+
 
     private Context context;
 
@@ -31,18 +35,17 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
 
     private void populateSampleData() {
 
-        String[] nameArray = {"Friend 1", "Friend 2", "Friend 3", "Friend 4", "Friend 5", "Friend 6", "Friend 7", "Friend 8", "Friend 9", "Friend 10"};
-        String[] descArray = {"Male/Female toilet", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!"};
 
         final int SIZE = nameArray.length;
 
         for (int i = 0; i < SIZE; i++) {
             Friend dessert = new Friend(
                     nameArray[i],
-                    descArray[i]
+                    descArray[i],
+                    ""
             );
 
-            items.add(dessert);
+            curFriendList.add(dessert);
         }
     }
 
@@ -56,7 +59,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
 
     @Override
     public void onBindViewHolder(ItemVH holder, int position) {
-        Friend item = items.get(position);
+        Friend item = curFriendList.get(position);
 
         holder.txtTitle.setText(item.getName());
         holder.txtDesc.setText(item.getDescription());
@@ -64,7 +67,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
 
     @Override
     public int getItemCount() {
-        return items != null ? items.size() : 0;
+        return curFriendList != null ? curFriendList.size() : 0;
     }
 
     protected static class ItemVH extends RecyclerView.ViewHolder {
@@ -77,4 +80,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
             txtDesc = (TextView) itemView.findViewById(R.id.item_friend_desc);
         }
     }
+
+
+
+
 }

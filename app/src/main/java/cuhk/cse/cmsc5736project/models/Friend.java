@@ -10,10 +10,12 @@ public class Friend {
     private String description;
     private String nearestLocation;
     private Beacon beacon;
+    private String mac;
 
-    public Friend(String name, String description) {
+    public Friend(String name, String description, String mac) {
         this.name = name;
         this.description = description;
+        this.mac = mac;
     }
 
     public String getName() {
@@ -31,5 +33,11 @@ public class Friend {
     public void setDescription(String description) {
         this.description = description;
     }
-
+    public boolean isSame(Friend f) {
+        return mac.equals(f.mac);
+    }
+    public String getMAC()
+    {
+        return mac;
+    }
 }
