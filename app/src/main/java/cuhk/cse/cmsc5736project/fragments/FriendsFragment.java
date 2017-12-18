@@ -22,10 +22,14 @@ import cuhk.cse.cmsc5736project.adapters.FriendListAdapter;
 import cuhk.cse.cmsc5736project.models.Friend;
 import cuhk.cse.cmsc5736project.utils.Utility;
 
+import static android.app.Activity.RESULT_OK;
+
 
 public class FriendsFragment extends Fragment {
 
     public static final String TAG = FriendsFragment.class.getSimpleName();
+    public static final String INTENT_KEY_NEW_FRIEND = "new_friend";
+    public static final int REQUEST_CODE_ADD_FRIEND = 1999;
 
     // Variable for fragment coloring
     private static final String ARG_COLOR = "color";
@@ -61,7 +65,7 @@ public class FriendsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setBackgroundColor(layoutColor);
 
-        adapter = new FriendListAdapter(getContext(), false);
+        adapter = new FriendListAdapter(getContext(), getActivity(), false, null);
         recyclerView.setAdapter(adapter);
 
         // Add friend with FAB
@@ -81,7 +85,14 @@ public class FriendsFragment extends Fragment {
     }
 
     private void showAddFriendActivity() {
-        startActivity(new Intent(getContext(), AddNewFriendActivity.class));
+        startActivityForResult(new Intent(getContext(), AddNewFriendActivity.class), REQUEST_CODE_ADD_FRIEND);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == FriendsFragment.REQUEST_CODE_ADD_FRIEND && resultCode == RESULT_OK && data != null) {
+            Log.i(TAG, "Get result!" + data.getIntExtra(FriendsFragment.INTENT_KEY_NEW_FRIEND, -1));
+        }
     }
 
 }

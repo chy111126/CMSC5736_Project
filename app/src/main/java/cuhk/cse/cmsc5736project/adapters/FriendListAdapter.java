@@ -1,6 +1,9 @@
 package cuhk.cse.cmsc5736project.adapters;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cuhk.cse.cmsc5736project.R;
+import cuhk.cse.cmsc5736project.fragments.FriendsFragment;
+import cuhk.cse.cmsc5736project.interfaces.OnFriendSelectedListener;
 import cuhk.cse.cmsc5736project.models.Friend;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by TCC on 12/10/2017.
@@ -20,17 +27,23 @@ import cuhk.cse.cmsc5736project.models.Friend;
 
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.ItemVH> {
 
+    // Add new friend flag
+    private boolean isAddNewFriend = false;
+
     //  Data
-    static public ArrayList<Friend> friendList = new ArrayList<>();
+    public ArrayList<Friend> friendList = new ArrayList<>();
 
     String[] nameArray = {"Friend 1", "Friend 2", "Friend 3", "Friend 4", "Friend 5", "Friend 6", "Friend 7", "Friend 8", "Friend 9", "Friend 10"};
     String[] descArray = {"Male/Female toilet", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!"};
 
+    private Activity activity;
+    private OnFriendSelectedListener onFriendSelectedListener;
 
-    private Context context;
+    public FriendListAdapter(Context context, Activity activity, boolean isAddNewFriend, OnFriendSelectedListener onFriendSelectedListener) {
+        this.activity = activity;
+        this.isAddNewFriend = isAddNewFriend;
+        this.onFriendSelectedListener = onFriendSelectedListener;
 
-    public FriendListAdapter(Context context, boolean isAddNewFriend) {
-        this.context = context;
         if (isAddNewFriend) {
             populateSampleData();
         } else {
@@ -60,10 +73,31 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
 
     @Override
     public void onBindViewHolder(ItemVH holder, int position) {
-        Friend item = friendList.get(position);
+        final Friend item = friendList.get(position);
 
         holder.txtTitle.setText(item.getName());
         holder.txtDesc.setText(item.getDescription());
+
+        if(isAddNewFriend) {
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(onFriendSelectedListener != null) {
+                        onFriendSelectedListener.onSelect(v, item);
+                    }
+                }
+            });
+        } else {
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    if(onFriendSelectedListener != null) {
+                        onFriendSelectedListener.onSelect(view, item);
+                    }
+                    return false;
+                }
+            });
+        }
     }
 
     @Override
@@ -81,8 +115,5 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
             txtDesc = (TextView) itemView.findViewById(R.id.item_friend_desc);
         }
     }
-
-
-
 
 }

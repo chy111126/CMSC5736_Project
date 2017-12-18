@@ -30,6 +30,7 @@ import cuhk.cse.cmsc5736project.fragments.FriendsFragment;
 import cuhk.cse.cmsc5736project.fragments.MapFragment;
 import cuhk.cse.cmsc5736project.fragments.POIFragment;
 import cuhk.cse.cmsc5736project.models.RSSIModel;
+import cuhk.cse.cmsc5736project.utils.Utility;
 import cuhk.cse.cmsc5736project.views.NoSwipePager;
 
 public class MainActivity extends AppCompatActivity {
@@ -93,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         else
             return true;
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -254,12 +256,12 @@ public class MainActivity extends AppCompatActivity {
     private void tintSystemBars(int to_color_id, boolean isAnimated) {
 
         // Desired final colors of each bar.
-        final int statusBarToColor = blendColors(to_color_id, 0, 0.2f);
+        final int statusBarToColor = Utility.blendColors(to_color_id, 0, 0.2f);
         final int toolbarToColor = to_color_id;
 
         if (isAnimated) {
             // Initial colors of each system bar.
-            final int statusBarColor = blendColors(last_color, 0, 0.2f);
+            final int statusBarColor = Utility.blendColors(last_color, 0, 0.2f);
             final int toolbarColor = last_color;
 
             ValueAnimator anim = ValueAnimator.ofFloat(0, 1);
@@ -270,11 +272,11 @@ public class MainActivity extends AppCompatActivity {
                     float position = animation.getAnimatedFraction();
 
                     // Apply blended color to the status bar.
-                    int blended = blendColors(statusBarColor, statusBarToColor, position);
+                    int blended = Utility.blendColors(statusBarColor, statusBarToColor, position);
                     getWindow().setStatusBarColor(blended);
 
                     // Apply blended color to the ActionBar.
-                    blended = blendColors(toolbarColor, toolbarToColor, position);
+                    blended = Utility.blendColors(toolbarColor, toolbarToColor, position);
                     ColorDrawable background = new ColorDrawable(blended);
                     getSupportActionBar().setBackgroundDrawable(background);
                 }
@@ -288,18 +290,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private int blendColors(int from, int to, float ratio) {
-        final float inverseRatio = 1f - ratio;
-
-        final float r = Color.red(to) * ratio + Color.red(from) * inverseRatio;
-        final float g = Color.green(to) * ratio + Color.green(from) * inverseRatio;
-        final float b = Color.blue(to) * ratio + Color.blue(from) * inverseRatio;
-
-        return Color.rgb((int) r, (int) g, (int) b);
-    }
-
-
     private int fetchColor(@ColorRes int color) {
         return ContextCompat.getColor(this, color);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
