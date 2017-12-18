@@ -2,18 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_weight="1"
-    android:orientation="vertical"
-    android:paddingBottom="50dp"
-    android:paddingTop="80dp">
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/list_devices"
         android:layout_alignStart="@+id/list_devices"
         android:padding="10dp"
@@ -25,14 +22,13 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/black" />
+        android:background="#44000000" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/add_friend_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="@dimen/bottom_navigation_height"
-        android:paddingTop="24dp"/>
+        android:paddingBottom="@dimen/bottom_navigation_height"/>
 
 </LinearLayout>

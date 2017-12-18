@@ -20,6 +20,7 @@ import cuhk.cse.cmsc5736project.AddNewFriendActivity;
 import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.adapters.FriendListAdapter;
 import cuhk.cse.cmsc5736project.models.Friend;
+import cuhk.cse.cmsc5736project.utils.Utility;
 
 
 public class FriendsFragment extends Fragment {
@@ -32,7 +33,7 @@ public class FriendsFragment extends Fragment {
 
     // UI elements
     private RecyclerView recyclerView;
-    static private FriendListAdapter adapter;
+    private FriendListAdapter adapter;
 
     public FriendsFragment() {
         // Required empty public constructor
@@ -49,16 +50,18 @@ public class FriendsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        int layoutColor = Utility.getLighterColor(color);
+
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_friends, container, false);
-        rootView.setBackgroundColor(getLighterColor(color));
+        rootView.setBackgroundColor(layoutColor);
 
         // Friend list through RecyclerView
         recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_friends_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        recyclerView.setBackgroundColor(getLighterColor(color));
+        recyclerView.setBackgroundColor(layoutColor);
 
-        adapter = new FriendListAdapter(getContext());
+        adapter = new FriendListAdapter(getContext(), false);
         recyclerView.setAdapter(adapter);
 
         // Add friend with FAB
@@ -71,23 +74,14 @@ public class FriendsFragment extends Fragment {
 
         return rootView;
     }
-    static public void AddFriend(Friend friend)
+
+    public void updateFriendList()
     {
-        FriendListAdapter.curFriendList.add(friend);
         adapter.notifyDataSetChanged();
     }
 
     private void showAddFriendActivity() {
-        startActivity(new Intent(getContext(), AddFriendActivity.class));
-    }
-
-    private int getLighterColor(int color) {
-        // Lighter color = 30% of given color hex
-        return Color.argb(10,
-                Color.red(color),
-                Color.green(color),
-                Color.blue(color)
-        );
+        startActivity(new Intent(getContext(), AddNewFriendActivity.class));
     }
 
 }

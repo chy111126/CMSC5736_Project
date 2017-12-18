@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
             checkLocationPermission();
         }
 
-        RSSIModel.getInstance().updateModel(MainActivity.this);
+        //RSSIModel.getInstance().updateModel(MainActivity.this);
     }
 
     public boolean checkLocationPermission()

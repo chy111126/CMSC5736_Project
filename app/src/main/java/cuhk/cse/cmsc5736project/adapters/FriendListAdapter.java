@@ -21,31 +21,32 @@ import cuhk.cse.cmsc5736project.models.Friend;
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.ItemVH> {
 
     //  Data
-    static public ArrayList<Friend> curFriendList= new ArrayList<>();
+    static public ArrayList<Friend> friendList = new ArrayList<>();
+
     String[] nameArray = {"Friend 1", "Friend 2", "Friend 3", "Friend 4", "Friend 5", "Friend 6", "Friend 7", "Friend 8", "Friend 9", "Friend 10"};
     String[] descArray = {"Male/Female toilet", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!"};
 
 
     private Context context;
 
-    public FriendListAdapter(Context context) {
+    public FriendListAdapter(Context context, boolean isAddNewFriend) {
         this.context = context;
-        populateSampleData();
+        if (isAddNewFriend) {
+            populateSampleData();
+        } else {
+            // TODO: Replace with list of proximate friends (that equipped with the same app)
+        }
     }
 
     private void populateSampleData() {
-
-
-        final int SIZE = nameArray.length;
-
-        for (int i = 0; i < SIZE; i++) {
-            Friend dessert = new Friend(
+        // Populate sample friend list
+        for (int i = 0; i < nameArray.length; i++) {
+            Friend friend = new Friend(
                     nameArray[i],
                     descArray[i],
                     ""
             );
-
-            curFriendList.add(dessert);
+            friendList.add(friend);
         }
     }
 
@@ -59,7 +60,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
 
     @Override
     public void onBindViewHolder(ItemVH holder, int position) {
-        Friend item = curFriendList.get(position);
+        Friend item = friendList.get(position);
 
         holder.txtTitle.setText(item.getName());
         holder.txtDesc.setText(item.getDescription());
@@ -67,7 +68,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
 
     @Override
     public int getItemCount() {
-        return curFriendList != null ? curFriendList.size() : 0;
+        return friendList != null ? friendList.size() : 0;
     }
 
     protected static class ItemVH extends RecyclerView.ViewHolder {

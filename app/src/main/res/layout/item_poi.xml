@@ -38,6 +38,7 @@
                 style="@style/TextAppearance.AppCompat.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:alpha="0.87"
                 android:textColor="@android:color/black"
                 tools:text="Name" />
@@ -46,8 +47,8 @@
                 android:id="@+id/item_poi_desc"
                 style="@style/TextAppearance.AppCompat.Body1"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="4dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:alpha="0.54"
                 android:ellipsize="end"
                 android:maxLines="3"

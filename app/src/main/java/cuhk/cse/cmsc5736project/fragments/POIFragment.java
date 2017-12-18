@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.adapters.POIListAdapter;
+import cuhk.cse.cmsc5736project.utils.Utility;
 
 
 public class POIFragment extends Fragment {
@@ -40,30 +41,22 @@ public class POIFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        int layoutColor = Utility.getLighterColor(color);
+
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_pois, container, false);
-        rootView.setBackgroundColor(getLighterColor(color));
+        rootView.setBackgroundColor(layoutColor);
 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_poi_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        recyclerView.setBackgroundColor(getLighterColor(color));
+        recyclerView.setBackgroundColor(layoutColor);
 
         POIListAdapter adapter = new POIListAdapter(getContext());
         recyclerView.setAdapter(adapter);
 
-
         Log.i(TAG, "onCreateView");
 
         return rootView;
-    }
-
-    private int getLighterColor(int color) {
-        // Lighter color = 30% of given color hex
-        return Color.argb(10,
-                Color.red(color),
-                Color.green(color),
-                Color.blue(color)
-        );
     }
 
 }

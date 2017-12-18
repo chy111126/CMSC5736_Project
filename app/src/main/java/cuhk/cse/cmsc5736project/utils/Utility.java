@@ -1,5 +1,7 @@
 package cuhk.cse.cmsc5736project.utils;
 
+import android.graphics.Color;
+
 /**
  * Created by alexchung on 16/12/2017.
  */
@@ -24,6 +26,15 @@ public class Utility {
             hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
         return new String(hexChars);
+    }
+
+    public static int getLighterColor(int color) {
+        // Lighter color = 10% of given color hex
+        return Color.argb(10,
+                Color.red(color),
+                Color.green(color),
+                Color.blue(color)
+        );
     }
 
 }

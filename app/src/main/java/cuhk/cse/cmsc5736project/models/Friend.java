@@ -36,6 +36,7 @@ public class Friend {
     public void setDescription(String description) {
         this.description = description;
     }
+
     public boolean isSame(Friend f) {
         return mac.equals(f.mac);
     }

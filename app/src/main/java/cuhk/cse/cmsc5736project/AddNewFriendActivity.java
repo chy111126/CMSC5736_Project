@@ -22,17 +22,17 @@ public class AddNewFriendActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Add new friend");
-        setContentView(R.layout.activity_add_friend);
+        setContentView(R.layout.activity_add_new_friend);
         
         setupFriendList();
     }
 
     private void setupFriendList() {
         // Friend list through RecyclerView
-        //recyclerView = (RecyclerView) findViewById(R.id.add_friend_recycler);
+        recyclerView = (RecyclerView) findViewById(R.id.add_friend_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        FriendListAdapter adapter = new FriendListAdapter(this);
+        FriendListAdapter adapter = new FriendListAdapter(this, true);
         recyclerView.setAdapter(adapter);
     }
 

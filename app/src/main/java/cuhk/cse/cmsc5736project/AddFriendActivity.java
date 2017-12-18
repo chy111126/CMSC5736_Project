@@ -21,7 +21,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import cuhk.cse.cmsc5736project.adapters.FriendListAdapter;
 import cuhk.cse.cmsc5736project.fragments.FriendsFragment;
 import cuhk.cse.cmsc5736project.models.Friend;
 
@@ -36,7 +35,7 @@ public class AddFriendActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_friend);
+        setContentView(R.layout.activity_add_new_friend);
 
         // init BLE
         btManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
@@ -54,7 +53,7 @@ public class AddFriendActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                FriendsFragment.AddFriend(scanDevices.get(position));
+                //FriendsFragment.AddFriend(scanDevices.get(position));
                 finish();
             }
 
