@@ -142,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     private void selectPage(int position) {
         // Change to page with index=position
         viewPager.setCurrentItem(position);
@@ -289,39 +288,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-/*
-    public boolean showPasswordDialog()
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter Password");
-
-// Set up the input
-        final EditText input = new EditText(this);
-        isCorrect = false;
-// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(input);
-
-// Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if(myPassword.equals(input.getText().toString()))
-                {
-                    isCorrect = true;
-                }
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        builder.show();
-        return isCorrect;
-    }
-*/
     private int blendColors(int from, int to, float ratio) {
         final float inverseRatio = 1f - ratio;
 

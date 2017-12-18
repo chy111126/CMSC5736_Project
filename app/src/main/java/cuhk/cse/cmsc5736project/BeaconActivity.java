@@ -97,7 +97,7 @@ public class BeaconActivity extends AppCompatActivity {
         @Override
         public View getView(int i, View view, ViewGroup viewGroup)
         {
-            view =getLayoutInflater().inflate(R.layout.beacon_list_item,null);
+            view = getLayoutInflater().inflate(R.layout.beacon_list_item,null);
             TextView textView_id =view.findViewById(R.id.textView_beacon_name);
             TextView textView_major=view.findViewById(R.id.textView_beacon_major);
             TextView textView_minor=view.findViewById(R.id.textView_beacon_minor);

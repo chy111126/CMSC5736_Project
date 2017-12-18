@@ -21,8 +21,8 @@ import cuhk.cse.cmsc5736project.MainActivity;
 
 public class RSSIModel implements AsyncResponse {
 
-    static public List<Beacon> beaconList =new ArrayList<Beacon>();
-    static private RSSIModel instance;
+    private static List<Beacon> beaconList = new ArrayList<Beacon>();
+    private static RSSIModel instance;
 
 
     public static RSSIModel getInstance() {
