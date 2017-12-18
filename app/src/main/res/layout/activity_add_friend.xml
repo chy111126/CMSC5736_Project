@@ -22,8 +22,13 @@
         tools:layout_editor_absoluteX="6dp"
         tools:layout_editor_absoluteY="6dp" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/add_friend_recycler"
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/black" />
+
+    <ListView
+        android:id="@+id/list_devices"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
