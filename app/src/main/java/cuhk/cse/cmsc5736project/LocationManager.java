@@ -12,8 +12,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
+import cuhk.cse.cmsc5736project.interfaces.OnFriendChangeListener;
 import cuhk.cse.cmsc5736project.interfaces.OnFriendResultListener;
+import cuhk.cse.cmsc5736project.interfaces.OnFriendSelectedListener;
 import cuhk.cse.cmsc5736project.interfaces.OnPOIResultListener;
 import cuhk.cse.cmsc5736project.models.Beacon;
 import cuhk.cse.cmsc5736project.models.Friend;
@@ -33,6 +37,7 @@ public class LocationManager {
     // ----- Friends -----
     private static HashMap<String, Friend> friendHM = new HashMap<>();
     private OnFriendResultListener friendListener = null;
+    private OnFriendChangeListener friendChangedListener = null;
 
     // ----- Singleton class -----
     private static LocationManager instance;
@@ -81,37 +86,88 @@ public class LocationManager {
         task.execute(GET_ALL_BEACON_DATA_URL);
     }
 
+    public void updatePOIDefintion() {
+
+    }
+
+    public void setOnPOIResultListener(OnPOIResultListener listener) {
+        // Caller method can update through the listener when this manager class sent updates
+        // this.poiListener.OnRetrieved method would be invoked after service successfully acquired new location information
+        this.poiListener = listener;
+    }
+
+    // Friend methods
+    public void getFriendDefinitions(Context context, final OnPOIResultListener initListener) {
+        // TODO: Get friend definitions from server, and materialize for client upgrades to each approximation
+        // For add new friend activity to scan all nearby devices
+        // This is not related to the instance's friendHM, which stores user bookmarked Friends
+    }
+
+    public void updateFriendDefintion() {
+
+    }
+
+    public void getCurrentUserFriendList(Context context, final OnFriendResultListener initListener) {
+        // Get list of user-stored friends for caller method
+        // When this class updates the friend objects, the UI would be updated as well (through setOnFriendResultListener)
+        List<Friend> friendList = new ArrayList<>(friendHM.values());
+        initListener.onRetrieved(friendList);
+    }
+
+    public void setOnFriendResultListener(OnFriendResultListener listener) {
+        // Caller method can update through the listener when this manager class sent updates
+        // this.friendListener.OnRetrieved method would be invoked after service successfully acquired new location information
+        this.friendListener = listener;
+    }
+
+    public void setOnFriendChangeListener(OnFriendChangeListener listener) {
+        this.friendChangedListener = listener;
+    }
+
+    public void putFriend(Friend newFriend) {
+        // Put a new friend to location manager service for tracking updates
+        friendHM.put(newFriend.getMAC(), newFriend);
+
+        if (this.friendChangedListener != null) {
+            this.friendChangedListener.onAdded(newFriend);
+        }
+    }
+
+
+    // ----- Simulated methods -----
+
     public void getSimulatedPOIDefinitions(Context context, final OnPOIResultListener initListener) {
+        poiHM = new HashMap<>();
         // Get POI definitions from server, and materialize for client upgrades to each approximation
         // ~= RSSIModel.updateModel method
         String poiResult =  "{\n" +
-                            "  \"beacons\": [\n" +
-                            "    {\n" +
-                            "      \"uuid_major_minor\": \"E3A513C7-EAB1-4988-AA99-C2C5145437E2_1_5891\",\n" +
-                            "      \"uuid\": \"E3A513C7-EAB1-4988-AA99-C2C5145437E2\",\n" +
-                            "      \"major\": \"1\",\n" +
-                            "      \"minor\": \"5891\",\n" +
-                            "      \"position_x\": \"5\",\n" +
-                            "      \"position_y\": \"60\",\n" +
-                            "      \"rssi_half_m_signal\": \"-60\",\n" +
-                            "      \"rssi_one_m_signal\": \"-79\",\n" +
-                            "      \"rssi_two_m_signal\": \"-89\",\n" +
-                            "      \"rssi_four_m_signal\": \"-93\"\n" +
-                            "    },\n" +
-                            "    {\n" +
-                            "      \"uuid_major_minor\": \"B5B182C7-EAB1-4988-AA99-B5C1517008D9_1_63496\",\n" +
-                            "      \"uuid\": \"B5B182C7-EAB1-4988-AA99-B5C1517008D9\",\n" +
-                            "      \"major\": \"1\",\n" +
-                            "      \"minor\": \"63496\",\n" +
-                            "      \"position_x\": \"85\",\n" +
-                            "      \"position_y\": \"60\",\n" +
-                            "      \"rssi_half_m_signal\": \"-68\",\n" +
-                            "      \"rssi_one_m_signal\": \"-69\",\n" +
-                            "      \"rssi_two_m_signal\": \"-66\",\n" +
-                            "      \"rssi_four_m_signal\": \"-66\"\n" +
-                            "    }\n" +
-                            "  ]\n" +
-                            "}";
+                "  \"beacons\": [\n" +
+                "    {\n" +
+                "      \"uuid_major_minor\": \"E3A513C7-EAB1-4988-AA99-C2C5145437E2_1_5891\",\n" +
+                "      \"uuid\": \"E3A513C7-EAB1-4988-AA99-C2C5145437E2\",\n" +
+                "      \"major\": \"1\",\n" +
+                "      \"minor\": \"5891\",\n" +
+                "      \"position_x\": \"5\",\n" +
+                "      \"position_y\": \"60\",\n" +
+                "      \"rssi_half_m_signal\": \"-60\",\n" +
+                "      \"rssi_one_m_signal\": \"-79\",\n" +
+                "      \"rssi_two_m_signal\": \"-89\",\n" +
+                "      \"rssi_four_m_signal\": \"-93\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"uuid_major_minor\": \"B5B182C7-EAB1-4988-AA99-B5C1517008D9_1_63496\",\n" +
+                "      \"uuid\": \"B5B182C7-EAB1-4988-AA99-B5C1517008D9\",\n" +
+                "      \"major\": \"1\",\n" +
+                "      \"minor\": \"63496\",\n" +
+                "      \"position_x\": \"85\",\n" +
+                "      \"position_y\": \"60\",\n" +
+                "      \"rssi_half_m_signal\": \"-68\",\n" +
+                "      \"rssi_one_m_signal\": \"-69\",\n" +
+                "      \"rssi_two_m_signal\": \"-66\",\n" +
+                "      \"rssi_four_m_signal\": \"-66\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
         try {
             JSONObject resultJson = new JSONObject(poiResult);
             JSONArray beaconsArr = resultJson.getJSONArray("beacons");
@@ -133,22 +189,35 @@ public class LocationManager {
         initListener.onRetrieved(poiList);
     }
 
-    public void setOnPOIResultListener(OnPOIResultListener listener) {
-        // Caller method can update through the listener when this manager class sent updates
-        // this.poiListener.OnRetrieved method would be invoked after service successfully acquired new location information
-        this.poiListener = listener;
+    public void getSimulatedFriendDefinitions(Context context, final OnFriendResultListener initListener) {
+        // For add new friend activity to scan all nearby devices
+        // This is not related to the instance's friendHM, which stores user bookmarked Friends
+        HashMap<String, Friend> friendHM = new HashMap<>();
+        for (int i=0; i < 10; i++) {
+            Beacon beacon = new Beacon();
+            beacon.setUUID(UUID.randomUUID().toString());
+            beacon.setMajor(1);
+            beacon.setMinor(123);
+            beacon.setRSSI(-i);
+
+            String macAddr = Utility.randomMACAddress();
+
+            Friend friend = new Friend("Friend " + i, macAddr, macAddr);
+            friend.setBeacon(beacon);
+
+            friendHM.put(macAddr, friend);
+        }
+        List<Friend> friendList = new ArrayList<>(friendHM.values());
+        initListener.onRetrieved(friendList);
     }
 
-    // Friend methods
-    public void getFriendDefinitions() {
-        // TODO: Get friend definitions from server, and materialize for client upgrades to each approximation
+    public void updateSimulatedFriendPositions() {
+        for(Friend friend : friendHM.values()) {
+            friend.getBeacon().setRSSI( -1 + -1 * new Random().nextInt(10));
+        }
+        if (this.friendChangedListener !=  null) {
+            this.friendChangedListener.onChanged();
+        }
     }
-
-    public void setOnFriendResultListener(OnFriendResultListener listener) {
-        // Caller method can update through the listener when this manager class sent updates
-        // this.friendListener.OnRetrieved method would be invoked after service successfully acquired new location information
-        this.friendListener = listener;
-    }
-
 }
 

@@ -12,10 +12,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import cuhk.cse.cmsc5736project.LocationManager;
 import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.fragments.FriendsFragment;
+import cuhk.cse.cmsc5736project.interfaces.OnFriendChangeListener;
+import cuhk.cse.cmsc5736project.interfaces.OnFriendResultListener;
 import cuhk.cse.cmsc5736project.interfaces.OnFriendSelectedListener;
 import cuhk.cse.cmsc5736project.models.Friend;
 
@@ -31,7 +36,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
     private boolean isAddNewFriend = false;
 
     //  Data
-    public ArrayList<Friend> friendList = new ArrayList<>();
+    private List<Friend> friendList = new ArrayList<>();
 
     String[] nameArray = {"Friend 1", "Friend 2", "Friend 3", "Friend 4", "Friend 5", "Friend 6", "Friend 7", "Friend 8", "Friend 9", "Friend 10"};
     String[] descArray = {"Male/Female toilet", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!"};
@@ -45,10 +50,59 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
         this.onFriendSelectedListener = onFriendSelectedListener;
 
         if (isAddNewFriend) {
-            populateSampleData();
+            //populateSampleData();
+            LocationManager.getInstance().getSimulatedFriendDefinitions(context, new OnFriendResultListener() {
+                @Override
+                public void onRetrieved(List<Friend> friendList) {
+                    FriendListAdapter.this.friendList = friendList;
+                    FriendListAdapter.this.notifyDataSetChanged();
+                }
+            });
         } else {
-            // TODO: Replace with list of proximate friends (that equipped with the same app)
+            LocationManager.getInstance().getCurrentUserFriendList(context, new OnFriendResultListener() {
+                @Override
+                public void onRetrieved(List<Friend> friendList) {
+                    FriendListAdapter.this.friendList = friendList;
+                    FriendListAdapter.this.notifyDataSetChanged();
+                }
+            });
+
+            // For the listener, it synchronize operation with that from LocationManager
+            LocationManager.getInstance().setOnFriendChangeListener(new OnFriendChangeListener() {
+                @Override
+                public void onAdded(Friend item) {
+                    friendList.add(item);
+                    sortViewList();
+                    FriendListAdapter.this.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onDeleted(Friend item) {
+                    friendList.remove(item);
+                    sortViewList();
+                    FriendListAdapter.this.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onChanged() {
+                    sortViewList();
+                    FriendListAdapter.this.notifyDataSetChanged();
+                }
+            });
         }
+    }
+
+    private void sortViewList() {
+        Collections.sort(friendList, new Comparator<Friend>() {
+            @Override
+            public int compare(Friend f1, Friend f2) {
+                if(f1.getBeacon().getRSSI() > f2.getBeacon().getRSSI()) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }
+        });
     }
 
     private void populateSampleData() {
@@ -75,7 +129,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
     public void onBindViewHolder(ItemVH holder, int position) {
         final Friend item = friendList.get(position);
 
-        holder.txtTitle.setText(item.getName());
+        holder.txtTitle.setText(item.getName() + " : RSSI= " + item.getBeacon().getRSSI());
         holder.txtDesc.setText(item.getDescription());
 
         if(isAddNewFriend) {

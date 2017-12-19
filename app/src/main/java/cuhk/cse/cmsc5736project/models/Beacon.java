@@ -1,6 +1,8 @@
 package cuhk.cse.cmsc5736project.models;
 
-public class Beacon
+import java.io.Serializable;
+
+public class Beacon implements Serializable
 {
     private String uuid;
     private int major;

@@ -189,6 +189,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onTabSelected(int position, boolean wasSelected) {
 
+                // TEST METHOD !!! WILL REMOVE LATER
+                LocationManager.getInstance().updateSimulatedFriendPositions();
+
                 if (!wasSelected)
                     selectPage(position);
 

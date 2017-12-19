@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import cuhk.cse.cmsc5736project.AddFriendActivity;
 import cuhk.cse.cmsc5736project.AddNewFriendActivity;
+import cuhk.cse.cmsc5736project.LocationManager;
 import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.adapters.FriendListAdapter;
 import cuhk.cse.cmsc5736project.models.Friend;
@@ -91,7 +92,8 @@ public class FriendsFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FriendsFragment.REQUEST_CODE_ADD_FRIEND && resultCode == RESULT_OK && data != null) {
-            Log.i(TAG, "Get result!" + data.getIntExtra(FriendsFragment.INTENT_KEY_NEW_FRIEND, -1));
+            Friend newFriend = (Friend) data.getSerializableExtra(FriendsFragment.INTENT_KEY_NEW_FRIEND);
+            LocationManager.getInstance().putFriend(newFriend);
         }
     }
 
