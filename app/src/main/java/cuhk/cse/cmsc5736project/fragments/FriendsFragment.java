@@ -20,6 +20,7 @@ import cuhk.cse.cmsc5736project.AddNewFriendActivity;
 import cuhk.cse.cmsc5736project.LocationManager;
 import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.adapters.FriendListAdapter;
+import cuhk.cse.cmsc5736project.interfaces.OnFriendSelectedListener;
 import cuhk.cse.cmsc5736project.models.Friend;
 import cuhk.cse.cmsc5736project.utils.Utility;
 
@@ -66,7 +67,13 @@ public class FriendsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setBackgroundColor(layoutColor);
 
-        adapter = new FriendListAdapter(getContext(), getActivity(), false, null);
+        adapter = new FriendListAdapter(getContext(), getActivity(), false, new OnFriendSelectedListener() {
+            @Override
+            public void onSelect(View v, Friend item) {
+                // TODO: Add confirm modal
+                LocationManager.getInstance().removeFriend(item);
+            }
+        });
         recyclerView.setAdapter(adapter);
 
         // Add friend with FAB

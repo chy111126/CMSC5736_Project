@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import cuhk.cse.cmsc5736project.interfaces.OnFriendChangeListener;
+import cuhk.cse.cmsc5736project.interfaces.OnFriendListChangeListener;
 import cuhk.cse.cmsc5736project.interfaces.OnFriendResultListener;
-import cuhk.cse.cmsc5736project.interfaces.OnFriendSelectedListener;
+import cuhk.cse.cmsc5736project.interfaces.OnPOIListChangeListener;
 import cuhk.cse.cmsc5736project.interfaces.OnPOIResultListener;
 import cuhk.cse.cmsc5736project.models.Beacon;
 import cuhk.cse.cmsc5736project.models.Friend;
@@ -32,12 +32,11 @@ public class LocationManager {
 
     // ----- POI -----
     private static HashMap<String, POI> poiHM = new HashMap<>();
-    private OnPOIResultListener poiListener = null;
+    private OnPOIListChangeListener poiChangedListener = null;
 
     // ----- Friends -----
     private static HashMap<String, Friend> friendHM = new HashMap<>();
-    private OnFriendResultListener friendListener = null;
-    private OnFriendChangeListener friendChangedListener = null;
+    private OnFriendListChangeListener friendChangedListener = null;
 
     // ----- Singleton class -----
     private static LocationManager instance;
@@ -69,7 +68,11 @@ public class LocationManager {
 
     // TODO: End
 
-    // POI methods
+
+
+
+
+    // ----- POI methods -----
     public void getPOIDefinitions(Context context, final OnPOIResultListener initListener) {
         // Get POI definitions from server, and materialize for client upgrades to each approximation
         // ~= RSSIModel.updateModel method
@@ -87,24 +90,37 @@ public class LocationManager {
     }
 
     public void updatePOIDefintion() {
+        // TODO: Do update POI beacon info here!
 
+        // Invoke callback method
+        if (this.poiChangedListener !=  null) {
+            this.poiChangedListener.onChanged();
+        }
     }
 
-    public void setOnPOIResultListener(OnPOIResultListener listener) {
+    public void setOnPOIChangedListener(OnPOIListChangeListener listener) {
         // Caller method can update through the listener when this manager class sent updates
         // this.poiListener.OnRetrieved method would be invoked after service successfully acquired new location information
-        this.poiListener = listener;
+        this.poiChangedListener = listener;
     }
 
-    // Friend methods
+
+
+
+    // ----- Friend methods -----
     public void getFriendDefinitions(Context context, final OnPOIResultListener initListener) {
-        // TODO: Get friend definitions from server, and materialize for client upgrades to each approximation
+        // TODO: Get friend definitions from server/scanning nearby devices
         // For add new friend activity to scan all nearby devices
         // This is not related to the instance's friendHM, which stores user bookmarked Friends
     }
 
     public void updateFriendDefintion() {
+        // TODO: Do update friend beacon info here!
 
+        // Invoke callback method
+        if (this.friendChangedListener !=  null) {
+            this.friendChangedListener.onChanged();
+        }
     }
 
     public void getCurrentUserFriendList(Context context, final OnFriendResultListener initListener) {
@@ -114,13 +130,11 @@ public class LocationManager {
         initListener.onRetrieved(friendList);
     }
 
-    public void setOnFriendResultListener(OnFriendResultListener listener) {
-        // Caller method can update through the listener when this manager class sent updates
-        // this.friendListener.OnRetrieved method would be invoked after service successfully acquired new location information
-        this.friendListener = listener;
-    }
-
-    public void setOnFriendChangeListener(OnFriendChangeListener listener) {
+    public void setOnFriendListChangeListener(OnFriendListChangeListener listener) {
+        // On friend list changed
+        // onAdd: After adding a new friend
+        // onDelete: After deleting a friend
+        // onChange: After getting updated friend info (e.g. beacon information)
         this.friendChangedListener = listener;
     }
 
@@ -128,14 +142,26 @@ public class LocationManager {
         // Put a new friend to location manager service for tracking updates
         friendHM.put(newFriend.getMAC(), newFriend);
 
-        if (this.friendChangedListener != null) {
+        // Invoke callback method
+        if (this.friendChangedListener !=  null) {
             this.friendChangedListener.onAdded(newFriend);
         }
     }
 
+    public void removeFriend(Friend toRemoveFriend) {
+        // Remove a friend from location manager service
+        friendHM.remove(toRemoveFriend.getMAC());
+
+        // Invoke callback method
+        if (this.friendChangedListener != null) {
+            this.friendChangedListener.onDeleted(toRemoveFriend);
+        }
+    }
+
+
+
 
     // ----- Simulated methods -----
-
     public void getSimulatedPOIDefinitions(Context context, final OnPOIResultListener initListener) {
         poiHM = new HashMap<>();
         // Get POI definitions from server, and materialize for client upgrades to each approximation
@@ -212,9 +238,14 @@ public class LocationManager {
     }
 
     public void updateSimulatedFriendPositions() {
+        // Simulated method for getting updated friend position
+
+        // Update positions
         for(Friend friend : friendHM.values()) {
             friend.getBeacon().setRSSI( -1 + -1 * new Random().nextInt(10));
         }
+
+        // Invoke callback method
         if (this.friendChangedListener !=  null) {
             this.friendChangedListener.onChanged();
         }

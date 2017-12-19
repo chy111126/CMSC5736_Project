@@ -1,14 +1,11 @@
 package cuhk.cse.cmsc5736project.adapters;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -18,13 +15,10 @@ import java.util.List;
 
 import cuhk.cse.cmsc5736project.LocationManager;
 import cuhk.cse.cmsc5736project.R;
-import cuhk.cse.cmsc5736project.fragments.FriendsFragment;
-import cuhk.cse.cmsc5736project.interfaces.OnFriendChangeListener;
+import cuhk.cse.cmsc5736project.interfaces.OnFriendListChangeListener;
 import cuhk.cse.cmsc5736project.interfaces.OnFriendResultListener;
 import cuhk.cse.cmsc5736project.interfaces.OnFriendSelectedListener;
 import cuhk.cse.cmsc5736project.models.Friend;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by TCC on 12/10/2017.
@@ -68,7 +62,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
             });
 
             // For the listener, it synchronize operation with that from LocationManager
-            LocationManager.getInstance().setOnFriendChangeListener(new OnFriendChangeListener() {
+            LocationManager.getInstance().setOnFriendListChangeListener(new OnFriendListChangeListener() {
                 @Override
                 public void onAdded(Friend item) {
                     friendList.add(item);
