@@ -43,9 +43,11 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
         this.isAddNewFriend = isAddNewFriend;
         this.onFriendSelectedListener = onFriendSelectedListener;
 
+
+
         if (isAddNewFriend) {
             //populateSampleData();
-            LocationManager.getInstance().getSimulatedFriendDefinitions(context, new OnFriendResultListener() {
+            LocationManager.getInstance().getFriendDefinitions(context, new OnFriendResultListener() {
                 @Override
                 public void onRetrieved(List<Friend> friendList) {
                     FriendListAdapter.this.friendList = friendList;
@@ -104,7 +106,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
         for (int i = 0; i < nameArray.length; i++) {
             Friend friend = new Friend(
                     nameArray[i],
-                    descArray[i],
                     ""
             );
             friendList.add(friend);
@@ -123,19 +124,25 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
     public void onBindViewHolder(ItemVH holder, int position) {
         final Friend item = friendList.get(position);
 
-        holder.txtTitle.setText(item.getName() + " : RSSI= " + item.getBeacon().getRSSI());
+        //holder.txtTitle.setText(item.getName() + " : RSSI= " + item.getBeacon().getRSSI());
         holder.txtDesc.setText(item.getDescription());
 
         if(isAddNewFriend) {
+            holder.txtTitle.setText(item.getName());
+            holder.txtDesc.setText(item.getMAC());
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(onFriendSelectedListener != null) {
                         onFriendSelectedListener.onSelect(v, item);
                     }
+
                 }
             });
         } else {
+            holder.txtTitle.setText(item.getName());
+            holder.txtDesc.setText(item.getMAC());
+
             holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {

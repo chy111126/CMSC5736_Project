@@ -102,7 +102,7 @@ public class AddFriendActivity extends AppCompatActivity {
                     isVaild = true;
                 }
                 if(isVaild) {
-                    Friend friend = new Friend(device.getName(),"", device.toString());
+                    Friend friend = new Friend(device.toString(), device.getName());
 
                     boolean isUpdated = false;
                     for (Friend f : scanDevices) {

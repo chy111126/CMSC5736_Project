@@ -8,6 +8,8 @@ import org.json.JSONObject;
 import java.util.Random;
 
 import cuhk.cse.cmsc5736project.models.Beacon;
+import cuhk.cse.cmsc5736project.models.Friend;
+import cuhk.cse.cmsc5736project.models.POI;
 
 /**
  * Created by alexchung on 16/12/2017.
@@ -72,6 +74,35 @@ public class Utility {
         }
     }
 
+    public static Friend creatFriendFromJsonObject(JSONObject jsonObj) {
+        try {
+            String mac = jsonObj.getString("mac");
+            String name = jsonObj.getString("name");
+            Friend friend = new Friend(mac,name);
+            return friend;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public static POI createPOIFromJsonObject(JSONObject jsonObj) {
+        try {
+            String id =jsonObj.getString("id");
+            String name =jsonObj.getString("name");
+            String description =jsonObj.getString("description");
+
+            POI poi = new POI(id,name,description);
+            Beacon beacon = new Beacon();
+            beacon.setUUID(jsonObj.getString("uuid"));
+            beacon.setMajor(jsonObj.getInt("major"));
+            beacon.setMinor(jsonObj.getInt("minor"));
+            poi.setBeacon(beacon);
+            return poi;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     public static String randomMACAddress(){
         Random rand = new Random();
         byte[] macAddr = new byte[6];
