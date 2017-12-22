@@ -1,5 +1,7 @@
 package cuhk.cse.cmsc5736project.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -71,7 +73,7 @@ public class FriendsFragment extends Fragment {
             @Override
             public void onSelect(View v, Friend item) {
                 // TODO: Add confirm modal
-                LocationManager.getInstance().removeFriend(item);
+                showConfirmRemoveFriendDialog(item);
             }
         });
         recyclerView.setAdapter(adapter);
@@ -94,6 +96,26 @@ public class FriendsFragment extends Fragment {
 
     private void showAddFriendActivity() {
         startActivityForResult(new Intent(getContext(), AddNewFriendActivity.class), REQUEST_CODE_ADD_FRIEND);
+    }
+
+    public void showConfirmRemoveFriendDialog(final Friend item) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this.getContext());
+        alert.setTitle("Remove selected friend?");
+
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                //Your action here
+                LocationManager.getInstance().removeFriend(item);
+            }
+        });
+
+        alert.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                });
+
+        alert.show();
     }
 
     @Override

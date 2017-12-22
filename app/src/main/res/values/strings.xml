@@ -4,4 +4,6 @@
     <string name="tab_1">Map</string>
     <string name="tab_2">POIs</string>
     <string name="tab_3">Friends</string>
+
+    <string name="settings_key_device_id">Device ID</string>
 </resources>
