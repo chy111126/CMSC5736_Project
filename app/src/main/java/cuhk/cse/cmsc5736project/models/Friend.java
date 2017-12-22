@@ -10,11 +10,11 @@ import java.util.Date;
 public class Friend implements Serializable {
 
     private String name;
-    private String description;
-    private Date lastUpdatedDate;
-    private String nearestLocation;
-    private Beacon beacon;
     private String mac;
+    private String description;
+    private Beacon beacon;
+    private POI nearestLocation;
+    private Date lastUpdatedDate;
 
     public Friend(String mac,  String name) {
         this.mac = mac;

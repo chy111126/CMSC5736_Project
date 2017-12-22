@@ -7,9 +7,11 @@ package cuhk.cse.cmsc5736project.models;
 
 public class POI {
 
+    // Metadata
     private String id;
     private String name;
     private String description;
+    private boolean isBookmarked;
     private Beacon beacon;
 
     public POI(String id, String name, String description) {
@@ -21,6 +23,7 @@ public class POI {
     public String getID() {
         return id;
     }
+
     public String getName() {
         return name;
     }
@@ -28,6 +31,11 @@ public class POI {
     public void setName(String name) {
         this.name = name;
     }
+
+    public Beacon getBeacon() {
+        return this.beacon;
+    }
+
     public void setBeacon(Beacon beacon) {
         this.beacon = beacon;
     }
@@ -38,5 +46,13 @@ public class POI {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isBookmarked() {
+        return isBookmarked;
+    }
+
+    public void setBookmarked(boolean bookmarked) {
+        isBookmarked = bookmarked;
     }
 }
