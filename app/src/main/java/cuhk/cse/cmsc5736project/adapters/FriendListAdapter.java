@@ -32,9 +32,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
     //  Data
     private List<Friend> friendList = new ArrayList<>();
 
-    String[] nameArray = {"Friend 1", "Friend 2", "Friend 3", "Friend 4", "Friend 5", "Friend 6", "Friend 7", "Friend 8", "Friend 9", "Friend 10"};
-    String[] descArray = {"Male/Female toilet", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!"};
-
     private Activity activity;
     private OnFriendSelectedListener onFriendSelectedListener;
 
@@ -101,23 +98,39 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
         });
     }
 
-    private void populateSampleData() {
-        // Populate sample friend list
-        for (int i = 0; i < nameArray.length; i++) {
-            Friend friend = new Friend(
-                    nameArray[i],
-                    ""
-            );
-            friendList.add(friend);
-        }
-    }
-
     @Override
     public ItemVH onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_friend, parent, false);
+        final ItemVH vh = new ItemVH(v);
 
-        return new ItemVH(v);
+        // For event listener, it should be set when list item view is populated, rather than when binding with new list items
+        // ... as it is "recycling" already populated view, thus this avoids repeated setting event listeners
+        if(isAddNewFriend) {
+            vh.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Friend item = friendList.get(vh.getAdapterPosition());
+                    if(onFriendSelectedListener != null) {
+                        onFriendSelectedListener.onSelect(v, item);
+                    }
+
+                }
+            });
+        } else {
+            vh.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    Friend item = friendList.get(vh.getAdapterPosition());
+                    if(onFriendSelectedListener != null) {
+                        onFriendSelectedListener.onSelect(view, item);
+                    }
+                    return false;
+                }
+            });
+        }
+
+        return vh;
     }
 
     @Override
@@ -127,32 +140,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
         //holder.txtTitle.setText(item.getName() + " : RSSI= " + item.getBeacon().getRSSI());
         holder.txtDesc.setText(item.getDescription());
 
-        if(isAddNewFriend) {
-            holder.txtTitle.setText(item.getName());
-            holder.txtDesc.setText(item.getMAC());
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(onFriendSelectedListener != null) {
-                        onFriendSelectedListener.onSelect(v, item);
-                    }
-
-                }
-            });
-        } else {
-            holder.txtTitle.setText(item.getName());
-            holder.txtDesc.setText(item.getMAC());
-
-            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    if(onFriendSelectedListener != null) {
-                        onFriendSelectedListener.onSelect(view, item);
-                    }
-                    return false;
-                }
-            });
-        }
+        holder.txtTitle.setText(item.getName());
+        holder.txtDesc.setText(item.getMAC());
     }
 
     @Override

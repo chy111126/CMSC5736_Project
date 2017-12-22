@@ -14,6 +14,7 @@ import android.graphics.PointF;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.kosalgeek.genasync12.AsyncResponse;
 import com.kosalgeek.genasync12.PostResponseAsyncTask;
@@ -68,21 +69,21 @@ public class LocationManager {
     private static String GET_ALL_FRIEND_DATA_URL = ROOT_URL + "/get_all_user_friends.php";
     private static String GET_ALL_NOT_FRIEND_DATA_URL = ROOT_URL + "/get_all_user_not_friend.php";
 
-
     private static String USER_ADD_FRIEND_URL = ROOT_URL + "/user_add_friend.php";
     private static String USER_REMOVE_FRIEND_URL = ROOT_URL + "/user_remove_friend.php";
 
     private static String UPDATE_USER_DATA_URL = ROOT_URL + "/update_user_data.php";
 
+    // Current device variables
     public static PointF userPos = new PointF(0, 0);
     public static String userName;
-    public static String userMAC;
+    public static String userMAC = "Not-init-BLE-yet";
 
+    // BLE service and states
     private BluetoothManager btManager;
     private BluetoothAdapter btAdapter;
     private BluetoothLeScanner btLeScanne;
     private boolean isScanning = false;
-
     private Handler scanHandler = new Handler();
 
     // Constructor
@@ -93,20 +94,33 @@ public class LocationManager {
         return instance;
     }
 
+    public String getUserMAC(Context context) {
+        return android.provider.Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
+    }
+
     // LocationManager service
     // The caller class (i.e. MainActivity, etc.) should be able to start/stop service as wished.
-
     public void startService(Context context) {
-        // TODO: startService methods
-
-        // init BLE
+        // init BLE; and check if bluetooth capability is enabled
         btManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+        if(btManager == null) {
+            Toast.makeText(context, "This device does not support Bluetooth!", Toast.LENGTH_SHORT).show();
+            return;
+        }
         btAdapter = btManager.getAdapter();
+        if(btAdapter == null) {
+            Toast.makeText(context, "This device does not support Bluetooth!", Toast.LENGTH_SHORT).show();
+            return;
+        }
         btLeScanne = btAdapter.getBluetoothLeScanner();
+        if(btLeScanne == null) {
+            Toast.makeText(context, "This device does not support Bluetooth!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         //set default user data
         userName = BluetoothAdapter.getDefaultAdapter().getName();
-        userMAC = android.provider.Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
+        userMAC = this.getUserMAC(context);
 
         // init/update user server data
         updateUserData(context);
@@ -209,7 +223,6 @@ public class LocationManager {
         // For add new friend activity to scan all nearby devices
         // This is not related to the instance's friendHM, which stores user bookmarked Friends
         HashMap postData = new HashMap();
-        userMAC = android.provider.Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
         postData.put("mac", userMAC);
         PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
             @Override
@@ -248,8 +261,7 @@ public class LocationManager {
         // Get list of user-stored friends for caller method
         // When this class updates the friend objects, the UI would be updated as well (through setOnFriendResultListener)
         HashMap postData = new HashMap();
-        String macAddress = android.provider.Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
-        postData.put("mac", macAddress);
+        postData.put("mac", userMAC);
         PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
             @Override
             public void processFinish(String s) {
@@ -398,10 +410,10 @@ public class LocationManager {
                 JSONObject row = beaconsArr.getJSONObject(i);
                 Beacon beacon = Utility.createBeaconFromJsonObject(row);
                 String uuid = beacon.getUUID();
-                //POI poi = new POI("POI test", uuid);
+                POI poi = new POI(uuid, "POI " + i, "Description!");
 
                 // Put objects to accessing array/Hashmap
-                //poiHM.put(uuid, poi);
+                poiHM.put(uuid, poi);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -416,6 +428,27 @@ public class LocationManager {
         // This is not related to the instance's friendHM, which stores user bookmarked Friends
         HashMap<String, Friend> friendHM = new HashMap<>();
         for (int i = 0; i < 10; i++) {
+            Beacon beacon = new Beacon();
+            beacon.setUUID(UUID.randomUUID().toString());
+            beacon.setMajor(1);
+            beacon.setMinor(123);
+            beacon.setRSSI(-i);
+
+            String macAddr = Utility.randomMACAddress();
+
+            Friend friend = new Friend(macAddr, "Friend " + i);
+            friend.setBeacon(beacon);
+
+            friendHM.put(macAddr, friend);
+        }
+        List<Friend> friendList = new ArrayList<>(friendHM.values());
+        initListener.onRetrieved(friendList);
+    }
+
+    public void getSimulatedCurrentUserFriendList(Context context, final OnFriendResultListener initListener) {
+        // For friend fragment to scan all nearby devices
+        HashMap<String, Friend> friendHM = new HashMap<>();
+        for (int i = 0; i < 5; i++) {
             Beacon beacon = new Beacon();
             beacon.setUUID(UUID.randomUUID().toString());
             beacon.setMajor(1);
