@@ -63,7 +63,7 @@ public class Beacon implements Serializable
         return rssi;
     }
 
-    public double calDistance(int power)
+    public double calDistance(double power)
     {
         return Math.pow((one_meter_power/power),(1/one_meter_power));
     }

@@ -68,7 +68,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
                 @Override
                 public void onAdded(Friend item) {
                     friendList.add(item);
-                    sortViewList();
+                    //sortViewList();
                     FriendListAdapter.this.notifyDataSetChanged();
                 }
 

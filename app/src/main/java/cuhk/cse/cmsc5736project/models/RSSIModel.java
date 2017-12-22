@@ -21,7 +21,7 @@ import cuhk.cse.cmsc5736project.MainActivity;
 
 public class RSSIModel implements AsyncResponse {
 
-    private static List<Beacon> beaconList = new ArrayList<Beacon>();
+    private static HashMap<String,Beacon> beaconHM = new HashMap<>();
     private static RSSIModel instance;
 
 
@@ -41,11 +41,17 @@ public class RSSIModel implements AsyncResponse {
         return true;
     }
 
+    public double getDistFromRSSIModel(Beacon beacon, double rssi)
+    {
+        String uuid_major_minor = beacon.getUUID() + "_" + Integer.toString(beacon.getMajor())+ "_" + Integer.toString(beacon.getMinor());
+        Beacon rssiModelBeacon = beaconHM.get(uuid_major_minor);
+        return rssiModelBeacon.calDistance(rssi);
+    }
     @Override
     public void processFinish(String s) {
 
         JSONObject mainObject = null;
-        beaconList.clear();
+        beaconHM.clear();
         try {
             mainObject = new JSONObject(s);
             JSONArray beacons = mainObject.getJSONArray("beacons");
@@ -59,21 +65,20 @@ public class RSSIModel implements AsyncResponse {
 
                 double pos_x = beacon.getDouble("position_x");
                 double pos_y = beacon.getDouble("position_y");
-                int n1 = beacon.getInt("rssi_half_m_signal");
-                int n2 = beacon.getInt("rssi_one_m_signal");
-                int n3 = beacon.getInt("rssi_two_m_signal");
-                int n4 = beacon.getInt("rssi_four_m_signal");
+                double n1 = beacon.getDouble("rssi_half_m_signal");
+                double n2 = beacon.getDouble("rssi_one_m_signal");
+                double n3 = beacon.getDouble("rssi_two_m_signal");
+                double n4 = beacon.getDouble("rssi_four_m_signal");
                 double n = (Math.log(n1/n2) / Math.log(0.5/1) + Math.log(n3/n2) / Math.log(2/1) + Math.log(n4/n2) / Math.log(4/1)) / 3;
                 b.setPathLossExponent(n);
                 b.setOneMeterPower(n2);
                 b.setPos(pos_x,pos_y);
-                beaconList.add(b);
+                String uuid_major_minor =beacon.getString("uuid_major_minor");
+                beaconHM.put(uuid_major_minor,b);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
     }
 
 }

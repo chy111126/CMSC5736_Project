@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
-
+        LocationManager.getInstance().startService(context);
         //RSSIModel.getInstance().updateModel(MainActivity.this);
     }
 

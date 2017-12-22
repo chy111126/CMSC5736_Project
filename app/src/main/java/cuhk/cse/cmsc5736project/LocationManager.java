@@ -1,6 +1,9 @@
 package cuhk.cse.cmsc5736project;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.graphics.PointF;
+import android.util.Log;
 
 import com.kosalgeek.genasync12.AsyncResponse;
 import com.kosalgeek.genasync12.PostResponseAsyncTask;
@@ -22,6 +25,7 @@ import cuhk.cse.cmsc5736project.interfaces.OnPOIResultListener;
 import cuhk.cse.cmsc5736project.models.Beacon;
 import cuhk.cse.cmsc5736project.models.Friend;
 import cuhk.cse.cmsc5736project.models.POI;
+import cuhk.cse.cmsc5736project.models.RSSIModel;
 import cuhk.cse.cmsc5736project.utils.Utility;
 
 /**
@@ -46,12 +50,21 @@ public class LocationManager {
 
     // ----- URLs -----
     //218.191.44.226
-    private static String ROOT_URL = "http://192.168.0.103/cmsc5736_project";
+    public static String ROOT_URL = "http://192.168.0.103/cmsc5736_project";
     private static String GET_ALL_BEACON_DATA_URL = ROOT_URL + "/get_all_beacon_data.php";
-    private static String GET_ALL_FRIEND_DATA_URL = ROOT_URL + "/get_all_user_friends.php";
     private static String GET_ALL_POI_DATA_URL = ROOT_URL + "/get_all_poi_data.php";
+    private static String GET_ALL_FRIEND_DATA_URL = ROOT_URL + "/get_all_user_friends.php";
     private static String GET_ALL_NOT_FRIEND_DATA_URL = ROOT_URL + "/get_all_user_not_friend.php";
 
+
+    private static String USER_ADD_FRIEND_URL = ROOT_URL + "/user_add_friend.php";
+    private static String USER_REMOVE_FRIEND_URL = ROOT_URL + "/user_remove_friend.php";
+
+    private static String UPDATE_USER_DATA_URL = ROOT_URL + "/update_user_data.php";
+
+    public static PointF userPos = new PointF(0,0);
+    public static String userName;
+    public static String userMAC;
 
     // Constructor
     public static LocationManager getInstance() {
@@ -66,6 +79,16 @@ public class LocationManager {
 
     public void startService(Context context) {
         // TODO: startService methods
+
+        //set default user data
+        userName = BluetoothAdapter.getDefaultAdapter().getName();
+        userMAC = android.provider.Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
+
+        // init/update user server data
+        updateUserData(context);
+
+        //init/update RSSI-distance model
+        RSSIModel.getInstance().updateModel(context);
     }
 
     public void stopService(Context context) {
@@ -78,7 +101,34 @@ public class LocationManager {
 
 
 
-
+    // ----- User methods -----
+    //keep update user data (name, position)
+    public void updateUserData(Context context) {
+        HashMap postData = new HashMap();
+        postData.put("mac",userMAC);
+        postData.put("name",userName);
+        postData.put("position_x",Float.toString(userPos.x));
+        postData.put("position_y",Float.toString(userPos.y));
+        PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
+            @Override
+            public void processFinish(String s) {
+                try {
+                    JSONObject resultJson = new JSONObject(s);
+                    if(resultJson.getBoolean("is_succeed"))
+                    {
+                        Log.d("LocationManager", "updateUserData succeed ");
+                    }
+                    else
+                    {
+                        Log.d("LocationManager", "updateUserData failed ");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        task.execute(UPDATE_USER_DATA_URL);
+    }
 
     // ----- POI methods -----
     public void getPOIDefinitions(Context context, final OnPOIResultListener initListener) {
@@ -133,8 +183,8 @@ public class LocationManager {
         // For add new friend activity to scan all nearby devices
         // This is not related to the instance's friendHM, which stores user bookmarked Friends
         HashMap postData = new HashMap();
-        String macAddress = android.provider.Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
-        postData.put("mac",macAddress);
+        userMAC = android.provider.Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
+        postData.put("mac",userMAC);
         PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
             @Override
             public void processFinish(String s) {
@@ -206,7 +256,9 @@ public class LocationManager {
         // onAdd: After adding a new friend
         // onDelete: After deleting a friend
         // onChange: After getting updated friend info (e.g. beacon information)
-        this.friendChangedListener = listener;
+        if (listener !=  null) {
+            this.friendChangedListener = listener;
+        }
     }
 
     public void putFriend(Friend newFriend) {
@@ -219,6 +271,60 @@ public class LocationManager {
         }
     }
 
+    public void addFriendToServer(Friend newFriend,Context context) {
+        // Get POI definitions from server, and materialize for client upgrades to each approximation
+        // ~= RSSIModel.updateModel method
+        HashMap postData = new HashMap();
+        postData.put("mac",userMAC);
+        postData.put("friend_mac",newFriend.getMAC());
+        PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
+            @Override
+            public void processFinish(String s) {
+                try {
+                    JSONObject resultJson = new JSONObject(s);
+                    if(resultJson.getBoolean("is_succeed"))
+                    {
+                        Log.d("LocationManager", "addFriendToServer succeed ");
+                    }
+                    else
+                    {
+                        Log.d("LocationManager", "addFriendToServer failed ");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        task.execute(USER_ADD_FRIEND_URL);
+    }
+
+    public void removeFriendFromServer(Friend toRemoveFriend,Context context) {
+        // Get POI definitions from server, and materialize for client upgrades to each approximation
+        // ~= RSSIModel.updateModel method
+        HashMap postData = new HashMap();
+        postData.put("mac",userMAC);
+        postData.put("friend_mac",toRemoveFriend.getMAC());
+
+        PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
+            @Override
+            public void processFinish(String s) {
+                try {
+                    JSONObject resultJson = new JSONObject(s);
+                    if(resultJson.getBoolean("is_succeed"))
+                    {
+                        Log.d("LocationManager", "removeFriendFromServer succeed ");
+                    }
+                    else
+                    {
+                        Log.d("LocationManager", "removeFriendFromServer failed ");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        task.execute(USER_REMOVE_FRIEND_URL);
+    }
     public void removeFriend(Friend toRemoveFriend) {
         // Remove a friend from location manager service
         friendHM.remove(toRemoveFriend.getMAC());
