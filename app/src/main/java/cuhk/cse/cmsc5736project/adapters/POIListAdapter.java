@@ -29,7 +29,7 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
 
     public POIListAdapter(Context context) {
         this.context = context;
-        LocationManager.getInstance().getSimulatedPOIDefinitions(context, new OnPOIResultListener() {
+        LocationManager.getInstance().getPOIDefinitions(context, new OnPOIResultListener() {
             @Override
             public void onRetrieved(List<POI> poiList) {
                 items = poiList;
@@ -49,6 +49,7 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
 
         for (int i = 0; i < SIZE; i++) {
             POI dessert = new POI(
+                    "0",
                     nameArray[i],
                     descArray[i]
             );

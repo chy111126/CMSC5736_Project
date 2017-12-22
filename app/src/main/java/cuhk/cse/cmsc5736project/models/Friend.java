@@ -16,10 +16,9 @@ public class Friend implements Serializable {
     private Beacon beacon;
     private String mac;
 
-    public Friend(String name, String description, String mac) {
-        this.name = name;
-        this.description = description;
+    public Friend(String mac,  String name) {
         this.mac = mac;
+        this.name = name;
     }
 
     public String getName() {

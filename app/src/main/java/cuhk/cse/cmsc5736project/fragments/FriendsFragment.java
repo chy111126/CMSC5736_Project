@@ -123,6 +123,7 @@ public class FriendsFragment extends Fragment {
         if (requestCode == FriendsFragment.REQUEST_CODE_ADD_FRIEND && resultCode == RESULT_OK && data != null) {
             Friend newFriend = (Friend) data.getSerializableExtra(FriendsFragment.INTENT_KEY_NEW_FRIEND);
             LocationManager.getInstance().putFriend(newFriend);
+            LocationManager.getInstance().addFriendToServer(newFriend,getContext());
         }
     }
 
