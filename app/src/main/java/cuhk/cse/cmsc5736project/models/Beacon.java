@@ -65,6 +65,6 @@ public class Beacon implements Serializable
 
     public double calDistance(double power)
     {
-        return Math.pow((one_meter_power/power),(1/one_meter_power));
+        return Math.pow((one_meter_power/power),(1/path_loss_exponent));
     }
 }

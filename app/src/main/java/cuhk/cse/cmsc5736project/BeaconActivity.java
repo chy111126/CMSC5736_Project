@@ -3,11 +3,18 @@ package cuhk.cse.cmsc5736project;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanRecord;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -26,6 +33,7 @@ public class BeaconActivity extends AppCompatActivity {
 
     private BluetoothManager btManager;
     private BluetoothAdapter btAdapter;
+    private BluetoothLeScanner btLeScanne;
     private Handler scanHandler = new Handler();
     private int scan_interval_ms = 5000;
     private boolean isScanning = false;
@@ -41,19 +49,11 @@ public class BeaconActivity extends AppCompatActivity {
         // init BLE
         btManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
         btAdapter = btManager.getAdapter();
+        btLeScanne = btAdapter.getBluetoothLeScanner();
 
         scanHandler.post(scanRunnable);
         //init list
-/*
-        Beacon a = new Beacon();
-        a.setUUID("a");
-        a.setMajor(3);
-        a.setMinor(3);
-        a.setRSSI(3);
-        scanBeacon.add(a);
-        scanBeacon.add(a);
-        scanBeacon.add(a);
-        scanBeacon.add(a);*/
+
         ListView beaconListView = (ListView)findViewById(R.id.list_devices);
         BeaconListAdapter beaconListAdapter = new BeaconListAdapter();
         beaconListView.setAdapter(beaconListAdapter);
@@ -114,36 +114,34 @@ public class BeaconActivity extends AppCompatActivity {
     {
         @Override
         public void run() {
+            ScanFilter beaconFilter = new ScanFilter.Builder()
+                    .build();
 
-            if (isScanning)
-            {
-                if (btAdapter != null)
-                {
-                    btAdapter.stopLeScan(leScanCallback);
-                }
-            }
-            else
-            {
-                if (btAdapter != null)
-                {
-                    btAdapter.startLeScan(leScanCallback);
-                }
-            }
+            ArrayList<ScanFilter> filters = new ArrayList<ScanFilter>();
+            filters.add(beaconFilter);
 
-            isScanning = !isScanning;
+            ScanSettings settings = new ScanSettings.Builder()
+                    .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                    .build();
+;
+            btLeScanne.startScan(filters, settings, mScanCallback);
 
-            scanHandler.postDelayed(this, scan_interval_ms);
+           // scanHandler.postDelayed(this, scan_interval_ms);
         }
     };
-    private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback()
-    {
+
+    private ScanCallback mScanCallback = new ScanCallback() {
         @Override
-        public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord)
-        {
+        public void onScanResult(int callbackType, ScanResult result) {
+            Log.d("", "onScanResult");
+            Log.i("callbackType", String.valueOf(callbackType));
+            Log.i("result", result.toString());
+            ScanRecord mScanRecord = result.getScanRecord();
+            byte[] scanRecord = result.getScanRecord().getBytes();
+            BluetoothDevice btDevice = result.getDevice();
+
             int startByte = 2;
             boolean patternFound = false;
-            String a = device.getName();
-            int b = device.getType();
             while (startByte <= 5)
             {
                 if (    ((int) scanRecord[startByte + 2] & 0xff) == 0x02 && //Identifies an iBeacon
@@ -175,7 +173,7 @@ public class BeaconActivity extends AppCompatActivity {
                 beacon.setUUID(uuid);
                 beacon.setMajor(major);
                 beacon.setMinor(minor);
-                beacon.setRSSI(rssi);
+                beacon.setRSSI(result.getRssi());
 
                 boolean isUpdated = false;
                 for(Beacon beaconItem : scanBeacon) {
@@ -192,9 +190,22 @@ public class BeaconActivity extends AppCompatActivity {
                 ListView beaconListView = (ListView)findViewById(R.id.list_devices);
                 beaconListView.invalidateViews();
             }
+        }
 
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            Log.d("", "onBatchScanResults: " + results.size() + " results");
+            for (ScanResult sr : results) {
+                Log.i("ScanResult - Results", sr.toString());
+            }
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            Log.w("", "LE Scan Failed: " + errorCode);
         }
     };
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
