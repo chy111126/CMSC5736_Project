@@ -194,11 +194,16 @@ public class LocationManager {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                List<POI> poiList = new ArrayList<>(poiHM.values());
-                initListener.onRetrieved(poiList);
+                initListener.onRetrieved(LocationManager.this.getPOIList());
             }
         });
         task.execute(GET_ALL_POI_DATA_URL);
+    }
+
+    public List<POI> getPOIList() {
+        // Translate updated POI Hashmap to list
+        List<POI> poiList = new ArrayList<>(poiHM.values());
+        return poiList;
     }
 
     public void updatePOIDefintion() {

@@ -65,6 +65,7 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
 
         holder.txtTitle.setText(item.getName());
         holder.txtDesc.setText(item.getDescription());
+        holder.toggleBookmark.setChecked(item.isBookmarked());
     }
 
     @Override
