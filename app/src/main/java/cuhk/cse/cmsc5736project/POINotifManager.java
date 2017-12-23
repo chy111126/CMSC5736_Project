@@ -8,16 +8,23 @@ import android.support.v4.app.NotificationCompat;
 
 import cuhk.cse.cmsc5736project.models.POI;
 
+import static android.support.v4.app.NotificationCompat.DEFAULT_SOUND;
+import static android.support.v4.app.NotificationCompat.DEFAULT_VIBRATE;
+
 /**
  * Created by TCC on 12/23/2017.
  */
 
 public class POINotifManager {
     public static void notifyPOIArrival(Context context, POI poi) {
+        int NOTIFICATION_ID = 123;
+
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_maps_place)
                         .setAutoCancel(true)
+                        .setDefaults(DEFAULT_SOUND | DEFAULT_VIBRATE)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setContentTitle("POI arrived")
                         .setContentText("You arrived " + poi.getName() + "!");
 
@@ -28,6 +35,6 @@ public class POINotifManager {
 
         // Add as notification
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(0, builder.build());
+        manager.notify(NOTIFICATION_ID, builder.build());
     }
 }

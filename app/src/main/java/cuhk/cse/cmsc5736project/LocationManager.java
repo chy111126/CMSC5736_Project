@@ -304,9 +304,10 @@ public class LocationManager {
         }
     }
 
-    public void putFriend(Friend newFriend) {
+    public void putFriend(Context context, Friend newFriend) {
         // Put a new friend to location manager service for tracking updates
         friendHM.put(newFriend.getMAC(), newFriend);
+        addFriendToServer(newFriend, context);
 
         // Invoke callback method
         if (this.friendChangedListener != null) {
@@ -314,7 +315,7 @@ public class LocationManager {
         }
     }
 
-    public void addFriendToServer(Friend newFriend, Context context) {
+    private void addFriendToServer(Friend newFriend, Context context) {
         // Get POI definitions from server, and materialize for client upgrades to each approximation
         // ~= RSSIModel.updateModel method
         HashMap postData = new HashMap();
@@ -338,7 +339,18 @@ public class LocationManager {
         task.execute(USER_ADD_FRIEND_URL);
     }
 
-    public void removeFriendFromServer(Friend toRemoveFriend, Context context) {
+    public void removeFriend(Context context, Friend toRemoveFriend) {
+        // Remove a friend from location manager service
+        friendHM.remove(toRemoveFriend.getMAC());
+        removeFriendFromServer(toRemoveFriend, context);
+
+        // Invoke callback method
+        if (this.friendChangedListener != null) {
+            this.friendChangedListener.onDeleted(toRemoveFriend);
+        }
+    }
+
+    private void removeFriendFromServer(Friend toRemoveFriend, Context context) {
         // Get POI definitions from server, and materialize for client upgrades to each approximation
         // ~= RSSIModel.updateModel method
         HashMap postData = new HashMap();
@@ -361,16 +373,6 @@ public class LocationManager {
             }
         });
         task.execute(USER_REMOVE_FRIEND_URL);
-    }
-
-    public void removeFriend(Friend toRemoveFriend) {
-        // Remove a friend from location manager service
-        friendHM.remove(toRemoveFriend.getMAC());
-
-        // Invoke callback method
-        if (this.friendChangedListener != null) {
-            this.friendChangedListener.onDeleted(toRemoveFriend);
-        }
     }
 
 

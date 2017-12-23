@@ -105,7 +105,7 @@ public class FriendsFragment extends Fragment {
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 //Your action here
-                LocationManager.getInstance().removeFriend(item);
+                LocationManager.getInstance().removeFriend(getContext(), item);
             }
         });
 
@@ -122,8 +122,7 @@ public class FriendsFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FriendsFragment.REQUEST_CODE_ADD_FRIEND && resultCode == RESULT_OK && data != null) {
             Friend newFriend = (Friend) data.getSerializableExtra(FriendsFragment.INTENT_KEY_NEW_FRIEND);
-            LocationManager.getInstance().putFriend(newFriend);
-            LocationManager.getInstance().addFriendToServer(newFriend,getContext());
+            LocationManager.getInstance().putFriend(getContext(), newFriend);
         }
     }
 
