@@ -41,6 +41,9 @@ public class BeaconSetupActivity extends AppCompatActivity implements AsyncRespo
     String uuid;
     int major,minor;
     TextView textView_id,textView_major,textView_minor,textView_rssi;
+
+    int rssiCountAvg = 0;
+    int prevRSSI = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -192,8 +195,22 @@ public class BeaconSetupActivity extends AppCompatActivity implements AsyncRespo
                 final int d_major = (scanRecord[startByte + 20] & 0xff) * 0x100 + (scanRecord[startByte + 21] & 0xff);
                 final int d_minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
 
+                int avgRSSI;
                 if(uuid.equals(d_uuid) && d_major == major && d_minor == minor) {
-                    textView_rssi.setText(Integer.toString(rssi));
+                    if(rssiCountAvg ==0)
+                    {
+                        avgRSSI = rssi;
+                        prevRSSI = avgRSSI;
+                        rssiCountAvg++;
+                    }
+                    else {
+                        avgRSSI = (prevRSSI * rssiCountAvg + rssi) / (rssiCountAvg + 1);
+                        prevRSSI = avgRSSI;
+                        if (rssiCountAvg <= 10) {
+                            rssiCountAvg++;
+                        }
+                    }
+                    textView_rssi.setText(Integer.toString(avgRSSI));
                 }
             }
 

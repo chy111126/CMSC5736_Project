@@ -12,6 +12,9 @@ public class Beacon implements Serializable
     double one_meter_power = 0;
     double pos_x = 0,pos_y = 0;
 
+    public int scanTimes = 0;
+    public double prevRSSIAvg = 0;
+
     public boolean isSameBeacon(Beacon b)
     {
         return uuid.equals(b.uuid) && major == b.major && minor == b.minor;

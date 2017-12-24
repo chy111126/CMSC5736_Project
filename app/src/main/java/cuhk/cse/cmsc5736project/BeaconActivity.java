@@ -176,15 +176,22 @@ public class BeaconActivity extends AppCompatActivity {
                 beacon.setRSSI(result.getRssi());
 
                 boolean isUpdated = false;
-                for(Beacon beaconItem : scanBeacon) {
+                for (Beacon beaconItem : scanBeacon) {
                     if (beacon.isSameBeacon(beaconItem)) {
-                        beaconItem.setRSSI(beacon.getRSSI());
+                        beaconItem.setRSSI((int)((beaconItem.prevRSSIAvg * beaconItem.scanTimes + beacon.getRSSI())/(beaconItem.scanTimes + 1)));
+                        beaconItem.prevRSSIAvg = beaconItem.getRSSI();
+
+                        if(beaconItem.scanTimes <= 10) {
+                            beaconItem.scanTimes++;
+                        }
+                        //beaconItem.setRSSI(beacon.getRSSI());
                         isUpdated = true;
                         break;
                     }
                 }
-                if(!isUpdated)
-                {
+                if (!isUpdated) {
+                    beacon.scanTimes ++;
+                    beacon.prevRSSIAvg =(beacon.getRSSI());
                     scanBeacon.add(beacon);
                 }
                 ListView beaconListView = (ListView)findViewById(R.id.list_devices);

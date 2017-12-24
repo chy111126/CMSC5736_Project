@@ -40,7 +40,7 @@ import cuhk.cse.cmsc5736project.views.NoSwipePager;
 public class MainActivity extends AppCompatActivity {
     //Constant
     //static String domain ="218.191.44.226" ;
-    public static String domain ="192.168.0.103" ;
+    public static String domain ="192.168.100.11" ;
     public static final int REQUEST_LOCATION_CODE = 99;
 
     // Variables

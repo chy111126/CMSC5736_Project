@@ -126,7 +126,8 @@ public class LocationManager {
         userMAC = this.getUserMAC(context);
 
         // init/update user server data
-        updateUserData(context);
+        POI a = new POI("a","a","a");
+        updateUserData(context,a );
 
         //init/update RSSI-distance model
         //RSSIModel.getInstance().updateModel(context);
@@ -153,12 +154,14 @@ public class LocationManager {
 
     // ----- User methods -----
     //keep update user data (name, position)
-    public void updateUserData(Context context) {
+    public void updateUserData(Context context, POI nearPOI) {
         HashMap postData = new HashMap();
         postData.put("mac", userMAC);
         postData.put("name", userName);
         postData.put("position_x", Float.toString(userPos.x));
         postData.put("position_y", Float.toString(userPos.y));
+        postData.put("near_POI", nearPOI.getID());
+        //last_update use server time
         PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
             @Override
             public void processFinish(String s) {
@@ -176,7 +179,33 @@ public class LocationManager {
         });
         task.execute(UPDATE_USER_DATA_URL);
     }
+    /*
+    public void getUserData(Context context) {
+        HashMap postData = new HashMap();
+        postData.put("mac", userMAC);
 
+        PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
+            @Override
+            public void processFinish(String s) {
+                        try {
+                            JSONObject resultJson = new JSONObject(s);
+                            String mac = resultJson.getString("mac");
+                            String name = resultJson.getString("name");
+                            int nearPOI = resultJson.getInt("near_POI");
+                            String lastUpdate = resultJson.getString("last_update");
+
+                            userPos.x = (float)(resultJson.getDouble("position_x"));
+                            userPos.y = (float)(resultJson.getDouble("position_y"));
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+            }
+        });
+        //task.execute(UPDATE_USER_DATA_URL);
+
+    }
+    */
     // ----- POI methods -----
     public void initPOIDefinitions(Context context, final OnPOIResultListener initListener) {
         // Get POI definitions from server, and materialize for client upgrades to each approximation
@@ -250,7 +279,7 @@ public class LocationManager {
                     for (int i = 0; i < friendArr.length(); i++) {
                         // Transform raw result to object
                         JSONObject row = friendArr.getJSONObject(i);
-                        Friend friend = Utility.creatFriendFromJsonObject(row);
+                        Friend friend = Utility.createNotFriendFromJsonObject(row);
                         String id = friend.getMAC();
                         // Put objects to accessing array/Hashmap
                         notFriendHM.put(id, friend);
@@ -288,7 +317,7 @@ public class LocationManager {
                     for (int i = 0; i < friendArr.length(); i++) {
                         // Transform raw result to object
                         JSONObject row = friendArr.getJSONObject(i);
-                        Friend friend = Utility.creatFriendFromJsonObject(row);
+                        Friend friend = Utility.createFriendFromJsonObject(row);
                         String id = friend.getMAC();
                         // Put objects to accessing array/Hashmap
                         friendHM.put(id, friend);
@@ -493,7 +522,7 @@ public class LocationManager {
 
         // Update positions
         for (Friend friend : friendHM.values()) {
-            friend.getBeacon().setRSSI(-1 + -1 * new Random().nextInt(10));
+        //    friend.getBeacon().setRSSI(-1 + -1 * new Random().nextInt(10));
         }
 
         // Invoke callback method
@@ -570,12 +599,20 @@ public class LocationManager {
                 boolean isUpdated = false;
                 for (Beacon beaconItem : scanBeacon) {
                     if (beacon.isSameBeacon(beaconItem)) {
-                        beaconItem.setRSSI(beacon.getRSSI());
+                        beaconItem.setRSSI((int)((beaconItem.prevRSSIAvg * beaconItem.scanTimes + beacon.getRSSI())/(beaconItem.scanTimes + 1)));
+                        beaconItem.prevRSSIAvg = beaconItem.getRSSI();
+
+                        if(beaconItem.scanTimes <= 10) {
+                            beaconItem.scanTimes++;
+                        }
+                        //beaconItem.setRSSI(beacon.getRSSI());
                         isUpdated = true;
                         break;
                     }
                 }
                 if (!isUpdated) {
+                    beacon.scanTimes ++;
+                    beacon.prevRSSIAvg =(beacon.getRSSI());
                     scanBeacon.add(beacon);
                 }
                 */

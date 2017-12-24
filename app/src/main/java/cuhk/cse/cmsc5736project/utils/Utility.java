@@ -5,6 +5,9 @@ import android.graphics.Color;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 
 import cuhk.cse.cmsc5736project.models.Beacon;
@@ -74,16 +77,44 @@ public class Utility {
         }
     }
 
-    public static Friend creatFriendFromJsonObject(JSONObject jsonObj) {
+    public static Friend createNotFriendFromJsonObject(JSONObject jsonObj) {
         try {
             String mac = jsonObj.getString("mac");
             String name = jsonObj.getString("name");
             Friend friend = new Friend(mac,name);
+
             return friend;
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static Friend createFriendFromJsonObject(JSONObject jsonObj) {
+        try {
+            String mac = jsonObj.getString("mac");
+            String name = jsonObj.getString("name");
+
+            String nearPOIID = Integer.toString(jsonObj.getInt("near_POI"));
+            String nearPOIName = jsonObj.getString("near_POI_name");
+            String nearPOIDescription = jsonObj.getString("near_POI_description");
+            POI poi = new POI(nearPOIID,nearPOIName,nearPOIDescription);
+
+            String updateTimeString = jsonObj.getString("update_time");
+            Date updateTime =(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).parse(updateTimeString);
+
+            Friend friend = new Friend(mac,name);
+            friend.setLastUpdated(updateTime);
+            friend.setNearPOI(poi);
+
+            return friend;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
     public static POI createPOIFromJsonObject(JSONObject jsonObj) {
         try {
@@ -96,6 +127,7 @@ public class Utility {
             beacon.setUUID(jsonObj.getString("uuid"));
             beacon.setMajor(jsonObj.getInt("major"));
             beacon.setMinor(jsonObj.getInt("minor"));
+            beacon.setPos(jsonObj.getDouble("position_x"),jsonObj.getDouble("position_y"));
             poi.setBeacon(beacon);
             return poi;
         } catch (JSONException e) {
