@@ -20,11 +20,6 @@ public class MapActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-
-        PinView imageView = (PinView)findViewById(R.id.imageView2);
-        imageView.setImage(ImageSource.resource(R.drawable.shb_00));
-        imageView.setMinimumScaleType(SCALE_TYPE_CENTER_CROP);
-        imageView.setPin(new PointF(50,50));
     }
 
 }

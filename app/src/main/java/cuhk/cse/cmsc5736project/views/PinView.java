@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
@@ -57,6 +58,7 @@ public class PinView extends SubsamplingScaleImageView {
             float vX = vPin.x - (pin.getWidth()/2);
             float vY = vPin.y - pin.getHeight();
             canvas.drawBitmap(pin, vX, vY, paint);
+            Log.i("pin view", "onDraw: " + vX + ", " + vY);
         }
 
     }

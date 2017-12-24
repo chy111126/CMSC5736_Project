@@ -13,4 +13,9 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:text="Map Fragment" />
+
+    <cuhk.cse.cmsc5736project.views.PinView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </FrameLayout>

@@ -17,7 +17,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.TranslucentNavigation">
         <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity android:name=".BeaconActivity"></activity>
         <activity android:name=".BeaconSetupActivity"></activity>
@@ -29,11 +33,6 @@
             android:name=".AddNewFriendActivity"
             android:theme="@style/AppTheme" />
         <activity android:name=".MapActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 
