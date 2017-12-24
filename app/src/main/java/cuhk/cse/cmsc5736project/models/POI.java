@@ -1,5 +1,7 @@
 package cuhk.cse.cmsc5736project.models;
 
+import android.graphics.PointF;
+
 /**
  * Tentative class for POI fragment
  * Created by TCC on 12/16/2017.
@@ -12,6 +14,7 @@ public class POI {
     private String name;
     private String description;
     private boolean isBookmarked;
+    private PointF location;
     private Beacon beacon;
 
     public POI(String id, String name, String description) {
@@ -54,5 +57,13 @@ public class POI {
 
     public void setBookmarked(boolean bookmarked) {
         isBookmarked = bookmarked;
+    }
+
+    public PointF getPosition() {
+        return location;
+    }
+
+    public void setPosition(double pos_x, double pos_y) {
+        this.location = new PointF((float)pos_x, (float)pos_y);
     }
 }

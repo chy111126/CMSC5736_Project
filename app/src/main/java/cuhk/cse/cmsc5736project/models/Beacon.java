@@ -62,6 +62,8 @@ public class Beacon implements Serializable
     {
         return rssi;
     }
+    public double getPos_x(){return pos_x;}
+    public double getPos_y(){return pos_y;}
 
     public double getDistance() {
         // Get distance using RSSI power

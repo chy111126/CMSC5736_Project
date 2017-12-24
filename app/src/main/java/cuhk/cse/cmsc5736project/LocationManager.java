@@ -420,6 +420,7 @@ public class LocationManager {
                 Beacon beacon = Utility.createBeaconFromJsonObject(row);
                 String uuid = beacon.getUUID();
                 POI poi = new POI(uuid, "POI " + i, "Description!");
+                poi.setPosition(beacon.getPos_x(), beacon.getPos_y());
 
                 // Put objects to accessing array/Hashmap
                 poiHM.put(uuid, poi);
