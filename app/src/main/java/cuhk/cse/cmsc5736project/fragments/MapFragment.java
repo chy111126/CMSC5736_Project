@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cuhk.cse.cmsc5736project.LocationManager;
@@ -23,6 +24,7 @@ import cuhk.cse.cmsc5736project.interfaces.OnFriendResultListener;
 import cuhk.cse.cmsc5736project.interfaces.OnPOIResultListener;
 import cuhk.cse.cmsc5736project.models.Friend;
 import cuhk.cse.cmsc5736project.models.POI;
+import cuhk.cse.cmsc5736project.models.Pin;
 import cuhk.cse.cmsc5736project.views.PinView;
 
 import static com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.SCALE_TYPE_CENTER_CROP;
@@ -40,6 +42,8 @@ public class MapFragment extends Fragment {
     float lastKnownX;
     float lastKnownY;
     LocationManager locationManager;
+
+    //List<Pin> pinList = new ArrayList<Pin>();
 
     public MapFragment() {
         // Required empty public constructor
@@ -67,12 +71,17 @@ public class MapFragment extends Fragment {
         setImageViewListeers(imageView);
 
         locationManager = LocationManager.getInstance();
-        locationManager.getPOIDefinitions(getContext(), new OnPOIResultListener(){
-            public void onRetrieved(List<POI> friendList){
-
+        locationManager.getSimulatedPOIDefinitions(getContext(), new OnPOIResultListener(){
+            public void onRetrieved(List<POI> poiList){
+                for(POI poi: poiList) {
+                    List<Pin> pinList = new ArrayList<Pin>() ;
+                    PointF pinPosition = poi.getPosition();
+                    pinList.add(new Pin(MapFragment.this.getContext(), pinPosition, R.drawable.map_marker));
+                    imageView.addPinList(pinList);
+                }
             }
         });
-        locationManager.getFriendDefinitions(getContext(), new OnFriendResultListener(){
+        locationManager.getSimulatedFriendDefinitions(getContext(), new OnFriendResultListener(){
             public void onRetrieved(List<Friend> friendList){
                 //TODO: handle friend list
             }
@@ -84,16 +93,18 @@ public class MapFragment extends Fragment {
     void setImageViewListeers(PinView imageView){
         imageView.setImage(ImageSource.resource(R.drawable.shb_00));
         imageView.setMinimumScaleType(SCALE_TYPE_CENTER_CROP);
-        imageView.setPin(new PointF(1000,100));
+        //imageView.setPin(new PointF(1000,100));
 
         final PinView imageViewF = imageView;
 
         imageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (view.getId()== R.id.imageView && motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                //Log.i("", "onTouch: " + motionEvent.getAction());
+                if (view.getId()== R.id.mapView && motionEvent.getAction() == MotionEvent.ACTION_DOWN){
                     lastKnownX= motionEvent.getX();
                     lastKnownY= motionEvent.getY();
+                    Log.i("image view: onTouch: ", lastKnownX + ", " + lastKnownY);
                 }
                 return false;
             }
@@ -104,8 +115,8 @@ public class MapFragment extends Fragment {
                 if (view.getId() == R.id.imageView) {
                     Toast.makeText(getActivity(), "Long clicked "+lastKnownX+" "+lastKnownY, Toast.LENGTH_SHORT).show();
                     Log.d("EditPlanFragment","Scale "+imageViewF.getScale());
-                    //MapPins.add(new MapPin(lastKnownX,lastKnownY,pinCounter));
-                    imageViewF.setPin(new PointF(lastKnownX,lastKnownY));
+                    //pinList.add(new Pin(MapFragment.this.getContext(), new PointF(lastKnownX,lastKnownY),R.drawable.map_marker));
+                    //imageViewF.setPin(new PointF(lastKnownX,lastKnownY));
 
                     imageViewF.post(new Runnable(){
                         public void run(){
