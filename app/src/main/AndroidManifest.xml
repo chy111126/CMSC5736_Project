@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cuhk.cse.cmsc5736project">
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -15,29 +17,24 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.TranslucentNavigation">
         <activity android:name=".MainActivity">
+
+        </activity>
+        <activity android:name=".BeaconActivity"></activity>
+        <activity android:name=".BeaconSetupActivity"></activity>
+        <activity android:name=".AddFriendActivity"></activity>
+        <activity
+            android:name=".SettingsPrefActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".AddNewFriendActivity"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".MapActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BeaconActivity">
-
-        </activity>
-        <activity android:name=".BeaconSetupActivity">
-
-        </activity>
-        <activity android:name=".AddFriendActivity">
-
-        </activity>
-        <activity
-            android:name=".SettingsPrefActivity"
-            android:theme="@style/AppTheme"
-            />
-        <activity
-            android:name=".AddNewFriendActivity"
-            android:theme="@style/AppTheme"
-            />
     </application>
 
 </manifest>
