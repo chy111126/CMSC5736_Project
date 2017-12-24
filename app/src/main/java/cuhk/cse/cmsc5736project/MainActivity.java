@@ -29,6 +29,10 @@ import cuhk.cse.cmsc5736project.adapters.SmartFragmentStatePagerAdapter;
 import cuhk.cse.cmsc5736project.fragments.FriendsFragment;
 import cuhk.cse.cmsc5736project.fragments.MapFragment;
 import cuhk.cse.cmsc5736project.fragments.POIFragment;
+import cuhk.cse.cmsc5736project.interfaces.OnFriendResultListener;
+import cuhk.cse.cmsc5736project.interfaces.OnPOIResultListener;
+import cuhk.cse.cmsc5736project.models.Friend;
+import cuhk.cse.cmsc5736project.models.POI;
 import cuhk.cse.cmsc5736project.models.RSSIModel;
 import cuhk.cse.cmsc5736project.utils.Utility;
 import cuhk.cse.cmsc5736project.views.NoSwipePager;
@@ -55,20 +59,30 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         context = this;
-
         setupBottomNavBar();
-        setupViewPager();
 
-        // Select initial page
-        int initialPage = 1;
-        selectPage(initialPage);
-        bottomNavigation.setCurrentItem(initialPage);
+        LocationManager.getInstance().initPOIDefinitions(context, new OnPOIResultListener() {
+            @Override
+            public void onRetrieved(List<POI> poiList) {
+                LocationManager.getInstance().initCurrentUserFriendList(context, new OnFriendResultListener() {
+                    @Override
+                    public void onRetrieved(List<Friend> friendList) {
+                        setupViewPager();
 
+                        // Select initial page
+                        int initialPage = 1;
+                        selectPage(initialPage);
+                        bottomNavigation.setCurrentItem(initialPage);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkLocationPermission();
-        }
-        LocationManager.getInstance().startService(context);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            checkLocationPermission();
+                        }
+                        LocationManager.getInstance().startService(context);
+                    }
+                });
+            }
+        });
+
         //RSSIModel.getInstance().updateModel(MainActivity.this);
     }
 

@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -45,7 +46,9 @@ import cuhk.cse.cmsc5736project.utils.Utility;
 
 public class LocationManager {
 
-    private List<Beacon> scanBeacon = new ArrayList<Beacon>();
+    private Date lastScanningDate;
+
+    //private List<Beacon> scanBeacon = new ArrayList<Beacon>();
 
     // ----- POI -----
     private static HashMap<String, POI> poiHM = new HashMap<>();
@@ -63,7 +66,7 @@ public class LocationManager {
 
     // ----- URLs -----
     //218.191.44.226
-    public static String ROOT_URL = "http://192.168.0.103/cmsc5736_project";
+    public static String ROOT_URL = "http://192.168.100.11/cmsc5736_project";
     private static String GET_ALL_BEACON_DATA_URL = ROOT_URL + "/get_all_beacon_data.php";
     private static String GET_ALL_POI_DATA_URL = ROOT_URL + "/get_all_poi_data.php";
     private static String GET_ALL_FRIEND_DATA_URL = ROOT_URL + "/get_all_user_friends.php";
@@ -126,7 +129,7 @@ public class LocationManager {
         updateUserData(context);
 
         //init/update RSSI-distance model
-        RSSIModel.getInstance().updateModel(context);
+        //RSSIModel.getInstance().updateModel(context);
 
         //start beacon scan
         if (!isScanning) {
@@ -175,7 +178,7 @@ public class LocationManager {
     }
 
     // ----- POI methods -----
-    public void getPOIDefinitions(Context context, final OnPOIResultListener initListener) {
+    public void initPOIDefinitions(Context context, final OnPOIResultListener initListener) {
         // Get POI definitions from server, and materialize for client upgrades to each approximation
         // ~= RSSIModel.updateModel method
         HashMap postData = new HashMap();
@@ -192,14 +195,21 @@ public class LocationManager {
                         String id = poi.getID();
                         // Put objects to accessing array/Hashmap
                         poiHM.put(id, poi);
+                        //Log.i("getPOIDefinitions", poi.toString());
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
                 initListener.onRetrieved(LocationManager.this.getPOIList());
             }
         });
         task.execute(GET_ALL_POI_DATA_URL);
+    }
+
+    public void getPOIDefinitions(Context context, final OnPOIResultListener initListener) {
+        // Already initialized. returning old list
+        initListener.onRetrieved(LocationManager.this.getPOIList());
     }
 
     public List<POI> getPOIList() {
@@ -264,7 +274,7 @@ public class LocationManager {
         }
     }
 
-    public void getCurrentUserFriendList(Context context, final OnFriendResultListener initListener) {
+    public void initCurrentUserFriendList(Context context, final OnFriendResultListener initListener) {
         // Get list of user-stored friends for caller method
         // When this class updates the friend objects, the UI would be updated as well (through setOnFriendResultListener)
         HashMap postData = new HashMap();
@@ -291,7 +301,9 @@ public class LocationManager {
             }
         });
         task.execute(GET_ALL_FRIEND_DATA_URL);
+    }
 
+    public void getCurrentUserFriendList(Context context, final OnFriendResultListener initListener) {
         List<Friend> friendList = new ArrayList<>(friendHM.values());
         initListener.onRetrieved(friendList);
     }
@@ -569,12 +581,19 @@ public class LocationManager {
                 */
 
                 // Check beacon entry in POI Hashmap
-                POI targetPOI = poiHM.get(uuid);
-                if (targetPOI != null) {
-                    targetPOI.getBeacon().setRSSI(result.getRssi());
-                    poiChangedListener.onChanged();
+                // If threshold passed, trigger POI change listener
+                Date nowDate = new Date();
+                int scanning_threshold = 1;
+                if (lastScanningDate == null || (nowDate.getTime() - lastScanningDate.getTime()) / 1000 > scanning_threshold) {
+                    POI targetPOI = poiHM.get(uuid);
+                    if (targetPOI != null) {
+                        targetPOI.getBeacon().setRSSI(result.getRssi());
+                        //Log.i("targetPOI", " " + targetPOI.toString());
+                        //Log.i("targetPOI RSSI", " " + result.getRssi());
+                        poiChangedListener.onChanged();
+                    }
+                    lastScanningDate = new Date();
                 }
-
             }
         }
 

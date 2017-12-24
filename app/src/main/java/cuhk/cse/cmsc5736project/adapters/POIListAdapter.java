@@ -61,6 +61,7 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
             @Override
             public void onClick(View view) {
                 POI poi = items.get(vh.getAdapterPosition());
+                poi.setBookmarked(!poi.isBookmarked());
                 Toast.makeText(context, poi.getName() + poi.isBookmarked(), Toast.LENGTH_SHORT).show();
             }
         });
