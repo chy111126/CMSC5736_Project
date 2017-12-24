@@ -52,10 +52,12 @@ public class LocationManager {
 
     // ----- POI -----
     private static HashMap<String, POI> poiHM = new HashMap<>();
+    private OnPOIListChangeListener poiChangedMapFragmentListener = null;
     private OnPOIListChangeListener poiChangedListener = null;
 
     // ----- Friends -----
     private static HashMap<String, Friend> friendHM = new HashMap<>();
+    private OnFriendListChangeListener friendChangedMapFragmentListener = null;
     private OnFriendListChangeListener friendChangedListener = null;
 
     private static HashMap<String, Friend> notFriendHM = new HashMap<>();
@@ -225,12 +227,20 @@ public class LocationManager {
         if (this.poiChangedListener != null) {
             this.poiChangedListener.onChanged();
         }
+        if (this.poiChangedMapFragmentListener != null) {
+            this.poiChangedMapFragmentListener.onChanged();
+        }
     }
 
     public void setOnPOIChangedListener(OnPOIListChangeListener listener) {
         // Caller method can update through the listener when this manager class sent updates
         // this.poiListener.OnRetrieved method would be invoked after service successfully acquired new location information
         this.poiChangedListener = listener;
+    }
+    public void setOnPOIChangedMapFragmentListener(OnPOIListChangeListener listener) {
+        // Caller method can update through the listener when this manager class sent updates
+        // this.poiListener.OnRetrieved method would be invoked after service successfully acquired new location information
+        this.poiChangedMapFragmentListener = listener;
     }
 
 
@@ -271,6 +281,9 @@ public class LocationManager {
         // Invoke callback method
         if (this.friendChangedListener != null) {
             this.friendChangedListener.onChanged();
+        }
+        if (this.friendChangedMapFragmentListener != null) {
+            this.friendChangedMapFragmentListener.onChanged();
         }
     }
 
@@ -318,6 +331,16 @@ public class LocationManager {
         }
     }
 
+    public void setOnFriendListChangeMapFragmentListener(OnFriendListChangeListener listener) {
+        // On friend list changed
+        // onAdd: After adding a new friend
+        // onDelete: After deleting a friend
+        // onChange: After getting updated friend info (e.g. beacon information)
+        if (listener != null) {
+            this.friendChangedMapFragmentListener = listener;
+        }
+    }
+
     public void putFriend(Context context, Friend newFriend) {
         // Put a new friend to location manager service for tracking updates
         friendHM.put(newFriend.getMAC(), newFriend);
@@ -326,6 +349,9 @@ public class LocationManager {
         // Invoke callback method
         if (this.friendChangedListener != null) {
             this.friendChangedListener.onAdded(newFriend);
+        }
+        if (this.friendChangedMapFragmentListener != null) {
+            this.friendChangedMapFragmentListener.onAdded(newFriend);
         }
     }
 
@@ -361,6 +387,9 @@ public class LocationManager {
         // Invoke callback method
         if (this.friendChangedListener != null) {
             this.friendChangedListener.onDeleted(toRemoveFriend);
+        }
+        if (this.friendChangedMapFragmentListener != null) {
+            this.friendChangedMapFragmentListener.onDeleted(toRemoveFriend);
         }
     }
 
@@ -581,17 +610,19 @@ public class LocationManager {
                 */
 
                 // Check beacon entry in POI Hashmap
+                POI targetPOI = poiHM.get(uuid);
+                if (targetPOI != null) {
+                    targetPOI.getBeacon().setRSSI(result.getRssi());
+                    //Log.i("targetPOI", " " + targetPOI.toString());
+                    //Log.i("targetPOI RSSI", " " + result.getRssi());
+                    poiChangedListener.onChanged();
+                }
+
                 // If threshold passed, trigger POI change listener
                 Date nowDate = new Date();
                 int scanning_threshold = 1;
                 if (lastScanningDate == null || (nowDate.getTime() - lastScanningDate.getTime()) / 1000 > scanning_threshold) {
-                    POI targetPOI = poiHM.get(uuid);
-                    if (targetPOI != null) {
-                        targetPOI.getBeacon().setRSSI(result.getRssi());
-                        //Log.i("targetPOI", " " + targetPOI.toString());
-                        //Log.i("targetPOI RSSI", " " + result.getRssi());
-                        poiChangedListener.onChanged();
-                    }
+                    LocationManager.this.updatePOIDefintion();
                     lastScanningDate = new Date();
                 }
             }
