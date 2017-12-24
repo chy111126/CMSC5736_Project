@@ -43,10 +43,12 @@ public class RSSIModel implements AsyncResponse {
 
     public double getDistFromRSSIModel(Beacon beacon, double rssi)
     {
+        // TODO: RSSI update should be done in LocationManager method; and trigger Beacon.getDistance() method in POIListAdapter to get latest RSSI values
         String uuid_major_minor = beacon.getUUID() + "_" + Integer.toString(beacon.getMajor())+ "_" + Integer.toString(beacon.getMinor());
         Beacon rssiModelBeacon = beaconHM.get(uuid_major_minor);
         return rssiModelBeacon.calDistance(rssi);
     }
+
     @Override
     public void processFinish(String s) {
 

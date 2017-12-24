@@ -131,6 +131,7 @@ public class LocationManager {
         //start beacon scan
         if (!isScanning) {
             scanHandler.post(scanRunnable);
+            Toast.makeText(context, "Scanning started!", Toast.LENGTH_SHORT);
         }
     }
 
@@ -138,6 +139,7 @@ public class LocationManager {
         // TODO: stopService methods
         if (isScanning) {
             scanHandler.post(scanRunnable);
+            Toast.makeText(context, "Scanning stopped!", Toast.LENGTH_SHORT);
         }
     }
 
@@ -194,11 +196,16 @@ public class LocationManager {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                List<POI> poiList = new ArrayList<>(poiHM.values());
-                initListener.onRetrieved(poiList);
+                initListener.onRetrieved(LocationManager.this.getPOIList());
             }
         });
         task.execute(GET_ALL_POI_DATA_URL);
+    }
+
+    public List<POI> getPOIList() {
+        // Translate updated POI Hashmap to list
+        List<POI> poiList = new ArrayList<>(poiHM.values());
+        return poiList;
     }
 
     public void updatePOIDefintion() {
@@ -299,9 +306,10 @@ public class LocationManager {
         }
     }
 
-    public void putFriend(Friend newFriend) {
+    public void putFriend(Context context, Friend newFriend) {
         // Put a new friend to location manager service for tracking updates
         friendHM.put(newFriend.getMAC(), newFriend);
+        addFriendToServer(newFriend, context);
 
         // Invoke callback method
         if (this.friendChangedListener != null) {
@@ -309,7 +317,7 @@ public class LocationManager {
         }
     }
 
-    public void addFriendToServer(Friend newFriend, Context context) {
+    private void addFriendToServer(Friend newFriend, Context context) {
         // Get POI definitions from server, and materialize for client upgrades to each approximation
         // ~= RSSIModel.updateModel method
         HashMap postData = new HashMap();
@@ -333,7 +341,18 @@ public class LocationManager {
         task.execute(USER_ADD_FRIEND_URL);
     }
 
-    public void removeFriendFromServer(Friend toRemoveFriend, Context context) {
+    public void removeFriend(Context context, Friend toRemoveFriend) {
+        // Remove a friend from location manager service
+        friendHM.remove(toRemoveFriend.getMAC());
+        removeFriendFromServer(toRemoveFriend, context);
+
+        // Invoke callback method
+        if (this.friendChangedListener != null) {
+            this.friendChangedListener.onDeleted(toRemoveFriend);
+        }
+    }
+
+    private void removeFriendFromServer(Friend toRemoveFriend, Context context) {
         // Get POI definitions from server, and materialize for client upgrades to each approximation
         // ~= RSSIModel.updateModel method
         HashMap postData = new HashMap();
@@ -356,16 +375,6 @@ public class LocationManager {
             }
         });
         task.execute(USER_REMOVE_FRIEND_URL);
-    }
-
-    public void removeFriend(Friend toRemoveFriend) {
-        // Remove a friend from location manager service
-        friendHM.remove(toRemoveFriend.getMAC());
-
-        // Invoke callback method
-        if (this.friendChangedListener != null) {
-            this.friendChangedListener.onDeleted(toRemoveFriend);
-        }
     }
 
 
@@ -538,6 +547,7 @@ public class LocationManager {
                 final int major = (scanRecord[startByte + 20] & 0xff) * 0x100 + (scanRecord[startByte + 21] & 0xff);
                 final int minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
 
+                /*
                 Beacon beacon = new Beacon();
                 beacon.setUUID(uuid);
                 beacon.setMajor(major);
@@ -555,6 +565,15 @@ public class LocationManager {
                 if (!isUpdated) {
                     scanBeacon.add(beacon);
                 }
+                */
+
+                // Check beacon entry in POI Hashmap
+                POI targetPOI = poiHM.get(uuid);
+                if (targetPOI != null) {
+                    targetPOI.getBeacon().setRSSI(result.getRssi());
+                    poiChangedListener.onChanged();
+                }
+
             }
         }
 

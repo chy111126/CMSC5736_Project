@@ -10,9 +10,6 @@
         android:title="Setup" />
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        app:showAsAction="always"
-        android:icon="@drawable/settings_white"
-        android:title="Settings"/>
+        android:title="Settings" />
 
 </menu>
