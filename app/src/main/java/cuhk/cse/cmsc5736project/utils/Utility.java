@@ -87,7 +87,7 @@ public class Utility {
     }
     public static POI createPOIFromJsonObject(JSONObject jsonObj) {
         try {
-            String id =jsonObj.getString("id");
+            String id =jsonObj.getString("uuid");
             String name =jsonObj.getString("name");
             String description =jsonObj.getString("description");
 

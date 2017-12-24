@@ -131,6 +131,7 @@ public class LocationManager {
         //start beacon scan
         if (!isScanning) {
             scanHandler.post(scanRunnable);
+            Toast.makeText(context, "Scanning started!", Toast.LENGTH_SHORT);
         }
     }
 
@@ -138,6 +139,7 @@ public class LocationManager {
         // TODO: stopService methods
         if (isScanning) {
             scanHandler.post(scanRunnable);
+            Toast.makeText(context, "Scanning stopped!", Toast.LENGTH_SHORT);
         }
     }
 
@@ -545,6 +547,7 @@ public class LocationManager {
                 final int major = (scanRecord[startByte + 20] & 0xff) * 0x100 + (scanRecord[startByte + 21] & 0xff);
                 final int minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
 
+                /*
                 Beacon beacon = new Beacon();
                 beacon.setUUID(uuid);
                 beacon.setMajor(major);
@@ -562,6 +565,15 @@ public class LocationManager {
                 if (!isUpdated) {
                     scanBeacon.add(beacon);
                 }
+                */
+
+                // Check beacon entry in POI Hashmap
+                POI targetPOI = poiHM.get(uuid);
+                if (targetPOI != null) {
+                    targetPOI.getBeacon().setRSSI(result.getRssi());
+                    poiChangedListener.onChanged();
+                }
+
             }
         }
 
