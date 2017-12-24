@@ -33,6 +33,8 @@ public class SettingsPrefActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_main);
 
+            findPreference(getString(R.string.settings_key_device_id)).setSummary("abc");
+
             // gallery EditText change listener
             //bindPreferenceSummaryToValue(findPreference(getString(R.string.key_gallery_name)));
 

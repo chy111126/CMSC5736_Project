@@ -5,7 +5,11 @@ import android.graphics.Color;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Random;
+
 import cuhk.cse.cmsc5736project.models.Beacon;
+import cuhk.cse.cmsc5736project.models.Friend;
+import cuhk.cse.cmsc5736project.models.POI;
 
 /**
  * Created by alexchung on 16/12/2017.
@@ -69,5 +73,55 @@ public class Utility {
             return null;
         }
     }
+
+    public static Friend creatFriendFromJsonObject(JSONObject jsonObj) {
+        try {
+            String mac = jsonObj.getString("mac");
+            String name = jsonObj.getString("name");
+            Friend friend = new Friend(mac,name);
+            return friend;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public static POI createPOIFromJsonObject(JSONObject jsonObj) {
+        try {
+            String id =jsonObj.getString("id");
+            String name =jsonObj.getString("name");
+            String description =jsonObj.getString("description");
+
+            POI poi = new POI(id,name,description);
+            Beacon beacon = new Beacon();
+            beacon.setUUID(jsonObj.getString("uuid"));
+            beacon.setMajor(jsonObj.getInt("major"));
+            beacon.setMinor(jsonObj.getInt("minor"));
+            poi.setBeacon(beacon);
+            return poi;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public static String randomMACAddress(){
+        Random rand = new Random();
+        byte[] macAddr = new byte[6];
+        rand.nextBytes(macAddr);
+
+        macAddr[0] = (byte)(macAddr[0] & (byte)254);  //zeroing last 2 bytes to make it unicast and locally adminstrated
+
+        StringBuilder sb = new StringBuilder(18);
+        for(byte b : macAddr){
+
+            if(sb.length() > 0)
+                sb.append(":");
+
+            sb.append(String.format("%02x", b));
+        }
+
+
+        return sb.toString();
+    }
+
 
 }

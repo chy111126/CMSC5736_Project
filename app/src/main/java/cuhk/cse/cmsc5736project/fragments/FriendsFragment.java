@@ -1,5 +1,7 @@
 package cuhk.cse.cmsc5736project.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -17,8 +19,10 @@ import java.util.ArrayList;
 
 import cuhk.cse.cmsc5736project.AddFriendActivity;
 import cuhk.cse.cmsc5736project.AddNewFriendActivity;
+import cuhk.cse.cmsc5736project.LocationManager;
 import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.adapters.FriendListAdapter;
+import cuhk.cse.cmsc5736project.interfaces.OnFriendSelectedListener;
 import cuhk.cse.cmsc5736project.models.Friend;
 import cuhk.cse.cmsc5736project.utils.Utility;
 
@@ -65,7 +69,13 @@ public class FriendsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setBackgroundColor(layoutColor);
 
-        adapter = new FriendListAdapter(getContext(), getActivity(), false, null);
+        adapter = new FriendListAdapter(getContext(), getActivity(), false, new OnFriendSelectedListener() {
+            @Override
+            public void onSelect(View v, Friend item) {
+                // TODO: Add confirm modal
+                showConfirmRemoveFriendDialog(item);
+            }
+        });
         recyclerView.setAdapter(adapter);
 
         // Add friend with FAB
@@ -88,10 +98,32 @@ public class FriendsFragment extends Fragment {
         startActivityForResult(new Intent(getContext(), AddNewFriendActivity.class), REQUEST_CODE_ADD_FRIEND);
     }
 
+    public void showConfirmRemoveFriendDialog(final Friend item) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this.getContext());
+        alert.setTitle("Remove selected friend?");
+
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                //Your action here
+                LocationManager.getInstance().removeFriend(item);
+            }
+        });
+
+        alert.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                });
+
+        alert.show();
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FriendsFragment.REQUEST_CODE_ADD_FRIEND && resultCode == RESULT_OK && data != null) {
-            Log.i(TAG, "Get result!" + data.getIntExtra(FriendsFragment.INTENT_KEY_NEW_FRIEND, -1));
+            Friend newFriend = (Friend) data.getSerializableExtra(FriendsFragment.INTENT_KEY_NEW_FRIEND);
+            LocationManager.getInstance().putFriend(newFriend);
+            LocationManager.getInstance().addFriendToServer(newFriend,getContext());
         }
     }
 

@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
-
+        LocationManager.getInstance().startService(context);
         //RSSIModel.getInstance().updateModel(MainActivity.this);
     }
 
@@ -188,6 +188,9 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
             @Override
             public boolean onTabSelected(int position, boolean wasSelected) {
+
+                // TEST METHOD !!! WILL REMOVE LATER
+                //LocationManager.getInstance().updateSimulatedFriendPositions();
 
                 if (!wasSelected)
                     selectPage(position);

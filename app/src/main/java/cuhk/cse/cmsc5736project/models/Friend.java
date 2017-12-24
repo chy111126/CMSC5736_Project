@@ -1,24 +1,24 @@
 package cuhk.cse.cmsc5736project.models;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by TCC on 12/16/2017.
  */
 
-public class Friend {
+public class Friend implements Serializable {
 
     private String name;
-    private String description;
-    private Date lastUpdatedDate;
-    private String nearestLocation;
-    private Beacon beacon;
     private String mac;
+    private String description;
+    private Beacon beacon;
+    private POI nearestLocation;
+    private Date lastUpdatedDate;
 
-    public Friend(String name, String description, String mac) {
-        this.name = name;
-        this.description = description;
+    public Friend(String mac,  String name) {
         this.mac = mac;
+        this.name = name;
     }
 
     public String getName() {
@@ -43,5 +43,13 @@ public class Friend {
     public String getMAC()
     {
         return mac;
+    }
+
+    public Beacon getBeacon() {
+        return beacon;
+    }
+
+    public void setBeacon(Beacon beacon) {
+        this.beacon = beacon;
     }
 }

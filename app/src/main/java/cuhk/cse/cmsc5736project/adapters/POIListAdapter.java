@@ -2,10 +2,13 @@ package cuhk.cse.cmsc5736project.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,39 +32,31 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
 
     public POIListAdapter(Context context) {
         this.context = context;
-        LocationManager.getInstance().getSimulatedPOIDefinitions(context, new OnPOIResultListener() {
+        LocationManager.getInstance().getPOIDefinitions(context, new OnPOIResultListener() {
             @Override
             public void onRetrieved(List<POI> poiList) {
                 items = poiList;
                 POIListAdapter.this.notifyDataSetChanged();
             }
         });
-
-        //populateSampleData();
-    }
-
-    private void populateSampleData() {
-
-        String[] nameArray = {"Toilet", "Booth 1", "Booth 2", "Booth 3", "Booth 4", "Booth 5", "Booth 6", "Booth 7"};
-        String[] descArray = {"Male/Female toilet", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!", "Buy book here!"};
-
-        final int SIZE = nameArray.length;
-
-        for (int i = 0; i < SIZE; i++) {
-            POI dessert = new POI(
-                    nameArray[i],
-                    descArray[i]
-            );
-
-            items.add(dessert);
-        }
     }
 
     @Override
     public ItemVH onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_poi, parent, false);
+        final ItemVH vh = new ItemVH(v);
 
-        return new ItemVH(v);
+        // For event listener, it should be set when list item view is populated, rather than when binding with new list items
+        // ... as it is "recycling" already populated view, thus this avoids repeated setting event listeners
+        vh.toggleBookmark.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                POI poi = items.get(vh.getAdapterPosition());
+                Toast.makeText(context, poi.getName() + poi.isBookmarked(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        return vh;
     }
 
     @Override
@@ -79,12 +74,14 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
 
     protected static class ItemVH extends RecyclerView.ViewHolder {
         TextView txtTitle, txtDesc;
+        ToggleButton toggleBookmark;
 
         public ItemVH(View itemView) {
             super(itemView);
 
             txtTitle = (TextView) itemView.findViewById(R.id.item_poi_name);
             txtDesc = (TextView) itemView.findViewById(R.id.item_poi_desc);
+            toggleBookmark = (ToggleButton) itemView.findViewById(R.id.item_poi_bookmark_toggle);
         }
     }
 }

@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
     <PreferenceCategory android:title="General">
+        <Preference
+            android:key="@string/settings_key_device_id"
+            android:selectable="false"
+            android:title="Your device ID"
+            android:summary="Device ID of the device." />
+
         <ListPreference
             android:defaultValue="3"
             android:dialogTitle="Location update frequency"

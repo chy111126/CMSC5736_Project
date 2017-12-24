@@ -42,7 +42,7 @@ public class AddNewFriendActivity extends AppCompatActivity {
             public void onSelect(View v, Friend item) {
                 // Add the friend to current friend list, and go back
                 Intent output = new Intent();
-                output.putExtra(FriendsFragment.INTENT_KEY_NEW_FRIEND, 1);
+                output.putExtra(FriendsFragment.INTENT_KEY_NEW_FRIEND, item);
                 AddNewFriendActivity.this.setResult(RESULT_OK, output);
                 AddNewFriendActivity.this.finish();
             }
