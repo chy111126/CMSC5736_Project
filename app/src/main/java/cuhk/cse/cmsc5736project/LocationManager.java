@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -45,7 +46,9 @@ import cuhk.cse.cmsc5736project.utils.Utility;
 
 public class LocationManager {
 
-    private List<Beacon> scanBeacon = new ArrayList<Beacon>();
+    private Date lastScanningDate;
+
+    //private List<Beacon> scanBeacon = new ArrayList<Beacon>();
 
     // ----- POI -----
     private static HashMap<String, POI> poiHM = new HashMap<>();
@@ -63,7 +66,7 @@ public class LocationManager {
 
     // ----- URLs -----
     //218.191.44.226
-    public static String ROOT_URL = "http://192.168.0.103/cmsc5736_project";
+    public static String ROOT_URL = "http://192.168.100.11/cmsc5736_project";
     private static String GET_ALL_BEACON_DATA_URL = ROOT_URL + "/get_all_beacon_data.php";
     private static String GET_ALL_POI_DATA_URL = ROOT_URL + "/get_all_poi_data.php";
     private static String GET_ALL_FRIEND_DATA_URL = ROOT_URL + "/get_all_user_friends.php";
@@ -126,11 +129,12 @@ public class LocationManager {
         updateUserData(context);
 
         //init/update RSSI-distance model
-        RSSIModel.getInstance().updateModel(context);
+        //RSSIModel.getInstance().updateModel(context);
 
         //start beacon scan
         if (!isScanning) {
             scanHandler.post(scanRunnable);
+            Toast.makeText(context, "Scanning started!", Toast.LENGTH_SHORT);
         }
     }
 
@@ -138,6 +142,7 @@ public class LocationManager {
         // TODO: stopService methods
         if (isScanning) {
             scanHandler.post(scanRunnable);
+            Toast.makeText(context, "Scanning stopped!", Toast.LENGTH_SHORT);
         }
     }
 
@@ -173,7 +178,7 @@ public class LocationManager {
     }
 
     // ----- POI methods -----
-    public void getPOIDefinitions(Context context, final OnPOIResultListener initListener) {
+    public void initPOIDefinitions(Context context, final OnPOIResultListener initListener) {
         // Get POI definitions from server, and materialize for client upgrades to each approximation
         // ~= RSSIModel.updateModel method
         HashMap postData = new HashMap();
@@ -190,15 +195,27 @@ public class LocationManager {
                         String id = poi.getID();
                         // Put objects to accessing array/Hashmap
                         poiHM.put(id, poi);
+                        //Log.i("getPOIDefinitions", poi.toString());
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                List<POI> poiList = new ArrayList<>(poiHM.values());
-                initListener.onRetrieved(poiList);
+
+                initListener.onRetrieved(LocationManager.this.getPOIList());
             }
         });
         task.execute(GET_ALL_POI_DATA_URL);
+    }
+
+    public void getPOIDefinitions(Context context, final OnPOIResultListener initListener) {
+        // Already initialized. returning old list
+        initListener.onRetrieved(LocationManager.this.getPOIList());
+    }
+
+    public List<POI> getPOIList() {
+        // Translate updated POI Hashmap to list
+        List<POI> poiList = new ArrayList<>(poiHM.values());
+        return poiList;
     }
 
     public void updatePOIDefintion() {
@@ -257,7 +274,7 @@ public class LocationManager {
         }
     }
 
-    public void getCurrentUserFriendList(Context context, final OnFriendResultListener initListener) {
+    public void initCurrentUserFriendList(Context context, final OnFriendResultListener initListener) {
         // Get list of user-stored friends for caller method
         // When this class updates the friend objects, the UI would be updated as well (through setOnFriendResultListener)
         HashMap postData = new HashMap();
@@ -284,7 +301,9 @@ public class LocationManager {
             }
         });
         task.execute(GET_ALL_FRIEND_DATA_URL);
+    }
 
+    public void getCurrentUserFriendList(Context context, final OnFriendResultListener initListener) {
         List<Friend> friendList = new ArrayList<>(friendHM.values());
         initListener.onRetrieved(friendList);
     }
@@ -299,9 +318,10 @@ public class LocationManager {
         }
     }
 
-    public void putFriend(Friend newFriend) {
+    public void putFriend(Context context, Friend newFriend) {
         // Put a new friend to location manager service for tracking updates
         friendHM.put(newFriend.getMAC(), newFriend);
+        addFriendToServer(newFriend, context);
 
         // Invoke callback method
         if (this.friendChangedListener != null) {
@@ -309,7 +329,7 @@ public class LocationManager {
         }
     }
 
-    public void addFriendToServer(Friend newFriend, Context context) {
+    private void addFriendToServer(Friend newFriend, Context context) {
         // Get POI definitions from server, and materialize for client upgrades to each approximation
         // ~= RSSIModel.updateModel method
         HashMap postData = new HashMap();
@@ -333,7 +353,18 @@ public class LocationManager {
         task.execute(USER_ADD_FRIEND_URL);
     }
 
-    public void removeFriendFromServer(Friend toRemoveFriend, Context context) {
+    public void removeFriend(Context context, Friend toRemoveFriend) {
+        // Remove a friend from location manager service
+        friendHM.remove(toRemoveFriend.getMAC());
+        removeFriendFromServer(toRemoveFriend, context);
+
+        // Invoke callback method
+        if (this.friendChangedListener != null) {
+            this.friendChangedListener.onDeleted(toRemoveFriend);
+        }
+    }
+
+    private void removeFriendFromServer(Friend toRemoveFriend, Context context) {
         // Get POI definitions from server, and materialize for client upgrades to each approximation
         // ~= RSSIModel.updateModel method
         HashMap postData = new HashMap();
@@ -356,16 +387,6 @@ public class LocationManager {
             }
         });
         task.execute(USER_REMOVE_FRIEND_URL);
-    }
-
-    public void removeFriend(Friend toRemoveFriend) {
-        // Remove a friend from location manager service
-        friendHM.remove(toRemoveFriend.getMAC());
-
-        // Invoke callback method
-        if (this.friendChangedListener != null) {
-            this.friendChangedListener.onDeleted(toRemoveFriend);
-        }
     }
 
 
@@ -539,6 +560,7 @@ public class LocationManager {
                 final int major = (scanRecord[startByte + 20] & 0xff) * 0x100 + (scanRecord[startByte + 21] & 0xff);
                 final int minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
 
+                /*
                 Beacon beacon = new Beacon();
                 beacon.setUUID(uuid);
                 beacon.setMajor(major);
@@ -555,6 +577,22 @@ public class LocationManager {
                 }
                 if (!isUpdated) {
                     scanBeacon.add(beacon);
+                }
+                */
+
+                // Check beacon entry in POI Hashmap
+                // If threshold passed, trigger POI change listener
+                Date nowDate = new Date();
+                int scanning_threshold = 1;
+                if (lastScanningDate == null || (nowDate.getTime() - lastScanningDate.getTime()) / 1000 > scanning_threshold) {
+                    POI targetPOI = poiHM.get(uuid);
+                    if (targetPOI != null) {
+                        targetPOI.getBeacon().setRSSI(result.getRssi());
+                        //Log.i("targetPOI", " " + targetPOI.toString());
+                        //Log.i("targetPOI RSSI", " " + result.getRssi());
+                        poiChangedListener.onChanged();
+                    }
+                    lastScanningDate = new Date();
                 }
             }
         }

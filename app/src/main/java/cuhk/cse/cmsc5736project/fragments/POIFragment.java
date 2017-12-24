@@ -10,8 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
+import cuhk.cse.cmsc5736project.LocationManager;
 import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.adapters.POIListAdapter;
+import cuhk.cse.cmsc5736project.models.POI;
 import cuhk.cse.cmsc5736project.utils.Utility;
 
 
@@ -25,6 +29,7 @@ public class POIFragment extends Fragment {
 
     // UI elements
     private RecyclerView recyclerView;
+    private POIListAdapter adapter;
 
     public POIFragment() {
         // Required empty public constructor
@@ -51,12 +56,21 @@ public class POIFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setBackgroundColor(layoutColor);
 
-        POIListAdapter adapter = new POIListAdapter(getContext());
+        adapter = new POIListAdapter(getContext());
         recyclerView.setAdapter(adapter);
 
         Log.i(TAG, "onCreateView");
 
         return rootView;
+    }
+
+    public void checkIfArriveBookmarkedLocation() {
+        // Get POI list
+        List<POI> poiList = LocationManager.getInstance().getPOIList();
+
+        // TODO: Sort POI list by RSSI value
+        // TODO: Check if first POI of list if bookmarked
+        // TODO: If yes, remove bookmark state, and update UI via adapter.notifyDataSetChanged();
     }
 
 }

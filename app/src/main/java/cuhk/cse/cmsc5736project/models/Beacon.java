@@ -65,8 +65,32 @@ public class Beacon implements Serializable
     public double getPos_x(){return pos_x;}
     public double getPos_y(){return pos_y;}
 
+    public double getDistance() {
+        // Get distance using RSSI power
+        return calDistance(this.rssi);
+    }
+
     public double calDistance(double power)
     {
         return Math.pow((one_meter_power/power),(1/path_loss_exponent));
+    }
+
+
+    // ----- Proximity method -----
+    public static int PROXIMITY_VERY_CLOSE = 0;
+    public static int PROXIMITY_CLOSE = 1;
+    public static int PROXIMITY_FAR = 2;
+    public static int PROXIMITY_UNDETERMINED = -1;
+
+    public int getProximity(){
+        // From RSSI value, determine how close the user is to the POI
+        if(getRSSI() < -90) {
+            return PROXIMITY_FAR;
+        } else if(getRSSI() < -70) {
+            return PROXIMITY_CLOSE;
+        } else if (getRSSI() < -50) {
+            return PROXIMITY_VERY_CLOSE;
+        }
+        return PROXIMITY_UNDETERMINED;
     }
 }

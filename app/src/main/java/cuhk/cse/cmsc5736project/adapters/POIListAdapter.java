@@ -10,11 +10,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import cuhk.cse.cmsc5736project.LocationManager;
 import cuhk.cse.cmsc5736project.R;
+import cuhk.cse.cmsc5736project.interfaces.OnPOIListChangeListener;
 import cuhk.cse.cmsc5736project.interfaces.OnPOIResultListener;
 import cuhk.cse.cmsc5736project.models.Dessert;
 import cuhk.cse.cmsc5736project.models.POI;
@@ -39,6 +42,12 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
                 POIListAdapter.this.notifyDataSetChanged();
             }
         });
+        LocationManager.getInstance().setOnPOIChangedListener(new OnPOIListChangeListener() {
+            @Override
+            public void onChanged() {
+                POIListAdapter.this.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -52,6 +61,7 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
             @Override
             public void onClick(View view) {
                 POI poi = items.get(vh.getAdapterPosition());
+                poi.setBookmarked(!poi.isBookmarked());
                 Toast.makeText(context, poi.getName() + poi.isBookmarked(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -65,6 +75,8 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
 
         holder.txtTitle.setText(item.getName());
         holder.txtDesc.setText(item.getDescription());
+        holder.txtRSSI.setText(" " + item.getBeacon().getRSSI());
+        holder.toggleBookmark.setChecked(item.isBookmarked());
     }
 
     @Override
@@ -73,7 +85,7 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
     }
 
     protected static class ItemVH extends RecyclerView.ViewHolder {
-        TextView txtTitle, txtDesc;
+        TextView txtTitle, txtDesc, txtRSSI;
         ToggleButton toggleBookmark;
 
         public ItemVH(View itemView) {
@@ -81,6 +93,7 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
 
             txtTitle = (TextView) itemView.findViewById(R.id.item_poi_name);
             txtDesc = (TextView) itemView.findViewById(R.id.item_poi_desc);
+            txtRSSI = (TextView) itemView.findViewById(R.id.item_poi_rssi_value);
             toggleBookmark = (ToggleButton) itemView.findViewById(R.id.item_poi_bookmark_toggle);
         }
     }

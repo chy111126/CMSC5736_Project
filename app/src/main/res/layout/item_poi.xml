@@ -33,9 +33,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toStartOf="@id/item_poi_bookmark_toggle"
-            android:layout_toEndOf="@id/imageView"
             android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/imageView"
+            android:layout_toStartOf="@id/item_poi_bookmark_toggle"
             android:orientation="vertical">
 
             <TextView
@@ -61,6 +61,13 @@
                 tools:text="A really long description, with a maximum three lines." />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/item_poi_rssi_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/item_poi_bookmark_toggle"
+            android:text="TextView" />
 
         <ToggleButton
             android:id="@+id/item_poi_bookmark_toggle"
