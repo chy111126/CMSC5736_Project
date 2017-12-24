@@ -1,6 +1,7 @@
 package cuhk.cse.cmsc5736project.fragments;
 
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -8,7 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+
 import cuhk.cse.cmsc5736project.R;
+import cuhk.cse.cmsc5736project.views.PinView;
+
+import static com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.SCALE_TYPE_CENTER_CROP;
 
 
 public class MapFragment extends Fragment {
@@ -40,6 +47,11 @@ public class MapFragment extends Fragment {
         rootView.setBackgroundColor(getLighterColor(color));
 
         Log.i(TAG, "onCreateView");
+
+        PinView imageView = (PinView)rootView.findViewById(R.id.mapView);
+        imageView.setImage(ImageSource.resource(R.drawable.shb_00));
+        imageView.setMinimumScaleType(SCALE_TYPE_CENTER_CROP);
+        imageView.setPin(new PointF(50,50));
 
         return rootView;
     }
