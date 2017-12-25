@@ -2,10 +2,12 @@ package cuhk.cse.cmsc5736project.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -110,6 +112,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
         // For event listener, it should be set when list item view is populated, rather than when binding with new list items
         // ... as it is "recycling" already populated view, thus this avoids repeated setting event listeners
         if(isAddNewFriend) {
+            // Hide some UI elements as well
+            vh.txtLastUpdated.setVisibility(View.INVISIBLE);
+            vh.ivProximityIndicator.setVisibility(View.INVISIBLE);
+
             vh.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -140,11 +146,16 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
     public void onBindViewHolder(ItemVH holder, int position) {
         final Friend item = friendList.get(position);
 
-        //holder.txtTitle.setText(item.getName() + " : RSSI= " + item.getBeacon().getRSSI());
-        holder.txtDesc.setText(item.getDescription());
-
-        holder.txtTitle.setText(item.getName());
-        holder.txtDesc.setText(item.getMAC());
+        if(isAddNewFriend) {
+            // Add friend: Show name + device ID only
+            holder.txtTitle.setText(item.getName());
+            holder.txtDesc.setText(item.getMAC());
+        } else {
+            // Current friend list: Show name + nearby POI + last update
+            holder.txtTitle.setText(item.getName());
+            holder.txtDesc.setText("Near: Toilet");
+            holder.txtLastUpdated.setText("10 seconds ago");
+        }
     }
 
     @Override
@@ -153,13 +164,16 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
     }
 
     protected static class ItemVH extends RecyclerView.ViewHolder {
-        TextView txtTitle, txtDesc;
+        TextView txtTitle, txtDesc, txtLastUpdated;
+        ImageView ivProximityIndicator;
 
         public ItemVH(View itemView) {
             super(itemView);
 
             txtTitle = (TextView) itemView.findViewById(R.id.item_friend_name);
             txtDesc = (TextView) itemView.findViewById(R.id.item_friend_desc);
+            txtLastUpdated = (TextView) itemView.findViewById(R.id.item_friend_last_updated);
+            ivProximityIndicator = (ImageView) itemView.findViewById(R.id.item_friend_proximity_indicator);
         }
     }
 

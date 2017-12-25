@@ -75,7 +75,7 @@ public class LocationManager {
 
     // Current device variables
     public static PointF userPos = new PointF(0, 0);
-    public static String userName;
+    public static String userName = "test-user";
     public static String userMAC = "Not-init-BLE-yet";
 
     // BLE service and states
@@ -100,6 +100,10 @@ public class LocationManager {
 
     public void iniUserData(Context context)
     {
+        if(BluetoothAdapter.getDefaultAdapter() == null) {
+            return;
+        }
+
         //set default user data
         userName = BluetoothAdapter.getDefaultAdapter().getName();
         userMAC = this.getUserMAC(context);
@@ -123,8 +127,6 @@ public class LocationManager {
             Toast.makeText(context, "This device does not support Bluetooth!", Toast.LENGTH_SHORT).show();
             return;
         }
-
-
 
         // init/update user server data
         updateUserData(context,null );
@@ -576,6 +578,7 @@ public class LocationManager {
                 Beacon beacon = Utility.createBeaconFromJsonObject(row);
                 String uuid = beacon.getUUID();
                 POI poi = new POI(uuid, "POI " + i, "Description!");
+                poi.setBeacon(beacon);
                 poi.setPosition(beacon.getPos_x(), beacon.getPos_y());
 
                 // Put objects to accessing array/Hashmap

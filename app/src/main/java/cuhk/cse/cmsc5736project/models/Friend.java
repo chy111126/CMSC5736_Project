@@ -58,8 +58,13 @@ public class Friend implements Serializable {
     public void setBeacon(Beacon beacon) {
         this.beacon = beacon;
     }
+
     public void setNearPOI(POI nearestLocation)
     {
         this.nearestLocation = nearestLocation;
+    }
+
+    public POI getNearestLocation() {
+        return nearestLocation;
     }
 }
