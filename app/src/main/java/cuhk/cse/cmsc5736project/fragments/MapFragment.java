@@ -70,6 +70,8 @@ public class MapFragment extends Fragment {
         imageView = (PinView)rootView.findViewById(R.id.mapView);
         setImageViewListeers(imageView);
 
+        //TODO: Map test
+/*
         locationManager = LocationManager.getInstance();
         locationManager.getSimulatedPOIDefinitions(getContext(), new OnPOIResultListener(){
             public void onRetrieved(List<POI> poiList){
@@ -86,7 +88,7 @@ public class MapFragment extends Fragment {
                 //TODO: handle friend list
             }
         });
-
+*/
         return rootView;
     }
 

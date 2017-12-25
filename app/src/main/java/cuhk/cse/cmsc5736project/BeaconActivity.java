@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -44,6 +45,8 @@ public class BeaconActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Settings");
         setContentView(R.layout.activity_beacon);
 
         // init BLE
@@ -125,8 +128,6 @@ public class BeaconActivity extends AppCompatActivity {
                     .build();
 ;
             btLeScanne.startScan(filters, settings, mScanCallback);
-
-           // scanHandler.postDelayed(this, scan_interval_ms);
         }
     };
 
@@ -218,5 +219,11 @@ public class BeaconActivity extends AppCompatActivity {
         super.onBackPressed();
         this.finish();
     }
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

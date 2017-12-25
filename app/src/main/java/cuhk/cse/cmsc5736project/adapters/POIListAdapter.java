@@ -35,6 +35,7 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
 
     public POIListAdapter(Context context) {
         this.context = context;
+
         LocationManager.getInstance().getPOIDefinitions(context, new OnPOIResultListener() {
             @Override
             public void onRetrieved(List<POI> poiList) {

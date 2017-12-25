@@ -1,19 +1,16 @@
 package cuhk.cse.cmsc5736project;
 
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanRecord;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.graphics.PointF;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.kosalgeek.genasync12.AsyncResponse;
@@ -27,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
 
 import cuhk.cse.cmsc5736project.interfaces.OnFriendListChangeListener;
 import cuhk.cse.cmsc5736project.interfaces.OnFriendResultListener;
@@ -59,14 +56,13 @@ public class LocationManager {
     private OnFriendListChangeListener friendChangedListener = null;
 
     private static HashMap<String, Friend> notFriendHM = new HashMap<>();
-    private OnFriendListChangeListener notFriendChangedListener = null;
 
     // ----- Singleton class -----
     private static LocationManager instance;
 
     // ----- URLs -----
     //218.191.44.226
-    public static String ROOT_URL = "http://192.168.100.11/cmsc5736_project";
+    public static String ROOT_URL = "http://192.168.0.103/cmsc5736_project";
     private static String GET_ALL_BEACON_DATA_URL = ROOT_URL + "/get_all_beacon_data.php";
     private static String GET_ALL_POI_DATA_URL = ROOT_URL + "/get_all_poi_data.php";
     private static String GET_ALL_FRIEND_DATA_URL = ROOT_URL + "/get_all_user_friends.php";
@@ -89,6 +85,7 @@ public class LocationManager {
     private boolean isScanning = false;
     private Handler scanHandler = new Handler();
 
+
     // Constructor
     public static LocationManager getInstance() {
         if (instance == null) {
@@ -97,10 +94,16 @@ public class LocationManager {
         return instance;
     }
 
-    public String getUserMAC(Context context) {
+    static public String getUserMAC(Context context) {
         return android.provider.Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
     }
 
+    public void iniUserData(Context context)
+    {
+        //set default user data
+        userName = BluetoothAdapter.getDefaultAdapter().getName();
+        userMAC = this.getUserMAC(context);
+    }
     // LocationManager service
     // The caller class (i.e. MainActivity, etc.) should be able to start/stop service as wished.
     public void startService(Context context) {
@@ -121,16 +124,13 @@ public class LocationManager {
             return;
         }
 
-        //set default user data
-        userName = BluetoothAdapter.getDefaultAdapter().getName();
-        userMAC = this.getUserMAC(context);
+
 
         // init/update user server data
-        POI a = new POI("a","a","a");
-        updateUserData(context,a );
+        updateUserData(context,null );
 
         //init/update RSSI-distance model
-        //RSSIModel.getInstance().updateModel(context);
+        RSSIModel.getInstance().updateModel(context);
 
         //start beacon scan
         if (!isScanning) {
@@ -148,20 +148,111 @@ public class LocationManager {
     }
 
     // TODO: Service callbacks methods
+    private Runnable scanRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if(!isScanning) {
+                ScanFilter beaconFilter = new ScanFilter.Builder()
+                        .build();
+
+                ArrayList<ScanFilter> filters = new ArrayList<ScanFilter>();
+                filters.add(beaconFilter);
+
+                ScanSettings settings = new ScanSettings.Builder()
+                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                        .build();
+                ;
+                btLeScanne.startScan(filters, settings, mScanCallback);
+                isScanning = true;
+            }
+            else {
+                btLeScanne.stopScan(mScanCallback);
+                isScanning = false;
+            }
+        }
+    };
+
+
+    private ScanCallback mScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+
+            byte[] scanRecord = result.getScanRecord().getBytes();
+
+            int startByte = 2;
+            boolean patternFound = false;
+            while (startByte <= 5) {
+                if (((int) scanRecord[startByte + 2] & 0xff) == 0x02 && //Identifies an iBeacon
+                        ((int) scanRecord[startByte + 3] & 0xff) == 0x15) { //Identifies correct data length
+                    patternFound = true;
+                    break;
+                }
+                startByte++;
+            }
+
+            if (patternFound) {
+                //Convert to hex String
+                byte[] uuidBytes = new byte[16];
+                System.arraycopy(scanRecord, startByte + 4, uuidBytes, 0, 16);
+                String hexString = Utility.getInstance().bytesToHex(uuidBytes);
+
+                //UUID detection
+                String uuid = hexString.substring(0, 8) + "-" +
+                        hexString.substring(8, 12) + "-" +
+                        hexString.substring(12, 16) + "-" +
+                        hexString.substring(16, 20) + "-" +
+                        hexString.substring(20, 32);
+                final int major = (scanRecord[startByte + 20] & 0xff) * 0x100 + (scanRecord[startByte + 21] & 0xff);
+                final int minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
+
+
+                // Check beacon entry in POI Hashmap
+                // If threshold passed, trigger POI change listener
+                Date nowDate = new Date();
+                int scanning_threshold = 1;
+                if (lastScanningDate == null || (nowDate.getTime() - lastScanningDate.getTime()) / 1000 > scanning_threshold) {
+                    POI targetPOI = poiHM.get(uuid);
+                    if (targetPOI != null) {
+                        targetPOI.getBeacon().setRSSI(result.getRssi());
+                        //Log.i("targetPOI", " " + targetPOI.toString());
+                        //Log.i("targetPOI RSSI", " " + result.getRssi());
+                        poiChangedListener.onChanged();
+                    }
+                    lastScanningDate = new Date();
+                }
+            }
+        }
+
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            Log.d("", "onBatchScanResults: " + results.size() + " results");
+            for (ScanResult sr : results) {
+                Log.i("ScanResult - Results", sr.toString());
+            }
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            Log.w("", "LE Scan Failed: " + errorCode);
+        }
+    };
 
     // TODO: End
 
 
     // ----- User methods -----
-    //keep update user data (name, position)
+    // Insert user item to users table if not exists, update the corresponding item if it is exists
     public void updateUserData(Context context, POI nearPOI) {
         HashMap postData = new HashMap();
         postData.put("mac", userMAC);
         postData.put("name", userName);
         postData.put("position_x", Float.toString(userPos.x));
         postData.put("position_y", Float.toString(userPos.y));
-        postData.put("near_POI", nearPOI.getID());
+        if (nearPOI!= null) {
+            postData.put("near_POI", nearPOI.getID());
+        }
         //last_update use server time
+
         PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
             @Override
             public void processFinish(String s) {
@@ -179,37 +270,52 @@ public class LocationManager {
         });
         task.execute(UPDATE_USER_DATA_URL);
     }
-    /*
-    public void getUserData(Context context) {
-        HashMap postData = new HashMap();
-        postData.put("mac", userMAC);
 
-        PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
-            @Override
-            public void processFinish(String s) {
-                        try {
-                            JSONObject resultJson = new JSONObject(s);
-                            String mac = resultJson.getString("mac");
-                            String name = resultJson.getString("name");
-                            int nearPOI = resultJson.getInt("near_POI");
-                            String lastUpdate = resultJson.getString("last_update");
-
-                            userPos.x = (float)(resultJson.getDouble("position_x"));
-                            userPos.y = (float)(resultJson.getDouble("position_y"));
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-            }
-        });
-        //task.execute(UPDATE_USER_DATA_URL);
-
-    }
-    */
     // ----- POI methods -----
     public void initPOIDefinitions(Context context, final OnPOIResultListener initListener) {
         // Get POI definitions from server, and materialize for client upgrades to each approximation
         // ~= RSSIModel.updateModel method
+        HashMap postData = new HashMap();
+        PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
+            @Override
+            public void processFinish(String s) {
+                try {
+                    JSONObject resultJson = new JSONObject(s);
+                    JSONArray poiArr = resultJson.getJSONArray("pois");
+                    for (int i = 0; i < poiArr.length(); i++) {
+                        // Transform raw result to object
+                        JSONObject row = poiArr.getJSONObject(i);
+                        POI poi = Utility.createPOIFromJsonObject(row);
+                        String id = poi.getID();
+                        // Put objects to accessing array/Hashmap
+                        poiHM.put(id, poi);
+                        //Log.i("getPOIDefinitions", poi.toString());
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                if(initListener != null) {
+                    initListener.onRetrieved(LocationManager.this.getPOIList());
+                }
+            }
+        });
+        task.execute(GET_ALL_POI_DATA_URL);
+    }
+
+    public void getPOIDefinitions(Context context, final OnPOIResultListener initListener) {
+        // Already initialized. returning old list
+        initListener.onRetrieved(LocationManager.this.getPOIList());
+    }
+
+    public List<POI> getPOIList() {
+        // Translate updated POI Hashmap to list
+        List<POI> poiList = new ArrayList<>(poiHM.values());
+        return poiList;
+    }
+
+    public void updatePOIDefintion(Context context) {
+        // TODO: Do update POI beacon info here!
         HashMap postData = new HashMap();
         PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
             @Override
@@ -230,30 +336,13 @@ public class LocationManager {
                     e.printStackTrace();
                 }
 
-                initListener.onRetrieved(LocationManager.this.getPOIList());
+                // Invoke callback method
+                if (poiChangedListener != null) {
+                    poiChangedListener.onChanged();
+                }
             }
         });
         task.execute(GET_ALL_POI_DATA_URL);
-    }
-
-    public void getPOIDefinitions(Context context, final OnPOIResultListener initListener) {
-        // Already initialized. returning old list
-        initListener.onRetrieved(LocationManager.this.getPOIList());
-    }
-
-    public List<POI> getPOIList() {
-        // Translate updated POI Hashmap to list
-        List<POI> poiList = new ArrayList<>(poiHM.values());
-        return poiList;
-    }
-
-    public void updatePOIDefintion() {
-        // TODO: Do update POI beacon info here!
-
-        // Invoke callback method
-        if (this.poiChangedListener != null) {
-            this.poiChangedListener.onChanged();
-        }
     }
 
     public void setOnPOIChangedListener(OnPOIListChangeListener listener) {
@@ -294,13 +383,35 @@ public class LocationManager {
         task.execute(GET_ALL_NOT_FRIEND_DATA_URL);
     }
 
-    public void updateFriendDefintion() {
+    public void updateFriendDefintion(Context context) {
         // TODO: Do update friend beacon info here!
-
-        // Invoke callback method
-        if (this.friendChangedListener != null) {
-            this.friendChangedListener.onChanged();
-        }
+        HashMap postData = new HashMap();
+        postData.put("mac", userMAC);
+        PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
+            @Override
+            public void processFinish(String s) {
+                try {
+                    JSONObject resultJson = new JSONObject(s);
+                    JSONArray friendArr = resultJson.getJSONArray("not_friends");
+                    for (int i = 0; i < friendArr.length(); i++) {
+                        // Transform raw result to object
+                        JSONObject row = friendArr.getJSONObject(i);
+                        Friend friend = Utility.createNotFriendFromJsonObject(row);
+                        String id = friend.getMAC();
+                        // Put objects to accessing array/Hashmap
+                        notFriendHM.put(id, friend);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                List<Friend> notFriendList = new ArrayList<>(notFriendHM.values());
+                // Invoke callback method
+                if (friendChangedListener != null) {
+                    friendChangedListener.onChanged();
+                }
+            }
+        });
+        task.execute(GET_ALL_NOT_FRIEND_DATA_URL);
     }
 
     public void initCurrentUserFriendList(Context context, final OnFriendResultListener initListener) {
@@ -350,12 +461,14 @@ public class LocationManager {
     public void putFriend(Context context, Friend newFriend) {
         // Put a new friend to location manager service for tracking updates
         friendHM.put(newFriend.getMAC(), newFriend);
+        notFriendHM.remove(newFriend.getMAC());
         addFriendToServer(newFriend, context);
 
         // Invoke callback method
         if (this.friendChangedListener != null) {
             this.friendChangedListener.onAdded(newFriend);
         }
+
     }
 
     private void addFriendToServer(Friend newFriend, Context context) {
@@ -385,12 +498,14 @@ public class LocationManager {
     public void removeFriend(Context context, Friend toRemoveFriend) {
         // Remove a friend from location manager service
         friendHM.remove(toRemoveFriend.getMAC());
+        notFriendHM.put(toRemoveFriend.getMAC(),toRemoveFriend);
         removeFriendFromServer(toRemoveFriend, context);
 
         // Invoke callback method
         if (this.friendChangedListener != null) {
             this.friendChangedListener.onDeleted(toRemoveFriend);
         }
+
     }
 
     private void removeFriendFromServer(Friend toRemoveFriend, Context context) {
@@ -532,119 +647,5 @@ public class LocationManager {
     }
 
 
-    private Runnable scanRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if(!isScanning) {
-                ScanFilter beaconFilter = new ScanFilter.Builder()
-                        .build();
 
-                ArrayList<ScanFilter> filters = new ArrayList<ScanFilter>();
-                filters.add(beaconFilter);
-
-                ScanSettings settings = new ScanSettings.Builder()
-                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                        .build();
-                ;
-                btLeScanne.startScan(filters, settings, mScanCallback);
-                isScanning = true;
-            }
-            else {
-                btLeScanne.stopScan(mScanCallback);
-                isScanning = false;
-            }
-        }
-    };
-
-
-    private ScanCallback mScanCallback = new ScanCallback() {
-        @Override
-        public void onScanResult(int callbackType, ScanResult result) {
-
-            byte[] scanRecord = result.getScanRecord().getBytes();
-
-            int startByte = 2;
-            boolean patternFound = false;
-            while (startByte <= 5) {
-                if (((int) scanRecord[startByte + 2] & 0xff) == 0x02 && //Identifies an iBeacon
-                        ((int) scanRecord[startByte + 3] & 0xff) == 0x15) { //Identifies correct data length
-                    patternFound = true;
-                    break;
-                }
-                startByte++;
-            }
-
-            if (patternFound) {
-                //Convert to hex String
-                byte[] uuidBytes = new byte[16];
-                System.arraycopy(scanRecord, startByte + 4, uuidBytes, 0, 16);
-                String hexString = Utility.getInstance().bytesToHex(uuidBytes);
-
-                //UUID detection
-                String uuid = hexString.substring(0, 8) + "-" +
-                        hexString.substring(8, 12) + "-" +
-                        hexString.substring(12, 16) + "-" +
-                        hexString.substring(16, 20) + "-" +
-                        hexString.substring(20, 32);
-                final int major = (scanRecord[startByte + 20] & 0xff) * 0x100 + (scanRecord[startByte + 21] & 0xff);
-                final int minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
-
-                /*
-                Beacon beacon = new Beacon();
-                beacon.setUUID(uuid);
-                beacon.setMajor(major);
-                beacon.setMinor(minor);
-                beacon.setRSSI(result.getRssi());
-
-                boolean isUpdated = false;
-                for (Beacon beaconItem : scanBeacon) {
-                    if (beacon.isSameBeacon(beaconItem)) {
-                        beaconItem.setRSSI((int)((beaconItem.prevRSSIAvg * beaconItem.scanTimes + beacon.getRSSI())/(beaconItem.scanTimes + 1)));
-                        beaconItem.prevRSSIAvg = beaconItem.getRSSI();
-
-                        if(beaconItem.scanTimes <= 10) {
-                            beaconItem.scanTimes++;
-                        }
-                        //beaconItem.setRSSI(beacon.getRSSI());
-                        isUpdated = true;
-                        break;
-                    }
-                }
-                if (!isUpdated) {
-                    beacon.scanTimes ++;
-                    beacon.prevRSSIAvg =(beacon.getRSSI());
-                    scanBeacon.add(beacon);
-                }
-                */
-
-                // Check beacon entry in POI Hashmap
-                // If threshold passed, trigger POI change listener
-                Date nowDate = new Date();
-                int scanning_threshold = 1;
-                if (lastScanningDate == null || (nowDate.getTime() - lastScanningDate.getTime()) / 1000 > scanning_threshold) {
-                    POI targetPOI = poiHM.get(uuid);
-                    if (targetPOI != null) {
-                        targetPOI.getBeacon().setRSSI(result.getRssi());
-                        //Log.i("targetPOI", " " + targetPOI.toString());
-                        //Log.i("targetPOI RSSI", " " + result.getRssi());
-                        poiChangedListener.onChanged();
-                    }
-                    lastScanningDate = new Date();
-                }
-            }
-        }
-
-        @Override
-        public void onBatchScanResults(List<ScanResult> results) {
-            Log.d("", "onBatchScanResults: " + results.size() + " results");
-            for (ScanResult sr : results) {
-                Log.i("ScanResult - Results", sr.toString());
-            }
-        }
-
-        @Override
-        public void onScanFailed(int errorCode) {
-            Log.w("", "LE Scan Failed: " + errorCode);
-        }
-    };
 }

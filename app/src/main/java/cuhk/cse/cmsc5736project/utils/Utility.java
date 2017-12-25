@@ -95,10 +95,14 @@ public class Utility {
             String mac = jsonObj.getString("mac");
             String name = jsonObj.getString("name");
 
-            String nearPOIID = Integer.toString(jsonObj.getInt("near_POI"));
-            String nearPOIName = jsonObj.getString("near_POI_name");
-            String nearPOIDescription = jsonObj.getString("near_POI_description");
-            POI poi = new POI(nearPOIID,nearPOIName,nearPOIDescription);
+            POI poi = null;
+            if(jsonObj.has("near_POI_ID")) {
+                String nearPOIID = Integer.toString(jsonObj.getInt("near_POI_ID"));
+                String nearPOIName = jsonObj.getString("near_POI_name");
+
+                String nearPOIDescription = jsonObj.getString("near_POI_description");
+                poi = new POI(nearPOIID, nearPOIName, nearPOIDescription);
+            }
 
             String updateTimeString = jsonObj.getString("update_time");
             Date updateTime =(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).parse(updateTimeString);
@@ -118,7 +122,7 @@ public class Utility {
     }
     public static POI createPOIFromJsonObject(JSONObject jsonObj) {
         try {
-            String id =jsonObj.getString("uuid");
+            String id =jsonObj.getString("id");
             String name =jsonObj.getString("name");
             String description =jsonObj.getString("description");
 

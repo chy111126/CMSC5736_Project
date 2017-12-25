@@ -3,13 +3,22 @@ package cuhk.cse.cmsc5736project;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanRecord;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,8 +28,11 @@ import com.kosalgeek.genasync12.PostResponseAsyncTask;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import cuhk.cse.cmsc5736project.models.Beacon;
 import cuhk.cse.cmsc5736project.models.RSSIModel;
 import cuhk.cse.cmsc5736project.utils.Utility;
 
@@ -34,6 +46,7 @@ public class BeaconSetupActivity extends AppCompatActivity implements AsyncRespo
 
     private BluetoothManager btManager;
     private BluetoothAdapter btAdapter;
+    private BluetoothLeScanner btLeScanne;
     private Handler scanHandler = new Handler();
     private int scan_interval_ms = 5000;
     private boolean isScanning = false;
@@ -47,11 +60,14 @@ public class BeaconSetupActivity extends AppCompatActivity implements AsyncRespo
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Settings");
         setContentView(R.layout.activity_beacon_setup);
 
         // init BLE
         btManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
         btAdapter = btManager.getAdapter();
+        btLeScanne = btAdapter.getBluetoothLeScanner();
 
 
         textView_id=findViewById(R.id.textview_becon_setup_id);
@@ -81,7 +97,7 @@ public class BeaconSetupActivity extends AppCompatActivity implements AsyncRespo
         HashMap postData = new HashMap();
         postData.put("uuid_major_minor",uuid + "_" + Integer.toString(major)+ "_" + Integer.toString(minor));
         PostResponseAsyncTask task = new PostResponseAsyncTask(BeaconSetupActivity.this,postData,this);
-        task.execute("http://"+ MainActivity.domain+"/cmsc5736_project/load_beacon_data.php");
+        task.execute(LocationManager.ROOT_URL+"/load_beacon_data.php");
     }
     public void onClick(View v) {
         TextView textView;
@@ -131,41 +147,18 @@ public class BeaconSetupActivity extends AppCompatActivity implements AsyncRespo
                 postData.put("rssi_two_m_signal", Integer.toString(n3));
                 postData.put("rssi_four_m_signal",Integer.toString(n4));
                 PostResponseAsyncTask task = new PostResponseAsyncTask(BeaconSetupActivity.this,postData,this);
-                task.execute("http://"+ MainActivity.domain+"/cmsc5736_project/save_beacon_data.php");
+                task.execute(LocationManager.ROOT_URL+"/save_beacon_data.php");
                 finish();
                 break;
         }
     }
-    private Runnable scanRunnable = new Runnable()
-    {
+
+
+
+    private ScanCallback mScanCallback = new ScanCallback() {
         @Override
-        public void run() {
-
-            if (isScanning)
-            {
-                if (btAdapter != null)
-                {
-                    btAdapter.stopLeScan(leScanCallback);
-                }
-            }
-            else
-            {
-                if (btAdapter != null)
-                {
-                    btAdapter.startLeScan(leScanCallback);
-                }
-            }
-
-            isScanning = !isScanning;
-
-            scanHandler.postDelayed(this, scan_interval_ms);
-        }
-    };
-    private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback()
-    {
-        @Override
-        public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord)
-        {
+        public void onScanResult(int callbackType, ScanResult result) {
+            byte[] scanRecord = result.getScanRecord().getBytes();
             int startByte = 2;
             boolean patternFound = false;
             while (startByte <= 5)
@@ -199,12 +192,12 @@ public class BeaconSetupActivity extends AppCompatActivity implements AsyncRespo
                 if(uuid.equals(d_uuid) && d_major == major && d_minor == minor) {
                     if(rssiCountAvg ==0)
                     {
-                        avgRSSI = rssi;
+                        avgRSSI = result.getRssi();
                         prevRSSI = avgRSSI;
                         rssiCountAvg++;
                     }
                     else {
-                        avgRSSI = (prevRSSI * rssiCountAvg + rssi) / (rssiCountAvg + 1);
+                        avgRSSI = (prevRSSI * rssiCountAvg + result.getRssi()) / (rssiCountAvg + 1);
                         prevRSSI = avgRSSI;
                         if (rssiCountAvg <= 10) {
                             rssiCountAvg++;
@@ -213,6 +206,49 @@ public class BeaconSetupActivity extends AppCompatActivity implements AsyncRespo
                     textView_rssi.setText(Integer.toString(avgRSSI));
                 }
             }
+        }
+
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            Log.d("", "onBatchScanResults: " + results.size() + " results");
+            for (ScanResult sr : results) {
+                Log.i("ScanResult - Results", sr.toString());
+            }
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            Log.w("", "LE Scan Failed: " + errorCode);
+        }
+    };
+
+
+
+    private Runnable scanRunnable = new Runnable()
+    {
+        @Override
+        public void run() {
+
+
+            ScanFilter beaconFilter = new ScanFilter.Builder()
+                    .build();
+
+            ArrayList<ScanFilter> filters = new ArrayList<ScanFilter>();
+            filters.add(beaconFilter);
+
+            ScanSettings settings = new ScanSettings.Builder()
+                    .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                    .build();
+            ;
+            btLeScanne.startScan(filters, settings, mScanCallback);
+        }
+    };
+    private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback()
+    {
+        @Override
+        public void onLeScan(final BluetoothDevice device, final int rssi, final byte[] scanRecord)
+        {
+
 
         }
     };
@@ -254,5 +290,12 @@ public class BeaconSetupActivity extends AppCompatActivity implements AsyncRespo
     public void onBackPressed() {
         super.onBackPressed();
         this.finish();
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

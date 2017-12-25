@@ -39,8 +39,7 @@ import cuhk.cse.cmsc5736project.views.NoSwipePager;
 
 public class MainActivity extends AppCompatActivity {
     //Constant
-    //static String domain ="218.191.44.226" ;
-    public static String domain ="192.168.100.11" ;
+
     public static final int REQUEST_LOCATION_CODE = 99;
 
     // Variables
@@ -61,29 +60,34 @@ public class MainActivity extends AppCompatActivity {
         context = this;
         setupBottomNavBar();
 
+        LocationManager.getInstance().iniUserData(context);
+
+
+
         LocationManager.getInstance().initPOIDefinitions(context, new OnPOIResultListener() {
             @Override
             public void onRetrieved(List<POI> poiList) {
+
                 LocationManager.getInstance().initCurrentUserFriendList(context, new OnFriendResultListener() {
-                    @Override
+                   @Override
                     public void onRetrieved(List<Friend> friendList) {
-                        setupViewPager();
+                       setupViewPager();
 
-                        // Select initial page
-                        int initialPage = 1;
-                        selectPage(initialPage);
-                        bottomNavigation.setCurrentItem(initialPage);
+                       // Select initial page
+                       int initialPage = 1;
+                       selectPage(initialPage);
+                       bottomNavigation.setCurrentItem(initialPage);
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            checkLocationPermission();
-                        }
+                       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                           checkLocationPermission();
+                       }
                         LocationManager.getInstance().startService(context);
                     }
-                });
+               });
+
             }
         });
 
-        //RSSIModel.getInstance().updateModel(MainActivity.this);
     }
 
     public boolean checkLocationPermission()

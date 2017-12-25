@@ -51,6 +51,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
                     FriendListAdapter.this.notifyDataSetChanged();
                 }
             });
+
         } else {
             LocationManager.getInstance().getCurrentUserFriendList(context, new OnFriendResultListener() {
                 @Override
@@ -82,6 +83,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
                     FriendListAdapter.this.notifyDataSetChanged();
                 }
             });
+
+
         }
     }
 

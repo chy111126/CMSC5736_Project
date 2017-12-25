@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import cuhk.cse.cmsc5736project.LocationManager;
 import cuhk.cse.cmsc5736project.MainActivity;
 
 /**
@@ -36,7 +37,7 @@ public class RSSIModel implements AsyncResponse {
     {
         HashMap postData = new HashMap();
         PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData,this);
-        task.execute("http://"+ MainActivity.domain+"/cmsc5736_project/get_all_beacon_data.php");
+        task.execute(LocationManager.ROOT_URL+"/get_all_beacon_data.php");
 
         return true;
     }
