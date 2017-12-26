@@ -732,4 +732,16 @@ public class LocationManager {
             this.friendChangedListener.onChanged();
         }
     }
+
+    public void simulateBluetoothPOIScanning() {
+        for(POI poi : poiHM.values()) {
+            poi.getBeacon().setRSSI(-30 - new Random().nextInt(70));
+        }
+
+        // Invoke callback method
+        if (this.poiChangedListener != null) {
+            this.poiChangedListener.onChanged();
+        }
+    }
+
 }

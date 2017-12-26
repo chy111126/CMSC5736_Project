@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import cuhk.cse.cmsc5736project.LocationManager;
+import cuhk.cse.cmsc5736project.POINotifManager;
 import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.interfaces.OnPOIListChangeListener;
 import cuhk.cse.cmsc5736project.interfaces.OnPOIResultListener;
@@ -52,6 +53,7 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
             @Override
             public void onChanged() {
                 sortViewList();
+                checkIfArrivedPOI(POIListAdapter.this.context);
                 POIListAdapter.this.notifyDataSetChanged();
             }
         });
@@ -69,11 +71,23 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
             public void onClick(View view) {
                 POI poi = items.get(vh.getAdapterPosition());
                 poi.setBookmarked(!poi.isBookmarked());
-                Toast.makeText(context, poi.getName() + poi.isBookmarked(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, poi.getName() + poi.isBookmarked(), Toast.LENGTH_SHORT).show();
             }
         });
 
         return vh;
+    }
+
+    private void checkIfArrivedPOI(Context context) {
+        for(POI poi : items) {
+            if(poi.isBookmarked()) {
+                // Check for proximity
+                if(poi.getBeacon().getProximity() == Beacon.PROXIMITY_VERY_CLOSE) {
+                    poi.setBookmarked(false);
+                    POINotifManager.notifyPOIArrival(context, poi);
+                }
+            }
+        }
     }
 
     private void sortViewList() {
