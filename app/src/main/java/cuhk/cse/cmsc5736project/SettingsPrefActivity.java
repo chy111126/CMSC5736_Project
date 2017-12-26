@@ -33,8 +33,7 @@ public class SettingsPrefActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_main);
 
-            // gallery EditText change listener
-            //bindPreferenceSummaryToValue(findPreference(getString(R.string.key_gallery_name)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.settings_key_username)));
 
             // notification preference change listener
             //bindPreferenceSummaryToValue(findPreference(getString(R.string.key_notifications_new_message_ringtone)));
@@ -80,7 +79,7 @@ public class SettingsPrefActivity extends AppCompatActivity {
                                 : null);
 
             } else if (preference instanceof EditTextPreference) {
-                if (preference.getKey().equals("key_gallery_name")) {
+                if (preference.getKey().equals("settings_key_username")) {
                     // update the changed gallery name to summary filed
                     preference.setSummary(stringValue);
                 }

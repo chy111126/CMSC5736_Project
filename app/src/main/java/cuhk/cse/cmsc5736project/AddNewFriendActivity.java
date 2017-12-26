@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import cuhk.cse.cmsc5736project.adapters.FriendListAdapter;
 import cuhk.cse.cmsc5736project.fragments.FriendsFragment;
@@ -28,6 +29,11 @@ public class AddNewFriendActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Add new friend");
         setContentView(R.layout.activity_add_new_friend);
+
+        TextView tvUserName = (TextView) findViewById(R.id.add_new_friend_user_name);
+        TextView tvUserMac = (TextView) findViewById(R.id.add_new_friend_user_id);
+        tvUserName.setText("Your name: " + LocationManager.getInstance().getUserName(this));
+        tvUserMac.setText("Your device ID: " + LocationManager.getInstance().getUserMAC(this));
         
         setupFriendList();
     }

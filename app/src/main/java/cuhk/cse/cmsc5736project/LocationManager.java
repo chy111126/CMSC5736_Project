@@ -10,8 +10,10 @@ import android.bluetooth.le.ScanRecord;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.PointF;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -104,6 +106,12 @@ public class LocationManager {
         return instance;
     }
 
+    static public String getUserName(Context context) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        String name = settings.getString("settings_key_username", "Default name");
+        return name;
+    }
+
     static public String getUserMAC(Context context) {
         return android.provider.Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
     }
@@ -115,9 +123,12 @@ public class LocationManager {
         }
 
         //set default user data
-        userName = BluetoothAdapter.getDefaultAdapter().getName();
+        userName = this.getUserName(context);
         userMAC = this.getUserMAC(context);
+        Log.i("initUserData", "userName="+ userName);
+        Log.i("initUserData", "userMAC="+ userMAC);
     }
+
     // LocationManager service
     // The caller class (i.e. MainActivity, etc.) should be able to start/stop service as wished.
     public void startService(final Context context) {
@@ -151,12 +162,13 @@ public class LocationManager {
         }
 
         // start friend poller
-        friendPoller = new PeriodicExecutor(3000);
+        final PeriodicExecutor friendPoller = new PeriodicExecutor(3000);
         friendPoller.execute(new Runnable() {
             @Override
             public void run() {
                 //LocationManager.this.updateFriendDefintion(context);
-                LocationManager.this.updateSimulatedFriendPositions();
+                LocationManager.getInstance().updateSimulatedFriendPositions();
+                LocationManager.getInstance().updateUserState(context);
             }
         });
     }
@@ -282,11 +294,26 @@ public class LocationManager {
     };
     // TODO: End
 
-    public void findNearestPOI() {
+    public void updateUserState(Context context) {
         // From all POIs, find the one with least RSSI
+        POI nearestPOI = null;
+        int leastRSSI = -10000;
         for(POI poi : poiHM.values()) {
-
+            if(poi.getBeacon() != null) {
+                if(poi.getBeacon().getRSSI() > leastRSSI) {
+                    nearestPOI = poi;
+                    leastRSSI = poi.getBeacon().getRSSI();
+                }
+            }
         }
+
+        // Get X/Y from POI
+        if(nearestPOI != null) {
+            userPos.set(nearestPOI.getPosition().x, nearestPOI.getPosition().y);
+        }
+
+        // Update user data to server
+        this.updateUserData(context, nearestPOI);
     }
 
     // ----- User methods -----
@@ -302,7 +329,10 @@ public class LocationManager {
         }
         //last_update use server time
 
-        PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
+        final HashMap finalPost = postData;
+
+        Log.i("LocationManager", "updateUserData started ");
+        PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, false, new AsyncResponse() {
             @Override
             public void processFinish(String s) {
                 try {
@@ -311,8 +341,11 @@ public class LocationManager {
                         Log.d("LocationManager", "updateUserData succeed ");
                     } else {
                         Log.d("LocationManager", "updateUserData failed ");
+                        Log.d("LocationManager", finalPost.toString());
+                        Log.d("LocationManager", resultJson.toString());
                     }
                 } catch (JSONException e) {
+                    Log.e("LocationManager", e.toString());
                     e.printStackTrace();
                 }
             }
@@ -335,9 +368,12 @@ public class LocationManager {
                         // Transform raw result to object
                         JSONObject row = poiArr.getJSONObject(i);
                         POI poi = Utility.createPOIFromJsonObject(row);
-                        String id = poi.getID();
+                        String uuid = poi.getBeacon().getUUID();
+                        int major = poi.getBeacon().getMajor();
+                        int minor = poi.getBeacon().getMinor();
+                        String uuid_major_minor = uuid + "_" + Integer.toString(major) + "_" + Integer.toString(minor);
                         // Put objects to accessing array/Hashmap
-                        poiHM.put(id, poi);
+                        poiHM.put(uuid_major_minor, poi);
                         //Log.i("getPOIDefinitions", poi.toString());
 
                     }
@@ -376,9 +412,12 @@ public class LocationManager {
                         // Transform raw result to object
                         JSONObject row = poiArr.getJSONObject(i);
                         POI poi = Utility.createPOIFromJsonObject(row);
-                        String id = poi.getID();
+                        String uuid = poi.getBeacon().getUUID();
+                        int major = poi.getBeacon().getMajor();
+                        int minor = poi.getBeacon().getMinor();
+                        String uuid_major_minor = uuid + "_" + Integer.toString(major) + "_" + Integer.toString(minor);
                         // Put objects to accessing array/Hashmap
-                        poiHM.put(id, poi);
+                        poiHM.put(uuid_major_minor, poi);
                         //Log.i("getPOIDefinitions", poi.toString());
                     }
                 } catch (JSONException e) {
@@ -445,7 +484,7 @@ public class LocationManager {
         // TODO: Do update friend beacon info here!
         HashMap postData = new HashMap();
         postData.put("mac", userMAC);
-        PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
+        PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, false, new AsyncResponse() {
             @Override
             public void processFinish(String s) {
                 try {
@@ -677,12 +716,16 @@ public class LocationManager {
             beacon.setPathLossExponent(n);
             beacon.setOneMeterPower(n2);
 
-            POI poi = new POI(beacon.getUUID(), "Toilet " + i, "Description " + i);
+            POI poi = new POI(i+"", "Toilet " + i, "Description " + i);
             poi.setBeacon(beacon);
             poi.setPosition(beacon.getPos_x(), beacon.getPos_y());
 
+            String uuid = poi.getBeacon().getUUID();
+            int major = poi.getBeacon().getMajor();
+            int minor = poi.getBeacon().getMinor();
+            String uuid_major_minor = uuid + "_" + Integer.toString(major) + "_" + Integer.toString(minor);
             // Put objects to accessing array/Hashmap
-            poiHM.put(beacon.getUUID(), poi);
+            poiHM.put(uuid_major_minor, poi);
         }
 
         List<POI> poiList = new ArrayList<>(poiHM.values());
