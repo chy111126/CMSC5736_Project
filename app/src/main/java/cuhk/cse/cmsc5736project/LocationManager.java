@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
@@ -541,6 +542,7 @@ public class LocationManager {
         poiHM = new HashMap<>();
         // Get POI definitions from server, and materialize for client upgrades to each approximation
         // ~= RSSIModel.updateModel method
+        /*
         String poiResult = "{\n" +
                 "  \"beacons\": [\n" +
                 "    {\n" +
@@ -587,6 +589,21 @@ public class LocationManager {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        */
+
+        for(int i=0; i < 5; i++) {
+            Beacon beacon = new Beacon();
+            beacon.setUUID(UUID.randomUUID().toString());
+            beacon.setPos(i * 5, i * 10);
+            beacon.setRSSI(-30 - new Random().nextInt(70));
+
+            POI poi = new POI(beacon.getUUID(), "Toilet " + i, "Description " + i);
+            poi.setBeacon(beacon);
+            poi.setPosition(beacon.getPos_x(), beacon.getPos_y());
+
+            // Put objects to accessing array/Hashmap
+            poiHM.put(beacon.getUUID(), poi);
+        }
 
         List<POI> poiList = new ArrayList<>(poiHM.values());
         initListener.onRetrieved(poiList);
@@ -616,8 +633,9 @@ public class LocationManager {
 
     public void getSimulatedCurrentUserFriendList(Context context, final OnFriendResultListener initListener) {
         // For friend fragment to scan all nearby devices
-        HashMap<String, Friend> friendHM = new HashMap<>();
+        friendHM = new HashMap<>();
         for (int i = 0; i < 5; i++) {
+
             Beacon beacon = new Beacon();
             beacon.setUUID(UUID.randomUUID().toString());
             beacon.setMajor(1);
@@ -631,16 +649,27 @@ public class LocationManager {
 
             friendHM.put(macAddr, friend);
         }
+
         List<Friend> friendList = new ArrayList<>(friendHM.values());
         initListener.onRetrieved(friendList);
     }
 
     public void updateSimulatedFriendPositions() {
         // Simulated method for getting updated friend position
+        List<POI> poiList = new ArrayList<>(poiHM.values());
+        List<Friend> friendList = new ArrayList<>(friendHM.values());
+
+        if(poiList.size() == 0 || friendList.size() == 0) {
+            return;
+        }
 
         // Update positions
-        for (Friend friend : friendHM.values()) {
-        //    friend.getBeacon().setRSSI(-1 + -1 * new Random().nextInt(10));
+        for (int i=0; i < 5; i++) {
+            Friend friend = friendList.get(i);
+            POI poi = poiList.get(i);
+
+            friend.setNearPOI(poi);
+            friend.setLastUpdated(new Date());
         }
 
         // Invoke callback method

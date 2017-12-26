@@ -153,8 +153,16 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
         } else {
             // Current friend list: Show name + nearby POI + last update
             holder.txtTitle.setText(item.getName());
-            holder.txtDesc.setText("Near: Toilet");
-            holder.txtLastUpdated.setText("10 seconds ago");
+            if(item.getNearestLocation() != null) {
+                holder.txtDesc.setText("Near: " + item.getNearestLocation().getName());
+            } else {
+                holder.txtDesc.setText("Near: Undetermined");
+            }
+            if(item.getLastUpdatedDate() != null) {
+                holder.txtLastUpdated.setText("10 seconds ago");
+            } else {
+                holder.txtLastUpdated.setText("---");
+            }
         }
     }
 
