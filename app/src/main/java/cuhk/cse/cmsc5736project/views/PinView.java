@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.icu.util.Freezable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -21,6 +22,11 @@ import cuhk.cse.cmsc5736project.models.Friend;
 import cuhk.cse.cmsc5736project.models.Pin;
 
 public class PinView extends SubsamplingScaleImageView {
+
+    private static final float textXOffset = -70;
+    private static final float textYMargin = 20;
+
+
     private final Paint paint = new Paint();
     private final PointF vPin = new PointF();
     //private PointF sPin;
@@ -51,7 +57,6 @@ public class PinView extends SubsamplingScaleImageView {
         //this.pinList.addAll(pinList);
 
         refreshPins();
-        invalidate();
     }
 
     public void addPin(Pin pin) {
@@ -65,7 +70,6 @@ public class PinView extends SubsamplingScaleImageView {
         this.pinList.add(pin);
 
         refreshPins();
-        invalidate();
     }
 
 /*    void toPinViewCoord(Pin pin){
@@ -99,6 +103,7 @@ public class PinView extends SubsamplingScaleImageView {
             pin.setScale();
         }
 
+        invalidate();
     }
 
     @Override
@@ -134,10 +139,15 @@ public class PinView extends SubsamplingScaleImageView {
                 // print friends for pin
                 List<Friend> friendList = pin.getFriendList();
                 if (friendList != null) {
+                    paint.setTextAlign(Paint.Align.LEFT);
+                    paint.setTextSize(pin.getTextSize() * 0.75f);
+                    Rect bounds = new Rect();
+                    paint.getTextBounds("a", 0, 1, bounds);
+                    int textHeight = bounds.height();
                     // print 3 friends maximum
                     for (int i = 0; i < 3 && i < friendList.size(); i++) {
-                        float vXText = vPin.x + -pin.getBitmap().getWidth();
-                        float vYText = vPin.y - pin.getBitmap().getHeight() - (20 * (3 - i));
+                        float vXText = vPin.x + pin.getBitmap().getWidth() + textXOffset;
+                        float vYText = vPin.y - pin.getBitmap().getHeight() + ((textHeight + textYMargin) * (i+1));
                         canvas.drawText(friendList.get(i).getName(), vXText, vYText, paint);
                     }
                 }

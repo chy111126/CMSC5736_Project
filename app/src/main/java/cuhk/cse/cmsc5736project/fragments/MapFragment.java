@@ -81,7 +81,7 @@ public class MapFragment extends Fragment {
 
         //TODO: Map test
         locationManager = LocationManager.getInstance();
-        locationManager.getSimulatedPOIDefinitions(getContext(), new OnPOIResultListener(){
+        locationManager.getPOIDefinitions(getContext(), new OnPOIResultListener(){
             public void onRetrieved(List< POI > poiList){
                 List<Pin> pinList = new ArrayList<Pin>() ;
                 for(POI poi: poiList) {
@@ -109,8 +109,9 @@ public class MapFragment extends Fragment {
                 //TODO: handle friend list
                 for (Friend friend: friendList) {
                     Log.i("init: ", "friend " + friend.getName() + " at " + friend.getNearestLocation());
-                    Pin friendAtPin = pinHm.get(friend.getNearestLocation());
+                    Pin friendAtPin = pinHm.get(new PointF(1008.75f, 995.209f));
                     if (friendAtPin!=null) {
+                        Log.i("init: ", "add friend " + friend.getName() + " to " + friendAtPin.getDescription());
                         friendAtPin.addFriend(friend);
                         friendHm.put(friend, friendAtPin);
                     }
@@ -213,9 +214,9 @@ public class MapFragment extends Fragment {
             @Override
             public boolean onLongClick(View view) {
                 if (view.getId() == imageView.getId()) {
-                    Toast.makeText(getContext(), "Long clicked "+lastKnownX+" "+lastKnownY, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Marked "+lastKnownX+" "+lastKnownY, Toast.LENGTH_SHORT).show();
                     Log.d("EditPlanFragment","Scale "+imageView.getScale());
-                    imageView.addPin(new Pin(getContext(), new PointF(lastKnownX,lastKnownY),R.drawable.map_marker,"long clicked"));
+                    imageView.addPin(new Pin(getContext(), new PointF(lastKnownX,lastKnownY),R.drawable.map_marker,"marked"));
 
 /*                    imageViewF.post(new Runnable(){
                         public void run(){

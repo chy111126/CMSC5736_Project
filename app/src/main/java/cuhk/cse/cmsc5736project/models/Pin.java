@@ -103,7 +103,9 @@ public class Pin {
                 this.scale = (float) ((1 - 0.5f * (distance/maxDistance))) ;
                 Log.i("Pin View", "Setted scale for distance " + distance + " as " + getScale());
                 this.scale = Math.min(Math.max(this.scale, 0.5f),1.0f);
-                pin = Bitmap.createScaledBitmap(pin, (int) (pin.getWidth() / oldScale * scale), (int) (pin.getHeight() / oldScale * scale), true);
+                int w = (int)(pin.getWidth() / oldScale * scale);
+                int h = (int)(pin.getHeight() / oldScale * scale);
+                if (w>0 && h>0) pin = Bitmap.createScaledBitmap(pin, (int) w, (int) h, true);
             }
             //setDescription("~" + getDistance() + "m");
         }
