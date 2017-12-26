@@ -28,7 +28,7 @@ public class Pin {
     private String description = "";
     private float scale = 1;
     private double distance = -1;
-    private static double maxDistance = 0;
+    private static double maxDistance = 3;
 
     private List<Friend> friendList = new ArrayList<>();
 
@@ -84,7 +84,7 @@ public class Pin {
 
 
     public double getDistance() {
-        return distance;
+        return ((poi==null||poi.getBeacon()==null)? distance: poi.getBeacon().getProximity());
     }
 
     public void setDistance(double distance) {
@@ -99,12 +99,13 @@ public class Pin {
         Log.i("Pin View", "Setting scale for distance " + distance + " for " + getDescription() + " with max dist " + maxDistance);
         if (distance>=0) {
             if (maxDistance > 0) {
+                float oldScale = scale;
                 this.scale = (float) ((1 - 0.5f * (distance/maxDistance))) ;
                 Log.i("Pin View", "Setted scale for distance " + distance + " as " + getScale());
                 this.scale = Math.min(Math.max(this.scale, 0.5f),1.0f);
-                pin = Bitmap.createScaledBitmap(pin, (int) (pin.getWidth() * scale), (int) (pin.getHeight() * scale), true);
+                pin = Bitmap.createScaledBitmap(pin, (int) (pin.getWidth() / oldScale * scale), (int) (pin.getHeight() / oldScale * scale), true);
             }
-            setDescription("~" + getDistance() + "m");
+            //setDescription("~" + getDistance() + "m");
         }
     }
 
