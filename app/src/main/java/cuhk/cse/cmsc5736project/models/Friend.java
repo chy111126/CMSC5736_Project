@@ -51,10 +51,6 @@ public class Friend implements Serializable {
         return lastUpdatedDate;
     }
 
-    public void setBeacon(Beacon beacon) {
-        this.beacon = beacon;
-    }
-
     public void setNearPOI(POI nearestLocation)
     {
         this.nearestLocation = nearestLocation;
@@ -63,7 +59,6 @@ public class Friend implements Serializable {
     public POI getNearestLocation() {
         return nearestLocation;
     }
-
 
     // ----- Friend proximity method -----
     public static int PROXIMITY_VERY_CLOSE = 0;
