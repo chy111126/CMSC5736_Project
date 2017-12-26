@@ -39,16 +39,16 @@ public class PinView extends SubsamplingScaleImageView {
 
         for (Pin pin : pinList) {
             // modify pin location before adding
-            PointF tarPin = new PointF();
+//            PointF tarPin = new PointF();
 
-            viewToSourceCoord(pin.getPin(), tarPin);
-            Log.i("pin view", "changing pin: " + pin.getPin().x + ", " + pin.getPin().y + ", " + tarPin.x + ", " + tarPin.y + ", " + getScale());
-            pin.setPin(tarPin);
+//            viewToSourceCoord(pin.getPin(), tarPin);
+//            Log.i("pin view", "changing pin: " + pin.getPin().x + ", " + pin.getPin().y + ", " + tarPin.x + ", " + tarPin.y + ", " + getScale());
+//            pin.setPin(tarPin);
             this.pinList.add(pin);
         }
         //this.pinList.addAll(pinList);
 
-        //initialise();
+        refreshPins();
         invalidate();
     }
 
@@ -62,14 +62,14 @@ public class PinView extends SubsamplingScaleImageView {
         pin.setPin(tarPin);
         this.pinList.add(pin);
 
-        //initialise();
+        refreshPins();
         invalidate();
     }
 
-    void toPinViewCoord(Pin pin){
+/*    void toPinViewCoord(Pin pin){
         pin.setPin(viewToSourceCoord(pin.getPin()));
         //return pin;
-    }
+    }*/
 
 /*    PointF viewToSourceCoord(PointF sPos){
         PointF afterTrans = new PointF();
@@ -86,13 +86,18 @@ public class PinView extends SubsamplingScaleImageView {
         return targetPin;
     }*/
 
-/*    private void initialise() {
-        float density = getResources().getDisplayMetrics().densityDpi;
+    public void refreshPins() {
+/*        float density = getResources().getDisplayMetrics().densityDpi;
         pin = BitmapFactory.decodeResource(this.getResources(), R.drawable.map_marker);
         float w = (density/420f) * pin.getWidth();
         float h = (density/420f) * pin.getHeight();
-        pin = Bitmap.createScaledBitmap(pin, (int)w, (int)h, true);
-    }*/
+        pin = Bitmap.createScaledBitmap(pin, (int)w, (int)h, true);*/
+
+        for (Pin pin:pinList){
+            pin.setScale();
+        }
+
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -115,10 +120,11 @@ public class PinView extends SubsamplingScaleImageView {
 
             if (!pin.getDescription().isEmpty()) {
                 paint.setColor(Color.BLACK);
-                paint.setTextSize(50);
-                //float vXText = vPin.x - (pin.getBitmap().getWidth() / 2);
+                paint.setTextSize(pin.getTextSize());
+                paint.setTextAlign(Paint.Align.CENTER);
+                float vXText = vPin.x;
                 //float vYText = vPin.y - pin.getBitmap().getHeight() - 20;
-                canvas.drawText(pin.getDescription(), vX, vY, paint);
+                canvas.drawText(pin.getDescription(), vXText, vY, paint);
             }
 
             //Log.i("pin view", "onDraw: " + vX + ", " + vY + ", " + pin.getPin().x + ", " + pin.getPin().y + ", " + getScale());

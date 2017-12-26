@@ -657,6 +657,28 @@ public class LocationManager {
             poiHM.put(beacon.getUUID(), poi);
         }
 
+        Beacon beacon = new Beacon();
+        beacon.setUUID(UUID.randomUUID().toString());
+        beacon.setPos(1008.8576, 996.6664);
+        beacon.setRSSI(-30 - new Random().nextInt(70));
+
+        POI poi = new POI(beacon.getUUID(), "Booth1 ", "Description ");
+        poi.setBeacon(beacon);
+        poi.setPosition(beacon.getPos_x(), beacon.getPos_y());
+        // Put objects to accessing array/Hashmap
+        poiHM.put(beacon.getUUID(), poi);
+
+        Beacon beacon2 = new Beacon();
+        beacon2.setUUID(UUID.randomUUID().toString());
+        beacon2.setPos(1013.0513, 851.0637);
+        beacon2.setRSSI(-30 - new Random().nextInt(70));
+
+        POI poi2 = new POI(beacon2.getUUID(), "Booth2 ", "Description ");
+        poi2.setBeacon(beacon2);
+        poi2.setPosition(beacon2.getPos_x(), beacon2.getPos_y());
+        // Put objects to accessing array/Hashmap
+        poiHM.put(beacon2.getUUID(), poi2);
+
         List<POI> poiList = new ArrayList<>(poiHM.values());
         initListener.onRetrieved(poiList);
     }
