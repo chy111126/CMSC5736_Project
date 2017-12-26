@@ -95,6 +95,14 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
         Collections.sort(friendList, new Comparator<Friend>() {
             @Override
             public int compare(Friend f1, Friend f2) {
+                // No last-update logic
+                if(f1.getLastUpdatedDate() == null) {
+                    return 1;
+                }
+                if(f2.getLastUpdatedDate() == null) {
+                    return -1;
+                }
+
                 if(f1.getLastUpdatedDate().getTime() < f2.getLastUpdatedDate().getTime() ) {
                     return 1;
                 } else {
