@@ -58,6 +58,7 @@ public class LocationManager {
     private static HashMap<String, POI> poiHM = new HashMap<>();
     private OnPOIListChangeListener poiChangedMapFragmentListener = null;
     private OnPOIListChangeListener poiChangedListener = null;
+    private OnPOIResultListener poiSyncDataListener = null;
 
     // ----- Friends -----
     private static HashMap<String, Friend> friendHM = new HashMap<>();
@@ -72,7 +73,7 @@ public class LocationManager {
 
     // ----- URLs -----
     //218.191.44.226
-    public static String ROOT_URL = "http://192.168.0.103/cmsc5736_project";
+    public static String ROOT_URL = "http://cmsc5736project.hopto.org/cmsc5736_project";
     private static String GET_ALL_BEACON_DATA_URL = ROOT_URL + "/get_all_beacon_data.php";
     private static String GET_ALL_POI_DATA_URL = ROOT_URL + "/get_all_poi_data.php";
     private static String GET_ALL_FRIEND_DATA_URL = ROOT_URL + "/get_all_user_friends.php";
@@ -125,8 +126,6 @@ public class LocationManager {
         //set default user data
         userName = this.getUserName(context);
         userMAC = this.getUserMAC(context);
-        Log.i("initUserData", "userName="+ userName);
-        Log.i("initUserData", "userMAC="+ userMAC);
     }
 
     // LocationManager service
@@ -150,10 +149,10 @@ public class LocationManager {
         }
 
         // init/update user server data
-        updateUserData(context,null );
+        //updateUserData(context,null );
 
         //init/update RSSI-distance model
-        RSSIModel.getInstance().updateModel(context);
+        //RSSIModel.getInstance().updateModel(context);
 
         //start beacon scan
         if (!isScanning) {
@@ -180,6 +179,8 @@ public class LocationManager {
             Toast.makeText(context, "Scanning stopped!", Toast.LENGTH_SHORT);
         }
     }
+
+
 
     // TODO: Service callbacks methods
     private Runnable scanRunnable = new Runnable() {
@@ -261,11 +262,13 @@ public class LocationManager {
 
                 // Check beacon entry in POI Hashmap
                 String uuid_major_minor = uuid + "_" + Integer.toString(major) + "_" + Integer.toString(minor);
+                uuid_major_minor = uuid_major_minor.toUpperCase();
+                Log.i("LocationManager", "mScanCallback:UUID= " + uuid_major_minor);
                 POI targetPOI = poiHM.get(uuid_major_minor);
                 if (targetPOI != null) {
                     targetPOI.getBeacon().setRSSI(result.getRssi());
-                    //Log.i("targetPOI", " " + targetPOI.toString());
-                    //Log.i("targetPOI RSSI", " " + result.getRssi());
+                    Log.i("LocationManager", "targetPOI: " + targetPOI.toString());
+                    Log.i("LocationManager", "targetPOI RSSI: " + result.getRssi());
                 }
 
                 // If threshold passed, trigger POI change listener
@@ -309,7 +312,7 @@ public class LocationManager {
 
         // Get X/Y from POI
         if(nearestPOI != null) {
-            userPos.set(nearestPOI.getPosition().x, nearestPOI.getPosition().y);
+            userPos.set((float) nearestPOI.getBeacon().getPos_x(), (float) nearestPOI.getBeacon().getPos_y());
         }
 
         // Update user data to server
@@ -321,7 +324,7 @@ public class LocationManager {
     public void updateUserData(Context context, POI nearPOI) {
         HashMap postData = new HashMap();
         postData.put("mac", userMAC);
-        postData.put("name", userName);
+        postData.put("name", getUserName(context));
         postData.put("position_x", Float.toString(userPos.x));
         postData.put("position_y", Float.toString(userPos.y));
         if (nearPOI!= null) {
@@ -331,7 +334,6 @@ public class LocationManager {
 
         final HashMap finalPost = postData;
 
-        Log.i("LocationManager", "updateUserData started ");
         PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, false, new AsyncResponse() {
             @Override
             public void processFinish(String s) {
@@ -372,9 +374,10 @@ public class LocationManager {
                         int major = poi.getBeacon().getMajor();
                         int minor = poi.getBeacon().getMinor();
                         String uuid_major_minor = uuid + "_" + Integer.toString(major) + "_" + Integer.toString(minor);
+                        uuid_major_minor = uuid_major_minor.toUpperCase();
                         // Put objects to accessing array/Hashmap
                         poiHM.put(uuid_major_minor, poi);
-                        //Log.i("getPOIDefinitions", poi.toString());
+                        Log.i("LocationManager", "initPOIDefinitions:uuid_major_minor" + poi.toString());
 
                     }
                 } catch (JSONException e) {
@@ -417,6 +420,7 @@ public class LocationManager {
                         int major = poi.getBeacon().getMajor();
                         int minor = poi.getBeacon().getMinor();
                         String uuid_major_minor = uuid + "_" + Integer.toString(major) + "_" + Integer.toString(minor);
+                        uuid_major_minor = uuid_major_minor.toUpperCase();
                         // Put objects to accessing array/Hashmap
                         poiHM.put(uuid_major_minor, poi);
                         //Log.i("getPOIDefinitions", poi.toString());
@@ -426,8 +430,8 @@ public class LocationManager {
                 }
 
                 // Invoke callback method
-                if (poiChangedListener != null) {
-                    poiChangedListener.onChanged();
+                if (poiSyncDataListener != null) {
+                    poiSyncDataListener.onRetrieved(LocationManager.this.getPOIList());
                 }
                 if (poiChangedMapFragmentListener != null) {
                     poiChangedMapFragmentListener.onChanged();
@@ -447,6 +451,9 @@ public class LocationManager {
         // Caller method can update through the listener when this manager class sent updates
         // this.poiListener.OnRetrieved method would be invoked after service successfully acquired new location information
         this.poiChangedMapFragmentListener = listener;
+    }
+    public void setPOISyncDataListener(OnPOIResultListener listener) {
+        this.poiSyncDataListener = listener;
     }
 
 
@@ -725,6 +732,7 @@ public class LocationManager {
             int major = poi.getBeacon().getMajor();
             int minor = poi.getBeacon().getMinor();
             String uuid_major_minor = uuid + "_" + Integer.toString(major) + "_" + Integer.toString(minor);
+            uuid_major_minor = uuid_major_minor.toUpperCase();
             // Put objects to accessing array/Hashmap
             poiHM.put(uuid_major_minor, poi);
         }

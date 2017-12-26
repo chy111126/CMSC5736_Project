@@ -1,6 +1,7 @@
 package cuhk.cse.cmsc5736project.utils;
 
 import android.graphics.Color;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -110,7 +111,8 @@ public class Utility {
     public static POI createPOIFromJsonObject(JSONObject jsonObj) {
         try {
             //String id =jsonObj.getString("id");
-            String id =jsonObj.getString("uuid_major_minor");
+            Log.i("createPOIFromJsonObject", jsonObj.toString());
+            String id =jsonObj.getString("id");
             String name =jsonObj.getString("name");
             String description =jsonObj.getString("description");
 

@@ -49,6 +49,14 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
                 POIListAdapter.this.notifyDataSetChanged();
             }
         });
+        LocationManager.getInstance().setPOISyncDataListener(new OnPOIResultListener() {
+            @Override
+            public void onRetrieved(List<POI> poiList) {
+                items = poiList;
+                sortViewList();
+                POIListAdapter.this.notifyDataSetChanged();
+            }
+        });
         LocationManager.getInstance().setOnPOIChangedListener(new OnPOIListChangeListener() {
             @Override
             public void onChanged() {
