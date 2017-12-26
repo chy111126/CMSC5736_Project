@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -13,12 +14,15 @@ import android.widget.ToggleButton;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import cuhk.cse.cmsc5736project.LocationManager;
 import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.interfaces.OnPOIListChangeListener;
 import cuhk.cse.cmsc5736project.interfaces.OnPOIResultListener;
+import cuhk.cse.cmsc5736project.models.Beacon;
 import cuhk.cse.cmsc5736project.models.Dessert;
 import cuhk.cse.cmsc5736project.models.POI;
 
@@ -40,12 +44,14 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
             @Override
             public void onRetrieved(List<POI> poiList) {
                 items = poiList;
+                sortViewList();
                 POIListAdapter.this.notifyDataSetChanged();
             }
         });
         LocationManager.getInstance().setOnPOIChangedListener(new OnPOIListChangeListener() {
             @Override
             public void onChanged() {
+                sortViewList();
                 POIListAdapter.this.notifyDataSetChanged();
             }
         });
@@ -70,6 +76,19 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
         return vh;
     }
 
+    private void sortViewList() {
+        Collections.sort(items, new Comparator<POI>() {
+            @Override
+            public int compare(POI f1, POI f2) {
+                if(f1.getBeacon().getRSSI() < f2.getBeacon().getRSSI()) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        });
+    }
+
     @Override
     public void onBindViewHolder(ItemVH holder, int position) {
         POI item = items.get(position);
@@ -77,7 +96,39 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
         holder.txtTitle.setText(item.getName());
         holder.txtDesc.setText(item.getDescription());
         holder.txtRSSI.setText(" " + item.getBeacon().getRSSI());
+        //holder.txtRSSI.setText(" " + item.getBeacon().getDistance());
         holder.toggleBookmark.setChecked(item.isBookmarked());
+
+        int poiProximity = item.getBeacon().getProximity();
+        switch (poiProximity) {
+            case Beacon.PROXIMITY_VERY_CLOSE:
+                holder.ivProximityIndicator_1.setVisibility(View.INVISIBLE);
+                holder.ivProximityIndicator_2.setVisibility(View.INVISIBLE);
+                holder.ivProximityIndicator_3.setVisibility(View.INVISIBLE);
+                holder.ivProximityIndicator_4.setVisibility(View.VISIBLE);
+                break;
+            case Beacon.PROXIMITY_CLOSE:
+                holder.ivProximityIndicator_1.setVisibility(View.INVISIBLE);
+                holder.ivProximityIndicator_2.setVisibility(View.INVISIBLE);
+                holder.ivProximityIndicator_3.setVisibility(View.VISIBLE);
+                holder.ivProximityIndicator_4.setVisibility(View.INVISIBLE);
+                break;
+            case Beacon.PROXIMITY_FAR:
+                holder.ivProximityIndicator_1.setVisibility(View.INVISIBLE);
+                holder.ivProximityIndicator_2.setVisibility(View.VISIBLE);
+                holder.ivProximityIndicator_3.setVisibility(View.INVISIBLE);
+                holder.ivProximityIndicator_4.setVisibility(View.INVISIBLE);
+                break;
+            case Beacon.PROXIMITY_UNDETERMINED:
+                holder.ivProximityIndicator_1.setVisibility(View.VISIBLE);
+                holder.ivProximityIndicator_2.setVisibility(View.INVISIBLE);
+                holder.ivProximityIndicator_3.setVisibility(View.INVISIBLE);
+                holder.ivProximityIndicator_4.setVisibility(View.INVISIBLE);
+                break;
+            default:
+                break;
+        }
+
     }
 
     @Override
@@ -88,6 +139,7 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
     protected static class ItemVH extends RecyclerView.ViewHolder {
         TextView txtTitle, txtDesc, txtRSSI;
         ToggleButton toggleBookmark;
+        ImageView ivProximityIndicator_1, ivProximityIndicator_2, ivProximityIndicator_3, ivProximityIndicator_4;
 
         public ItemVH(View itemView) {
             super(itemView);
@@ -96,6 +148,10 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
             txtDesc = (TextView) itemView.findViewById(R.id.item_poi_desc);
             txtRSSI = (TextView) itemView.findViewById(R.id.item_poi_rssi_value);
             toggleBookmark = (ToggleButton) itemView.findViewById(R.id.item_poi_bookmark_toggle);
+            ivProximityIndicator_1 = (ImageView) itemView.findViewById(R.id.item_poi_proximity_indicator_1);
+            ivProximityIndicator_2 = (ImageView) itemView.findViewById(R.id.item_poi_proximity_indicator_2);
+            ivProximityIndicator_3 = (ImageView) itemView.findViewById(R.id.item_poi_proximity_indicator_3);
+            ivProximityIndicator_4 = (ImageView) itemView.findViewById(R.id.item_poi_proximity_indicator_4);
         }
     }
 }

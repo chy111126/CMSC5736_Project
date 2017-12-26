@@ -61,10 +61,10 @@ public class Friend implements Serializable {
     }
 
     // ----- Friend proximity method -----
-    public static int PROXIMITY_VERY_CLOSE = 0;
-    public static int PROXIMITY_CLOSE = 1;
-    public static int PROXIMITY_FAR = 2;
-    public static int PROXIMITY_UNDETERMINED = 3;
+    public static final int PROXIMITY_VERY_CLOSE = 0;
+    public static final int PROXIMITY_CLOSE = 1;
+    public static final int PROXIMITY_FAR = 2;
+    public static final int PROXIMITY_UNDETERMINED = 3;
 
     public int getProximityToCurrentUserPos(double x, double y) {
         if(getNearestLocation() == null) {

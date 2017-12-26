@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@id/imageView"
-            android:layout_toStartOf="@id/item_poi_bookmark_toggle"
+            android:layout_toStartOf="@id/item_poi_proximity_indicator_4"
             android:orientation="vertical">
 
             <TextView
@@ -66,8 +66,46 @@
             android:id="@+id/item_poi_rssi_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toStartOf="@id/item_poi_bookmark_toggle"
+            android:layout_toStartOf="@id/item_poi_proximity_indicator_4"
             android:text="TextView" />
+
+        <ImageView
+            android:id="@+id/item_poi_proximity_indicator_1"
+            android:layout_toStartOf="@id/item_poi_bookmark_toggle"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_centerVertical="true"
+            app:srcCompat="@drawable/strength_1" />
+        <ImageView
+            android:id="@+id/item_poi_proximity_indicator_2"
+            android:layout_toStartOf="@id/item_poi_bookmark_toggle"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_centerVertical="true"
+            app:srcCompat="@drawable/strength_2" />
+        <ImageView
+            android:id="@+id/item_poi_proximity_indicator_3"
+            android:layout_toStartOf="@id/item_poi_bookmark_toggle"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_centerVertical="true"
+            app:srcCompat="@drawable/strength_3" />
+
+        <ImageView
+            android:id="@+id/item_poi_proximity_indicator_4"
+            android:layout_toStartOf="@id/item_poi_bookmark_toggle"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_centerVertical="true"
+            app:srcCompat="@drawable/strength_4" />
 
         <ToggleButton
             android:id="@+id/item_poi_bookmark_toggle"

@@ -68,7 +68,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
                 @Override
                 public void onAdded(Friend item) {
                     friendList.add(item);
-                    //sortViewList();
+                    sortViewList();
                     FriendListAdapter.this.notifyDataSetChanged();
                 }
 
@@ -116,7 +116,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
         if(isAddNewFriend) {
             // Hide some UI elements as well
             vh.txtLastUpdated.setVisibility(View.INVISIBLE);
-            vh.ivProximityIndicator.setVisibility(View.INVISIBLE);
+            vh.ivProximityIndicator_1.setVisibility(View.INVISIBLE);
+            vh.ivProximityIndicator_2.setVisibility(View.INVISIBLE);
+            vh.ivProximityIndicator_3.setVisibility(View.INVISIBLE);
+            vh.ivProximityIndicator_4.setVisibility(View.INVISIBLE);
 
             vh.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -160,11 +163,44 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
             } else {
                 holder.txtDesc.setText("Near: Undetermined");
             }
+
+            int prox = item.getProximityToCurrentUserPos(0, 0);
+            switch (prox) {
+                case Friend.PROXIMITY_VERY_CLOSE:
+                    holder.ivProximityIndicator_1.setVisibility(View.INVISIBLE);
+                    holder.ivProximityIndicator_2.setVisibility(View.INVISIBLE);
+                    holder.ivProximityIndicator_3.setVisibility(View.INVISIBLE);
+                    holder.ivProximityIndicator_4.setVisibility(View.VISIBLE);
+                    break;
+                case Friend.PROXIMITY_CLOSE:
+                    holder.ivProximityIndicator_1.setVisibility(View.INVISIBLE);
+                    holder.ivProximityIndicator_2.setVisibility(View.INVISIBLE);
+                    holder.ivProximityIndicator_3.setVisibility(View.VISIBLE);
+                    holder.ivProximityIndicator_4.setVisibility(View.INVISIBLE);
+                    break;
+                case Friend.PROXIMITY_FAR:
+                    holder.ivProximityIndicator_1.setVisibility(View.INVISIBLE);
+                    holder.ivProximityIndicator_2.setVisibility(View.VISIBLE);
+                    holder.ivProximityIndicator_3.setVisibility(View.INVISIBLE);
+                    holder.ivProximityIndicator_4.setVisibility(View.INVISIBLE);
+                    break;
+                case Friend.PROXIMITY_UNDETERMINED:
+                    holder.ivProximityIndicator_1.setVisibility(View.VISIBLE);
+                    holder.ivProximityIndicator_2.setVisibility(View.INVISIBLE);
+                    holder.ivProximityIndicator_3.setVisibility(View.INVISIBLE);
+                    holder.ivProximityIndicator_4.setVisibility(View.INVISIBLE);
+                    break;
+                default:
+                    break;
+            }
+
+
             if(item.getLastUpdatedDate() != null) {
                 holder.txtLastUpdated.setText("10 seconds ago");
             } else {
                 holder.txtLastUpdated.setText("---");
             }
+
         }
     }
 
@@ -175,7 +211,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
 
     protected static class ItemVH extends RecyclerView.ViewHolder {
         TextView txtTitle, txtDesc, txtLastUpdated;
-        ImageView ivProximityIndicator;
+        ImageView ivProximityIndicator_1, ivProximityIndicator_2, ivProximityIndicator_3, ivProximityIndicator_4;
 
         public ItemVH(View itemView) {
             super(itemView);
@@ -183,7 +219,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
             txtTitle = (TextView) itemView.findViewById(R.id.item_friend_name);
             txtDesc = (TextView) itemView.findViewById(R.id.item_friend_desc);
             txtLastUpdated = (TextView) itemView.findViewById(R.id.item_friend_last_updated);
-            ivProximityIndicator = (ImageView) itemView.findViewById(R.id.item_friend_proximity_indicator);
+            ivProximityIndicator_1 = (ImageView) itemView.findViewById(R.id.item_friend_proximity_indicator_1);
+            ivProximityIndicator_2 = (ImageView) itemView.findViewById(R.id.item_friend_proximity_indicator_2);
+            ivProximityIndicator_3 = (ImageView) itemView.findViewById(R.id.item_friend_proximity_indicator_3);
+            ivProximityIndicator_4 = (ImageView) itemView.findViewById(R.id.item_friend_proximity_indicator_4);
         }
     }
 

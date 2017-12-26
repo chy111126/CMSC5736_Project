@@ -61,21 +61,49 @@
 
 
         <ImageView
-            android:id="@+id/item_friend_proximity_indicator"
+            android:id="@+id/item_friend_proximity_indicator_1"
             android:layout_alignParentEnd="true"
-            android:layout_width="48dp"
+            android:layout_width="36dp"
             android:layout_height="wrap_content"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:layout_centerVertical="true"
-            app:srcCompat="@drawable/map_marker" />
+            app:srcCompat="@drawable/strength_1" />
+        <ImageView
+            android:id="@+id/item_friend_proximity_indicator_2"
+            android:layout_alignParentEnd="true"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_centerVertical="true"
+            app:srcCompat="@drawable/strength_2" />
+        <ImageView
+            android:id="@+id/item_friend_proximity_indicator_3"
+            android:layout_alignParentEnd="true"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_centerVertical="true"
+            app:srcCompat="@drawable/strength_3" />
+
+        <ImageView
+            android:id="@+id/item_friend_proximity_indicator_4"
+            android:layout_alignParentEnd="true"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_centerVertical="true"
+            app:srcCompat="@drawable/strength_4" />
 
         <TextView
             android:id="@+id/item_friend_last_updated"
             style="@style/TextAppearance.AppCompat.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toStartOf="@id/item_friend_proximity_indicator"
+            android:layout_toStartOf="@id/item_friend_proximity_indicator_4"
             android:alpha="0.54"
             android:ellipsize="end"
             android:textColor="@android:color/black"
@@ -86,7 +114,6 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="12dp"
         android:background="#22000000"/>
 
 

@@ -80,19 +80,19 @@ public class Beacon implements Serializable
 
 
     // ----- Proximity method -----
-    public static int PROXIMITY_VERY_CLOSE = 0;
-    public static int PROXIMITY_CLOSE = 1;
-    public static int PROXIMITY_FAR = 2;
-    public static int PROXIMITY_UNDETERMINED = -1;
+    public static final int PROXIMITY_VERY_CLOSE = 0;
+    public static final int PROXIMITY_CLOSE = 1;
+    public static final int PROXIMITY_FAR = 2;
+    public static final int PROXIMITY_UNDETERMINED = -1;
 
     public int getProximity(){
         // From RSSI value, determine how close the user is to the POI
-        if(getRSSI() < -90) {
-            return PROXIMITY_FAR;
-        } else if(getRSSI() < -70) {
-            return PROXIMITY_CLOSE;
-        } else if (getRSSI() < -50) {
+        if(getRSSI() >= -50) {
             return PROXIMITY_VERY_CLOSE;
+        } else if(getRSSI() >= -70) {
+            return PROXIMITY_CLOSE;
+        } else if (getRSSI() >= -90) {
+            return PROXIMITY_FAR;
         }
         return PROXIMITY_UNDETERMINED;
     }
