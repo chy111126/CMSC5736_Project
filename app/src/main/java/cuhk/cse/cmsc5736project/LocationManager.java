@@ -248,7 +248,8 @@ public class LocationManager {
                 */
 
                 // Check beacon entry in POI Hashmap
-                POI targetPOI = poiHM.get(uuid);
+                String uuid_major_minor = uuid + "_" + Integer.toString(major) + "_" + Integer.toString(minor);
+                POI targetPOI = poiHM.get(uuid_major_minor);
                 if (targetPOI != null) {
                     targetPOI.getBeacon().setRSSI(result.getRssi());
                     //Log.i("targetPOI", " " + targetPOI.toString());
