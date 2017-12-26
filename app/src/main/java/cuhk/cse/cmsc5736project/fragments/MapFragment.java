@@ -136,6 +136,7 @@ public class MapFragment extends Fragment {
     }
 
     private void sortViewList() {
+        /*
         Collections.sort(friendList, new Comparator<Friend>() {
             @Override
             public int compare(Friend f1, Friend f2) {
@@ -146,6 +147,7 @@ public class MapFragment extends Fragment {
                 }
             }
         });
+        */
     }
     void setImageViewListeers(final PinView imageView){
         imageView.setImage(ImageSource.resource(R.drawable.floorplan));

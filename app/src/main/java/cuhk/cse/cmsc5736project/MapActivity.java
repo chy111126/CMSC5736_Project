@@ -108,6 +108,7 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void sortViewList() {
+        /*
         Collections.sort(friendList, new Comparator<Friend>() {
             @Override
             public int compare(Friend f1, Friend f2) {
@@ -118,6 +119,7 @@ public class MapActivity extends AppCompatActivity {
                 }
             }
         });
+        */
     }
     void setImageViewListeers(final PinView imageView){
         imageView.setImage(ImageSource.resource(R.drawable.floorplan));

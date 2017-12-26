@@ -131,6 +131,7 @@ public class Utility {
             beacon.setPathLossExponent(n);
             beacon.setOneMeterPower(n2);
 
+            poi.setPosition(jsonObj.getDouble("position_x"),jsonObj.getDouble("position_y"));
             poi.setBeacon(beacon);
             return poi;
         } catch (JSONException e) {

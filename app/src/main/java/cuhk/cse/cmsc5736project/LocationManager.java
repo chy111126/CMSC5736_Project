@@ -378,6 +378,8 @@ public class LocationManager {
                         // Put objects to accessing array/Hashmap
                         poiHM.put(uuid_major_minor, poi);
                         Log.i("LocationManager", "initPOIDefinitions:uuid_major_minor" + poi.toString());
+                        Log.i("LocationManager", "initPOIDefinitions:pos_x" + poi.getBeacon().getPos_x());
+                        Log.i("LocationManager", "initPOIDefinitions:pos_y" + poi.getBeacon().getPos_y());
 
                     }
                 } catch (JSONException e) {
@@ -802,9 +804,9 @@ public class LocationManager {
         }
 
         // Update positions
-        for (int i=0; i < 5; i++) {
+        for (int i=0; i < friendList.size(); i++) {
             Friend friend = friendList.get(i);
-            POI poi = poiList.get(i);
+            POI poi = poiList.get(1);
 
             friend.setNearPOI(poi);
             Date nowDate = new Date();
