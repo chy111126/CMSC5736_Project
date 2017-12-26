@@ -12,7 +12,6 @@ public class Friend implements Serializable {
     private String name;
     private String mac;
     private String description;
-    private Beacon beacon;
     private POI nearestLocation;
     private Date lastUpdatedDate;
 
@@ -52,9 +51,6 @@ public class Friend implements Serializable {
         return lastUpdatedDate;
     }
 
-    public Beacon getBeacon() {
-        return beacon;
-    }
     public void setBeacon(Beacon beacon) {
         this.beacon = beacon;
     }
@@ -66,5 +62,33 @@ public class Friend implements Serializable {
 
     public POI getNearestLocation() {
         return nearestLocation;
+    }
+
+
+    // ----- Friend proximity method -----
+    public static int PROXIMITY_VERY_CLOSE = 0;
+    public static int PROXIMITY_CLOSE = 1;
+    public static int PROXIMITY_FAR = 2;
+    public static int PROXIMITY_UNDETERMINED = 3;
+
+    public int getProximityToCurrentUserPos(double x, double y) {
+        if(getNearestLocation() == null) {
+            return PROXIMITY_UNDETERMINED;
+        }
+
+        // Distance calculation
+        double friendX = getNearestLocation().getBeacon().getPos_x();
+        double friendY = getNearestLocation().getBeacon().getPos_y();
+        double dist = Math.sqrt(Math.pow(friendX - x, 2) + Math.pow(friendY - y, 2));
+
+        // TODO: Determine threshold for proximity
+        if(dist <= 10) {
+            return PROXIMITY_VERY_CLOSE;
+        } else if(dist <= 30) {
+            return PROXIMITY_CLOSE;
+        } else {
+            return PROXIMITY_FAR;
+        }
+
     }
 }

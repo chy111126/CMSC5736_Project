@@ -469,7 +469,7 @@ public class LocationManager {
                     for (int i = 0; i < friendArr.length(); i++) {
                         // Transform raw result to object
                         JSONObject row = friendArr.getJSONObject(i);
-                        Friend friend = Utility.createFriendFromJsonObject(row);
+                        Friend friend = Utility.createFriendFromJsonObject(row, poiHM);
                         String id = friend.getMAC();
                         // Put objects to accessing array/Hashmap
                         friendHM.put(id, friend);
@@ -649,6 +649,14 @@ public class LocationManager {
             beacon.setPos(i * 5, i * 10);
             beacon.setRSSI(-30 - new Random().nextInt(70));
 
+            double n1 = -30 - new Random().nextInt(70);
+            double n2 = n1 + 2;
+            double n3 = n2 + 2;
+            double n4 = n3 + 6;
+            double n = (Math.log(n1/n2) / Math.log(0.5/1) + Math.log(n3/n2) / Math.log(2/1) + Math.log(n4/n2) / Math.log(4/1)) / 3;
+            beacon.setPathLossExponent(n);
+            beacon.setOneMeterPower(n2);
+
             POI poi = new POI(beacon.getUUID(), "Toilet " + i, "Description " + i);
             poi.setBeacon(beacon);
             poi.setPosition(beacon.getPos_x(), beacon.getPos_y());
@@ -666,16 +674,8 @@ public class LocationManager {
         // This is not related to the instance's friendHM, which stores user bookmarked Friends
         HashMap<String, Friend> friendHM = new HashMap<>();
         for (int i = 0; i < 10; i++) {
-            Beacon beacon = new Beacon();
-            beacon.setUUID(UUID.randomUUID().toString());
-            beacon.setMajor(1);
-            beacon.setMinor(123);
-            beacon.setRSSI(-i);
-
             String macAddr = Utility.randomMACAddress();
-
             Friend friend = new Friend(macAddr, "Friend " + i);
-            friend.setBeacon(beacon);
 
             friendHM.put(macAddr, friend);
         }
@@ -687,17 +687,8 @@ public class LocationManager {
         // For friend fragment to scan all nearby devices
         friendHM = new HashMap<>();
         for (int i = 0; i < 5; i++) {
-
-            Beacon beacon = new Beacon();
-            beacon.setUUID(UUID.randomUUID().toString());
-            beacon.setMajor(1);
-            beacon.setMinor(123);
-            beacon.setRSSI(-i);
-
             String macAddr = Utility.randomMACAddress();
-
             Friend friend = new Friend(macAddr, "Friend " + i);
-            friend.setBeacon(beacon);
 
             friendHM.put(macAddr, friend);
         }

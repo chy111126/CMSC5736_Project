@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Random;
 
 import cuhk.cse.cmsc5736project.models.Beacon;
@@ -90,7 +91,7 @@ public class Utility {
         }
     }
 
-    public static Friend createFriendFromJsonObject(JSONObject jsonObj) {
+    public static Friend createFriendFromJsonObject(JSONObject jsonObj, HashMap<String, POI> poiHM) {
         try {
             String mac = jsonObj.getString("mac");
             String name = jsonObj.getString("name");
@@ -99,9 +100,13 @@ public class Utility {
             if(jsonObj.has("near_POI_ID")) {
                 String nearPOIID = Integer.toString(jsonObj.getInt("near_POI_ID"));
                 String nearPOIName = jsonObj.getString("near_POI_name");
-
+                String nearPOIUUID = jsonObj.getString("near_POI_UUID");
                 String nearPOIDescription = jsonObj.getString("near_POI_description");
-                poi = new POI(nearPOIID, nearPOIName, nearPOIDescription);
+
+                if(poiHM.get(nearPOIUUID) != null) {
+                    //poi = new POI(nearPOIID, nearPOIName, nearPOIDescription);
+                    poi = poiHM.get(nearPOIUUID);
+                }
             }
 
             String updateTimeString = jsonObj.getString("update_time");
@@ -132,6 +137,15 @@ public class Utility {
             beacon.setMajor(jsonObj.getInt("major"));
             beacon.setMinor(jsonObj.getInt("minor"));
             beacon.setPos(jsonObj.getDouble("position_x"),jsonObj.getDouble("position_y"));
+
+            double n1 = jsonObj.getDouble("rssi_half_m_signal");
+            double n2 = jsonObj.getDouble("rssi_one_m_signal");
+            double n3 = jsonObj.getDouble("rssi_two_m_signal");
+            double n4 = jsonObj.getDouble("rssi_four_m_signal");
+            double n = (Math.log(n1/n2) / Math.log(0.5/1) + Math.log(n3/n2) / Math.log(2/1) + Math.log(n4/n2) / Math.log(4/1)) / 3;
+            beacon.setPathLossExponent(n);
+            beacon.setOneMeterPower(n2);
+
             poi.setBeacon(beacon);
             return poi;
         } catch (JSONException e) {

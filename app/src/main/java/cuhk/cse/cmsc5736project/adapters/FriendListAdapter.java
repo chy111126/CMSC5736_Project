@@ -94,10 +94,12 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
         Collections.sort(friendList, new Comparator<Friend>() {
             @Override
             public int compare(Friend f1, Friend f2) {
-                if(f1.getBeacon().getRSSI() > f2.getBeacon().getRSSI()) {
-                    return -1;
-                } else {
+                double x = 0;
+                double y = 0;
+                if(f1.getProximityToCurrentUserPos(x, y) > f2.getProximityToCurrentUserPos(x, y)) {
                     return 1;
+                } else {
+                    return -1;
                 }
             }
         });
