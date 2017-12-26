@@ -39,6 +39,7 @@ import cuhk.cse.cmsc5736project.models.Beacon;
 import cuhk.cse.cmsc5736project.models.Friend;
 import cuhk.cse.cmsc5736project.models.POI;
 import cuhk.cse.cmsc5736project.models.RSSIModel;
+import cuhk.cse.cmsc5736project.utils.PeriodicExecutor;
 import cuhk.cse.cmsc5736project.utils.Utility;
 
 /**
@@ -280,6 +281,12 @@ public class LocationManager {
     };
     // TODO: End
 
+    public void findNearestPOI() {
+        // From all POIs, find the one with least RSSI
+        for(POI poi : poiHM.values()) {
+
+        }
+    }
 
     // ----- User methods -----
     // Insert user item to users table if not exists, update the corresponding item if it is exists
@@ -713,6 +720,7 @@ public class LocationManager {
         // Simulated method for getting updated friend position
         List<POI> poiList = new ArrayList<>(poiHM.values());
         List<Friend> friendList = new ArrayList<>(friendHM.values());
+        final long ONE_MINUTE_IN_MILLIS = 60000;//millisecs
 
         if(poiList.size() == 0 || friendList.size() == 0) {
             return;
@@ -724,7 +732,8 @@ public class LocationManager {
             POI poi = poiList.get(i);
 
             friend.setNearPOI(poi);
-            friend.setLastUpdated(new Date());
+            Date nowDate = new Date();
+            friend.setLastUpdated(new Date(nowDate.getTime() - ONE_MINUTE_IN_MILLIS * i / 3 + new Random().nextInt(3) * 1000));
         }
 
         // Invoke callback method

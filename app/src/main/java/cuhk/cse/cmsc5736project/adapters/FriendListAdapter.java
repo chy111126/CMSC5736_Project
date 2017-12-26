@@ -13,6 +13,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import cuhk.cse.cmsc5736project.LocationManager;
@@ -94,9 +95,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
         Collections.sort(friendList, new Comparator<Friend>() {
             @Override
             public int compare(Friend f1, Friend f2) {
-                double x = 0;
-                double y = 0;
-                if(f1.getProximityToCurrentUserPos(x, y) > f2.getProximityToCurrentUserPos(x, y)) {
+                if(f1.getLastUpdatedDate().getTime() < f2.getLastUpdatedDate().getTime() ) {
                     return 1;
                 } else {
                     return -1;
@@ -196,7 +195,21 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
 
 
             if(item.getLastUpdatedDate() != null) {
-                holder.txtLastUpdated.setText("10 seconds ago");
+                long last_update_in_sec = (new Date().getTime() - item.getLastUpdatedDate().getTime()) / 1000;
+                if(last_update_in_sec < 30) {
+                    // < 30s = just now
+                    holder.txtLastUpdated.setText("Just now");
+                } else if(last_update_in_sec < 60) {
+                    // < 60s = in terms of seconds
+                    holder.txtLastUpdated.setText(last_update_in_sec + " sec. ago");
+                } else if(last_update_in_sec < 60 * 60) {
+                    // < 1 hr = in terms of minutes
+                    int mins = (int) last_update_in_sec / 60;
+                    holder.txtLastUpdated.setText(mins + " min. ago");
+                } else {
+                    // just show >1hr
+                    holder.txtLastUpdated.setText("More than an hour");
+                }
             } else {
                 holder.txtLastUpdated.setText("---");
             }
