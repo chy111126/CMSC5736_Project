@@ -92,6 +92,8 @@ public class LocationManager {
     private boolean isScanning = false;
     private Handler scanHandler = new Handler();
 
+    // Friend location poller
+    PeriodicExecutor friendPoller;
 
     // Constructor
     public static LocationManager getInstance() {
@@ -117,7 +119,7 @@ public class LocationManager {
     }
     // LocationManager service
     // The caller class (i.e. MainActivity, etc.) should be able to start/stop service as wished.
-    public void startService(Context context) {
+    public void startService(final Context context) {
         // init BLE; and check if bluetooth capability is enabled
         btManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         if(btManager == null) {
@@ -146,6 +148,16 @@ public class LocationManager {
             scanHandler.post(scanRunnable);
             Toast.makeText(context, "Scanning started!", Toast.LENGTH_SHORT);
         }
+
+        // start friend poller
+        friendPoller = new PeriodicExecutor(3000);
+        friendPoller.execute(new Runnable() {
+            @Override
+            public void run() {
+                //LocationManager.this.updateFriendDefintion(context);
+                LocationManager.this.updateSimulatedFriendPositions();
+            }
+        });
     }
 
     public void stopService(Context context) {

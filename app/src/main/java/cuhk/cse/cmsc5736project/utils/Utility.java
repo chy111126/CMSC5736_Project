@@ -60,24 +60,6 @@ public class Utility {
         return Color.rgb((int) r, (int) g, (int) b);
     }
 
-    public static Beacon createBeaconFromJsonObject(JSONObject jsonObj) {
-        try {
-            Beacon beacon = new Beacon();
-            beacon.setUUID(jsonObj.getString("uuid"));
-            beacon.setMajor(jsonObj.getInt("major"));
-            beacon.setMinor(jsonObj.getInt("major"));
-            beacon.setPos(jsonObj.getInt("position_x"), jsonObj.getInt("position_y"));
-
-            // TODO: For RSSI, need some custom logic to reflect proximity better
-            beacon.setRSSI(jsonObj.getInt("rssi_two_m_signal"));
-
-            return beacon;
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public static Friend createNotFriendFromJsonObject(JSONObject jsonObj) {
         try {
             String mac = jsonObj.getString("mac");
