@@ -1,16 +1,19 @@
 package cuhk.cse.cmsc5736project;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanRecord;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.graphics.PointF;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.kosalgeek.genasync12.AsyncResponse;
@@ -50,13 +53,16 @@ public class LocationManager {
 
     // ----- POI -----
     private static HashMap<String, POI> poiHM = new HashMap<>();
+    private OnPOIListChangeListener poiChangedMapFragmentListener = null;
     private OnPOIListChangeListener poiChangedListener = null;
 
     // ----- Friends -----
     private static HashMap<String, Friend> friendHM = new HashMap<>();
+    private OnFriendListChangeListener friendChangedMapFragmentListener = null;
     private OnFriendListChangeListener friendChangedListener = null;
 
     private static HashMap<String, Friend> notFriendHM = new HashMap<>();
+    private OnFriendListChangeListener notFriendChangedListener = null;
 
     // ----- Singleton class -----
     private static LocationManager instance;
@@ -208,19 +214,40 @@ public class LocationManager {
                 final int major = (scanRecord[startByte + 20] & 0xff) * 0x100 + (scanRecord[startByte + 21] & 0xff);
                 final int minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
 
+                /*
+                Beacon beacon = new Beacon();
+                beacon.setUUID(uuid);
+                beacon.setMajor(major);
+                beacon.setMinor(minor);
+                beacon.setRSSI(result.getRssi());
+
+                boolean isUpdated = false;
+                for (Beacon beaconItem : scanBeacon) {
+                    if (beacon.isSameBeacon(beaconItem)) {
+                        beaconItem.setRSSI(beacon.getRSSI());
+                        isUpdated = true;
+                        break;
+                    }
+                }
+                if (!isUpdated) {
+                    scanBeacon.add(beacon);
+                }
+                */
 
                 // Check beacon entry in POI Hashmap
+                POI targetPOI = poiHM.get(uuid);
+                if (targetPOI != null) {
+                    targetPOI.getBeacon().setRSSI(result.getRssi());
+                    //Log.i("targetPOI", " " + targetPOI.toString());
+                    //Log.i("targetPOI RSSI", " " + result.getRssi());
+                }
+
                 // If threshold passed, trigger POI change listener
                 Date nowDate = new Date();
                 int scanning_threshold = 1;
                 if (lastScanningDate == null || (nowDate.getTime() - lastScanningDate.getTime()) / 1000 > scanning_threshold) {
-                    POI targetPOI = poiHM.get(uuid);
-                    if (targetPOI != null) {
-                        targetPOI.getBeacon().setRSSI(result.getRssi());
-                        //Log.i("targetPOI", " " + targetPOI.toString());
-                        //Log.i("targetPOI RSSI", " " + result.getRssi());
-                        poiChangedListener.onChanged();
-                    }
+                    //LocationManager.this.updatePOIDefintion();
+                    poiChangedListener.onChanged();
                     lastScanningDate = new Date();
                 }
             }
@@ -239,7 +266,6 @@ public class LocationManager {
             Log.w("", "LE Scan Failed: " + errorCode);
         }
     };
-
     // TODO: End
 
 
@@ -343,8 +369,12 @@ public class LocationManager {
                 if (poiChangedListener != null) {
                     poiChangedListener.onChanged();
                 }
+                if (poiChangedMapFragmentListener != null) {
+                    poiChangedMapFragmentListener.onChanged();
+                }
             }
         });
+
         task.execute(GET_ALL_POI_DATA_URL);
     }
 
@@ -352,6 +382,11 @@ public class LocationManager {
         // Caller method can update through the listener when this manager class sent updates
         // this.poiListener.OnRetrieved method would be invoked after service successfully acquired new location information
         this.poiChangedListener = listener;
+    }
+    public void setOnPOIChangedMapFragmentListener(OnPOIListChangeListener listener) {
+        // Caller method can update through the listener when this manager class sent updates
+        // this.poiListener.OnRetrieved method would be invoked after service successfully acquired new location information
+        this.poiChangedMapFragmentListener = listener;
     }
 
 
@@ -412,9 +447,12 @@ public class LocationManager {
                 if (friendChangedListener != null) {
                     friendChangedListener.onChanged();
                 }
+                if (friendChangedMapFragmentListener != null) {
+                    friendChangedMapFragmentListener.onChanged();
+                }
             }
         });
-        task.execute(GET_ALL_NOT_FRIEND_DATA_URL);
+        task.execute(UPDATE_USER_DATA_URL);
     }
 
     public void initCurrentUserFriendList(Context context, final OnFriendResultListener initListener) {
@@ -461,6 +499,16 @@ public class LocationManager {
         }
     }
 
+    public void setOnFriendListChangeMapFragmentListener(OnFriendListChangeListener listener) {
+        // On friend list changed
+        // onAdd: After adding a new friend
+        // onDelete: After deleting a friend
+        // onChange: After getting updated friend info (e.g. beacon information)
+        if (listener != null) {
+            this.friendChangedMapFragmentListener = listener;
+        }
+    }
+
     public void putFriend(Context context, Friend newFriend) {
         // Put a new friend to location manager service for tracking updates
         friendHM.put(newFriend.getMAC(), newFriend);
@@ -471,7 +519,9 @@ public class LocationManager {
         if (this.friendChangedListener != null) {
             this.friendChangedListener.onAdded(newFriend);
         }
-
+        if (this.friendChangedMapFragmentListener != null) {
+            this.friendChangedMapFragmentListener.onAdded(newFriend);
+        }
     }
 
     private void addFriendToServer(Friend newFriend, Context context) {
@@ -508,7 +558,9 @@ public class LocationManager {
         if (this.friendChangedListener != null) {
             this.friendChangedListener.onDeleted(toRemoveFriend);
         }
-
+        if (this.friendChangedMapFragmentListener != null) {
+            this.friendChangedMapFragmentListener.onDeleted(toRemoveFriend);
+        }
     }
 
     private void removeFriendFromServer(Friend toRemoveFriend, Context context) {
@@ -677,7 +729,4 @@ public class LocationManager {
             this.friendChangedListener.onChanged();
         }
     }
-
-
-
 }
