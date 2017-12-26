@@ -6,4 +6,5 @@
     <string name="tab_3">Friends</string>
 
     <string name="settings_key_device_id">Device ID</string>
+    <string name="settings_key_username">settings_key_username</string>
 </resources>

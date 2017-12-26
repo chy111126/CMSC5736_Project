@@ -143,7 +143,8 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.syncdata:
                 //updateModel
-                RSSIModel.getInstance().updateModel(MainActivity.this);
+                //RSSIModel.getInstance().updateModel(MainActivity.this);
+                LocationManager.getInstance().updatePOIDefintion(context);
                 return true;
             case R.id.setup:
                 intent = new Intent(this, BeaconActivity.class);

@@ -18,7 +18,7 @@
 
         <EditTextPreference
             android:defaultValue="Test"
-            android:key="pref_gallery_name"
+            android:key="settings_key_username"
             android:summary="Name to be displayed when others discover you."
             android:title="Display name" />
 

@@ -401,6 +401,7 @@ public class LocationManager {
 
     public void updatePOIDefintion(Context context) {
         // TODO: Do update POI beacon info here!
+        poiHM.clear();
         HashMap postData = new HashMap();
         PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
             @Override
