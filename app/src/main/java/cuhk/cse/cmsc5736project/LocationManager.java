@@ -276,7 +276,12 @@ public class LocationManager {
                 int scanning_threshold = 1;
                 if (lastScanningDate == null || (nowDate.getTime() - lastScanningDate.getTime()) / 1000 > scanning_threshold) {
                     //LocationManager.this.updatePOIDefintion();
-                    poiChangedListener.onChanged();
+                    if(poiChangedListener != null) {
+                        poiChangedListener.onChanged();
+                    }
+                    if (poiChangedMapFragmentListener != null) {
+                        poiChangedMapFragmentListener.onChanged();
+                    }
                     lastScanningDate = new Date();
                 }
             }
