@@ -2,6 +2,7 @@ package cuhk.cse.cmsc5736project.fragments;
 
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cuhk.cse.cmsc5736project.LocationManager;
 import cuhk.cse.cmsc5736project.R;
@@ -47,10 +49,10 @@ public class MapFragment extends Fragment {
     float lastKnownY;
     LocationManager locationManager;
 
-    private List<Friend> friendList = new ArrayList<>();
+    private Map<Friend, Pin> friendHm = new HashMap<>();
 
     //List<Pin> pinList = new ArrayList<Pin>();
-    HashMap<PointF, Pin> pinHm = new HashMap<>();
+    private HashMap<PointF, Pin> pinHm = new HashMap<>();
 
     public MapFragment() {
         // Required empty public constructor
@@ -75,7 +77,7 @@ public class MapFragment extends Fragment {
         Log.i(TAG, "onCreateView");
 
         imageView = (PinView)rootView.findViewById(R.id.mapView);
-        setImageViewListeers(imageView);
+        setImageViewListeners(imageView);
 
         //TODO: Map test
         locationManager = LocationManager.getInstance();
@@ -84,7 +86,9 @@ public class MapFragment extends Fragment {
                 List<Pin> pinList = new ArrayList<Pin>() ;
                 for(POI poi: poiList) {
                     //PointF pinPosition = poi.getPosition();
-                    pinList.add(new Pin(getContext(), poi, R.drawable.map_marker_icon));
+                    Pin newPin = new Pin(getContext(), poi, R.drawable.map_marker_icon);
+                    pinList.add(newPin);
+                    pinHm.put(poi.getPosition(), newPin);
                 }
                 imageView.addPinList(pinList);
             }
@@ -105,38 +109,75 @@ public class MapFragment extends Fragment {
                 //TODO: handle friend list
                 for (Friend friend: friendList) {
                     Log.i("init: ", "friend " + friend.getName() + " at " + friend.getNearestLocation());
+                    Pin friendAtPin = pinHm.get(friend.getNearestLocation());
+                    if (friendAtPin!=null) {
+                        friendAtPin.addFriend(friend);
+                        friendHm.put(friend, friendAtPin);
+                    }
                 }
             }
         });
 
         LocationManager.getInstance().setOnFriendListChangeMapFragmentListener(new OnFriendListChangeListener() {
             @Override
-            public void onAdded(Friend item) {
-                friendList.add(item);
-                sortViewList();
-
+            public void onAdded(Friend friend) {
+                //friendList.add(item);
+                //sortViewList();
+                Pin friendAtPin = pinHm.get(friend.getNearestLocation());
+                if (friendAtPin!=null) {
+                    friendAtPin.addFriend(friend);
+                    friendHm.put(friend, friendAtPin);
+                }
                 //FriendListAdapter.this.notifyDataSetChanged();
             }
 
             @Override
-            public void onDeleted(Friend item) {
-                friendList.remove(item);
-                sortViewList();
+            public void onDeleted(Friend friend) {
+                //friendList.remove(item);
+                Pin friendAtPin = pinHm.get(friend.getNearestLocation());
+                if (friendAtPin!=null)
+                    friendAtPin.removeFriend(friend);
+                friendHm.remove(friend);
+
+                //sortViewList();
                 //FriendListAdapter.this.notifyDataSetChanged();
             }
 
             @Override
             public void onChanged() {
-                sortViewList();
+                //sortViewList();
                 //FriendListAdapter.this.notifyDataSetChanged();
+                AsyncTask.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateFriendList();
+                    }
+                });
             }
         });
 
         return rootView;
     }
 
-    private void sortViewList() {
-        /*
+    void updateFriendList(){
+        for (Map.Entry<Friend, Pin> entry : friendHm.entrySet()) {
+            Friend friend = entry.getKey();
+            Pin pin = entry.getValue();
+            Pin friendAtPin = pinHm.get(friend.getNearestLocation());
+            if (friendAtPin!=pin){
+                if (pin!=null){
+                    pin.removeFriend(friend);
+                    friendHm.remove(friend);
+                }
+                if (friendAtPin!=null){
+                    friendAtPin.addFriend(friend);
+                    friendHm.put(friend, friendAtPin);
+                }
+            }
+        }
+    }
+
+/*    private void sortViewList() {
         Collections.sort(friendList, new Comparator<Friend>() {
             @Override
             public int compare(Friend f1, Friend f2) {
@@ -147,9 +188,8 @@ public class MapFragment extends Fragment {
                 }
             }
         });
-        */
-    }
-    void setImageViewListeers(final PinView imageView){
+    }*/
+    void setImageViewListeners(final PinView imageView){
         imageView.setImage(ImageSource.resource(R.drawable.floorplan));
         imageView.setMinimumScaleType(SCALE_TYPE_CENTER_CROP);
         //imageView.setPin(new PointF(1000,100));
