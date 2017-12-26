@@ -88,6 +88,7 @@ public class MapActivity extends AppCompatActivity {
             public void onAdded(Friend item) {
                 friendList.add(item);
                 sortViewList();
+
                 //FriendListAdapter.this.notifyDataSetChanged();
             }
 
@@ -110,7 +111,7 @@ public class MapActivity extends AppCompatActivity {
         Collections.sort(friendList, new Comparator<Friend>() {
             @Override
             public int compare(Friend f1, Friend f2) {
-                if(f1.getBeacon().getRSSI() > f2.getBeacon().getRSSI()) {
+                if(f1.getBeacon().getProximity() > f2.getBeacon().getProximity()) {
                     return -1;
                 } else {
                     return 1;

@@ -7,6 +7,9 @@ import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cuhk.cse.cmsc5736project.R;
 
 /**
@@ -23,10 +26,11 @@ public class Pin {
     private int drawable;
     private Bitmap pin;
     private String description = "";
-    private float scale;
+    private float scale = 1;
     private double distance = -1;
-    private double maxDistance = 0;
+    private static double maxDistance = 0;
 
+    private List<Friend> friendList = new ArrayList<>();
 
     public Pin(Context context, PointF position, int drawable){
         this.id = next_id;
@@ -48,7 +52,7 @@ public class Pin {
         if (poi!=null){
             setDescription(poi.getName());
             if(poi.getBeacon()!=null) {
-                setDistance(poi.getBeacon().getDistance());
+                setDistance(poi.getBeacon().getProximity());
                 if (getDistance() > maxDistance) maxDistance = getDistance();
             }
         }
@@ -92,20 +96,20 @@ public class Pin {
     }
 
     public void setScale() {
-        Log.i("Pin View", "Setting scale for distance " + getDistance() + " for " + getDescription());
-        if (getDistance()>=0) {
+        Log.i("Pin View", "Setting scale for distance " + distance + " for " + getDescription() + " with max dist " + maxDistance);
+        if (distance>=0) {
             if (maxDistance > 0) {
-                this.scale = (float) ((maxDistance - getDistance()) / maxDistance);
-                pin = Bitmap.createScaledBitmap(pin, Math.max((int) (pin.getWidth() * scale), 50), Math.max((int) (pin.getHeight() * scale), 50), true);
-            } else{
-                scale = 1;
+                this.scale = (float) ((1 - 0.5f * (distance/maxDistance))) ;
+                Log.i("Pin View", "Setted scale for distance " + distance + " as " + getScale());
+                this.scale = Math.min(Math.max(this.scale, 0.5f),1.0f);
+                pin = Bitmap.createScaledBitmap(pin, (int) (pin.getWidth() * scale), (int) (pin.getHeight() * scale), true);
             }
             setDescription("~" + getDistance() + "m");
         }
     }
 
     public float getTextSize(){
-        return Math.max(70*getScale(), 30);
+        return 70*getScale();
     }
 
     public Bitmap getBitmap(){
@@ -124,4 +128,15 @@ public class Pin {
 
     }
 
+    public void addFriend(Friend friend){
+        friendList.add(friend);
+    }
+
+    public void removeFriend(Friend friend){
+        friendList.remove(friend);
+    }
+
+    public List<Friend> getFriendList(){
+        return friendList;
+    }
 }

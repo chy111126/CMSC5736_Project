@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.icu.util.Freezable;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cuhk.cse.cmsc5736project.R;
+import cuhk.cse.cmsc5736project.models.Friend;
 import cuhk.cse.cmsc5736project.models.Pin;
 
 public class PinView extends SubsamplingScaleImageView {
@@ -113,21 +115,34 @@ public class PinView extends SubsamplingScaleImageView {
         //if (sPin != null && pin != null) {
         if (pinList!=null)
         for (Pin pin : pinList){
-            sourceToViewCoord(pin.getPin(), vPin);
-            float vX = vPin.x - (pin.getBitmap().getWidth()/2);
-            float vY = vPin.y - pin.getBitmap().getHeight();
-            canvas.drawBitmap(pin.getBitmap(), vX, vY, paint);
+            if (pin.getPin() != null) {
+                sourceToViewCoord(pin.getPin(), vPin);
+                float vX = vPin.x - (pin.getBitmap().getWidth() / 2);
+                float vY = vPin.y - pin.getBitmap().getHeight();
+                canvas.drawBitmap(pin.getBitmap(), vX, vY, paint);
 
-            if (!pin.getDescription().isEmpty()) {
-                paint.setColor(Color.BLACK);
-                paint.setTextSize(pin.getTextSize());
-                paint.setTextAlign(Paint.Align.CENTER);
-                float vXText = vPin.x;
-                //float vYText = vPin.y - pin.getBitmap().getHeight() - 20;
-                canvas.drawText(pin.getDescription(), vXText, vY, paint);
+                // print description for pin
+                if (!pin.getDescription().isEmpty()) {
+                    paint.setColor(Color.BLACK);
+                    paint.setTextSize(pin.getTextSize());
+                    paint.setTextAlign(Paint.Align.CENTER);
+                    float vXText = vPin.x;
+                    //float vYText = vPin.y - pin.getBitmap().getHeight() - 20;
+                    canvas.drawText(pin.getDescription(), vXText, vY, paint);
+                }
+
+                // print friends for pin
+                List<Friend> friendList = pin.getFriendList();
+                if (friendList != null) {
+                    // print 3 friends maximum
+                    for (int i = 0; i < 3 && i < friendList.size(); i++) {
+                        float vXText = vPin.x + -pin.getBitmap().getWidth();
+                        float vYText = vPin.y - pin.getBitmap().getHeight() - (20 * (3 - i));
+                        canvas.drawText(friendList.get(i).getName(), vXText, vYText, paint);
+                    }
+                }
+                //Log.i("pin view", "onDraw: " + vX + ", " + vY + ", " + pin.getPin().x + ", " + pin.getPin().y + ", " + getScale());
             }
-
-            //Log.i("pin view", "onDraw: " + vX + ", " + vY + ", " + pin.getPin().x + ", " + pin.getPin().y + ", " + getScale());
         }
 
     }
