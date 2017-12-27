@@ -122,14 +122,18 @@ public class Utility {
             beacon.setMajor(jsonObj.getInt("major"));
             beacon.setMinor(jsonObj.getInt("minor"));
             beacon.setPos(jsonObj.getDouble("position_x"),jsonObj.getDouble("position_y"));
+            beacon.setRSSI(-9999);      // Will be updated if scanned
 
             double n1 = jsonObj.getDouble("rssi_half_m_signal");
             double n2 = jsonObj.getDouble("rssi_one_m_signal");
             double n3 = jsonObj.getDouble("rssi_two_m_signal");
             double n4 = jsonObj.getDouble("rssi_four_m_signal");
+            beacon.setRSSIRanges(n1, n2, n3, n4);
             double n = (Math.log(n1/n2) / Math.log(0.5/1) + Math.log(n3/n2) / Math.log(2/1) + Math.log(n4/n2) / Math.log(4/1)) / 3;
             beacon.setPathLossExponent(n);
             beacon.setOneMeterPower(n2);
+            Log.i("createPOIFromJsonObject", "path loss=" + n);
+            Log.i("createPOIFromJsonObject", "one_meter_power=" + n2);
 
             poi.setPosition(jsonObj.getDouble("position_x"),jsonObj.getDouble("position_y"));
             poi.setBeacon(beacon);

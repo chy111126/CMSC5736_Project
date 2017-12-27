@@ -13,6 +13,7 @@ import android.widget.ToggleButton;
 
 import org.w3c.dom.Text;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -119,8 +120,14 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
 
         holder.txtTitle.setText(item.getName());
         holder.txtDesc.setText(item.getDescription());
-        holder.txtRSSI.setText(" " + item.getBeacon().getRSSI());
-        //holder.txtRSSI.setText(" " + item.getBeacon().getDistance());
+        DecimalFormat df = new DecimalFormat("#.##");
+
+        if(item.getBeacon().getRSSI() == -9999) {
+            holder.txtRSSI.setText("---");
+        } else {
+            //holder.txtRSSI.setText(" " + item.getBeacon().getRSSI());
+            holder.txtRSSI.setText(" " + df.format(item.getBeacon().getDistance()) + "/" + item.getBeacon().getRSSI());
+        }
         holder.toggleBookmark.setChecked(item.isBookmarked());
 
         int poiProximity = item.getBeacon().getProximity();
