@@ -10,6 +10,10 @@ public class Beacon implements Serializable
     private int rssi;
     private double path_loss_exponent;
     double one_meter_power = 0;
+    double half_m_rssi = 0;
+    double one_m_rssi = 0;
+    double two_m_rssi = 0;
+    double four_m_rssi = 0;
     double pos_x = 0,pos_y = 0;
 
     public int scanTimes = 0;
@@ -68,14 +72,37 @@ public class Beacon implements Serializable
     public double getPos_x(){return pos_x;}
     public double getPos_y(){return pos_y;}
 
+    public void setRSSIRanges(double half, double one, double two, double four) {
+        this.half_m_rssi = half;
+        this.one_m_rssi = one;
+        this.two_m_rssi = two;
+        this.four_m_rssi = four;
+    }
+
     public double getDistance() {
         // Get distance using RSSI power
-        return calDistance(this.rssi);
+        double theDist = calDistance(this.rssi);
+        return theDist;
     }
 
     public double calDistance(double power)
     {
-        return Math.pow((one_meter_power/power),(1/path_loss_exponent));
+        // Somehow it does not work, use interpolation for the purpose
+        if(power < four_m_rssi) {
+            return 4.0d;
+        } else if(four_m_rssi < power && power < two_m_rssi) {
+            double interValue = (4 - 2) * (four_m_rssi - power) / (four_m_rssi - two_m_rssi) + 1;
+            return interValue;
+        } else if(two_m_rssi < power && power < one_m_rssi) {
+            double interValue = (2 - 1) * (two_m_rssi - power) / (two_m_rssi - one_m_rssi) + 1;
+            return interValue;
+        } else if(one_m_rssi < power && power < half_m_rssi) {
+            double interValue = (1 - 0.5) * (one_m_rssi - power) / (one_m_rssi - half_m_rssi) + 0.5;
+            return interValue;
+        } else {
+            return 0.5d;
+        }
+        //return Math.pow((one_meter_power/power),(1/path_loss_exponent));
     }
 
 
