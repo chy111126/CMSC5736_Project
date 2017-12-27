@@ -127,17 +127,17 @@ public class Pin {
     }
 
     public void setScale() {
-        Log.i("Pin View", "Setting scale for distance " + distance + " for " + getDescription() + " with max dist " + maxDistance);
-        if (distance>=0) {
+        Log.i("Pin View", "Setting scale for distance " + this.distance + " for " + getDescription() + " with max dist " + maxDistance);
+        if (this.distance>=0) {
             if (maxDistance > 0) {
-                float oldScale = scale;
-                this.scale = (float) ((1 - (distance/maxDistance))) ;
-                Log.i("Pin View", "Setted scale for distance " + distance + " as " + getScale());
+                float oldScale = this.scale;
+                this.scale = (float) ((1 - (this.distance/maxDistance))) ;
+                Log.i("Pin View", "Setted scale for distance " + this.distance + " as " + getScale());
                 this.scale = Math.min(Math.max(this.scale, 0.5f),1.0f);
-                int w = (int)(pin.getWidth() / oldScale * scale);
-                int h = (int)(pin.getHeight() / oldScale * scale);
+                int w = (int)(pin.getWidth() / oldScale * this.scale);
+                int h = (int)(pin.getHeight() / oldScale * this.scale);
                 //if (w>0 && h>0) pin = Bitmap.createScaledBitmap(pin, (int) w, (int) h, true);
-                colorMatrix.setSaturation(getScale());
+                this.colorMatrix.setSaturation(this.scale);
             }
             //setDescription("~" + getDistance() + "m");
         }

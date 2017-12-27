@@ -35,7 +35,9 @@ public class PinView extends SubsamplingScaleImageView {
     private final Paint textPaint;
     private final Paint strokePaint;
     private final Paint friendmPaint;
-    private final float friendmHeight;
+    private final Paint friendStrokePaint;
+    private final Paint markerTextPaint;
+    //private final float friendmHeight;
 
     private Bitmap markerBitmap;
     private final PointF vPin = new PointF();
@@ -70,12 +72,26 @@ public class PinView extends SubsamplingScaleImageView {
         strokePaint.setStrokeWidth(15);
 
         friendmPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        friendmPaint.setColor(Color.WHITE);
+        friendmPaint.setColor(Color.RED);
         friendmPaint.setTypeface(Typeface.DEFAULT_BOLD);
-        friendmPaint.setTextAlign(Paint.Align.CENTER);
+        friendmPaint.setTextAlign(Paint.Align.RIGHT);
         friendmPaint.setTextSize(50);
-        Paint.FontMetrics fm = friendmPaint.getFontMetrics();
-        friendmHeight = fm.descent - fm.ascent;
+        //Paint.FontMetrics fm = friendmPaint.getFontMetrics();
+        //friendmHeight = fm.descent - fm.ascent;
+
+        friendStrokePaint = new Paint();
+        friendStrokePaint.setColor(Color.WHITE);
+        friendStrokePaint.setTextAlign(Paint.Align.RIGHT);
+        friendStrokePaint.setTextSize(50);
+        //strokePaint.setTypeface(Typeface.DEFAULT_BOLD);
+        friendStrokePaint.setStyle(Paint.Style.STROKE);
+        friendStrokePaint.setStrokeWidth(15);
+
+        markerTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        markerTextPaint.setColor(Color.BLACK);
+        //markerTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        markerTextPaint.setTextAlign(Paint.Align.CENTER);
+        markerTextPaint.setTextSize(50);
 
         float density = getResources().getDisplayMetrics().densityDpi;
         markerBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.map_marker_icon);
@@ -181,6 +197,14 @@ public class PinView extends SubsamplingScaleImageView {
                 }
 
                 // print friends for pin
+                List<Friend> friendList = pin.getFriendList();
+                if (friendList != null && friendList.size()>0){
+                    float vXText = vPin.x + (pin.getBitmap().getWidth() / 2);
+                    float vYText = vPin.y - (pin.getBitmap().getHeight() / 2) + textYMargin;
+                    String friendText = Integer.toString(friendList.size());
+                    canvas.drawText(friendText, vXText, vYText, friendStrokePaint);
+                    canvas.drawText(friendText, vXText, vYText, friendmPaint);
+                }
 /*                List<Friend> friendList = pin.getFriendList();
                 if (friendList != null) {
                     paint.setTextAlign(Paint.Align.LEFT);
@@ -201,6 +225,9 @@ public class PinView extends SubsamplingScaleImageView {
                     float vXMarker = vPin.x - (markerBitmap.getWidth() / 2);
                     float vYMarker = vPin.y - (markerBitmap.getHeight());
                     canvas.drawBitmap(markerBitmap, vXMarker, vYMarker, markerPaint);
+                    float vXText = vPin.x;
+                    float vYText = vYMarker;
+                    canvas.drawText(pin.getDistanceDescription(), vXText, vYText, markerTextPaint);
                 }
                 //Log.i("pin view", "onDraw: " + vX + ", " + vY + ", " + pin.getPin().x + ", " + pin.getPin().y + ", " + getScale());
             }
