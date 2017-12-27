@@ -119,7 +119,12 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
 
         holder.txtTitle.setText(item.getName());
         holder.txtDesc.setText(item.getDescription());
-        holder.txtRSSI.setText(" " + item.getBeacon().getRSSI());
+
+        if(item.getBeacon().getRSSI() == -9999) {
+            holder.txtRSSI.setText("---");
+        } else {
+            holder.txtRSSI.setText(" " + item.getBeacon().getRSSI());
+        }
         //holder.txtRSSI.setText(" " + item.getBeacon().getDistance());
         holder.toggleBookmark.setChecked(item.isBookmarked());
 

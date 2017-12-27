@@ -165,8 +165,8 @@ public class LocationManager {
         friendPoller.execute(new Runnable() {
             @Override
             public void run() {
-                //LocationManager.this.updateFriendDefintion(context);
-                LocationManager.getInstance().updateSimulatedFriendPositions();
+                LocationManager.getInstance().updateFriendDefintion(context);
+                //LocationManager.getInstance().updateSimulatedFriendPositions();
                 LocationManager.getInstance().updateUserState(context);
             }
         });
@@ -503,20 +503,25 @@ public class LocationManager {
             @Override
             public void processFinish(String s) {
                 try {
+                    Log.i("LocationManager", "updateFriendDefintion:" + s);
                     JSONObject resultJson = new JSONObject(s);
-                    JSONArray friendArr = resultJson.getJSONArray("not_friends");
+                    JSONArray friendArr = resultJson.getJSONArray("friends");
                     for (int i = 0; i < friendArr.length(); i++) {
                         // Transform raw result to object
                         JSONObject row = friendArr.getJSONObject(i);
-                        Friend friend = Utility.createNotFriendFromJsonObject(row);
+                        Friend friend = Utility.createFriendFromJsonObject(row, poiHM);
                         String id = friend.getMAC();
-                        // Put objects to accessing array/Hashmap
-                        notFriendHM.put(id, friend);
+                        // Find original friend object in memory
+                        Friend originalFriend = friendHM.get(id);
+                        if(originalFriend != null) {
+                            originalFriend.setLastUpdated(friend.getLastUpdatedDate());
+                            originalFriend.setName(friend.getName());
+                            originalFriend.setNearPOI(friend.getNearestLocation());
+                        }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                List<Friend> notFriendList = new ArrayList<>(notFriendHM.values());
                 // Invoke callback method
                 if (friendChangedListener != null) {
                     friendChangedListener.onChanged();
@@ -526,7 +531,7 @@ public class LocationManager {
                 }
             }
         });
-        task.execute(UPDATE_USER_DATA_URL);
+        task.execute(GET_ALL_FRIEND_DATA_URL);
     }
 
     public void initCurrentUserFriendList(Context context, final OnFriendResultListener initListener) {
@@ -538,6 +543,7 @@ public class LocationManager {
             @Override
             public void processFinish(String s) {
                 try {
+                    Log.i("LocationManager", "initCurrentUserFriendList:" + s);
                     JSONObject resultJson = new JSONObject(s);
                     JSONArray friendArr = resultJson.getJSONArray("friends");
                     for (int i = 0; i < friendArr.length(); i++) {

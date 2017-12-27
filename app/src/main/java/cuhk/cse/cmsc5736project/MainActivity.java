@@ -209,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTabSelected(int position, boolean wasSelected) {
 
                 // TEST METHOD !!! WILL REMOVE LATER
+                //LocationManager.getInstance().simulateBluetoothPOIScanning();
                 //LocationManager.getInstance().updateSimulatedFriendPositions();
 
                 if (!wasSelected)

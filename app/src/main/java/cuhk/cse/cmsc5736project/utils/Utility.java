@@ -122,6 +122,7 @@ public class Utility {
             beacon.setMajor(jsonObj.getInt("major"));
             beacon.setMinor(jsonObj.getInt("minor"));
             beacon.setPos(jsonObj.getDouble("position_x"),jsonObj.getDouble("position_y"));
+            beacon.setRSSI(-9999);      // Will be updated if scanned
 
             double n1 = jsonObj.getDouble("rssi_half_m_signal");
             double n2 = jsonObj.getDouble("rssi_one_m_signal");
