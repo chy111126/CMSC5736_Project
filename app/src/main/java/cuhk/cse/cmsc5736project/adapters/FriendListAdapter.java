@@ -182,7 +182,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
                 holder.txtDesc.setText("Near: Undetermined");
             }
 
-            int prox = item.getProximityToCurrentUserPos(0, 0);
+            int prox = item.getProximityToCurrentUserPos(LocationManager.getInstance().userPos.x, LocationManager.getInstance().userPos.y);
             switch (prox) {
                 case Friend.PROXIMITY_VERY_CLOSE:
                     holder.ivProximityIndicator_1.setVisibility(View.INVISIBLE);
