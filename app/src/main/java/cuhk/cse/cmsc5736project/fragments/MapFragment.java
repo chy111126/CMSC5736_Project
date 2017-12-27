@@ -52,7 +52,7 @@ public class MapFragment extends Fragment {
     private Map<Friend, Pin> friendHm = new HashMap<>();
 
     //List<Pin> pinList = new ArrayList<Pin>();
-    private HashMap<PointF, Pin> pinHm = new HashMap<>();
+    private HashMap<POI, Pin> pinHm = new HashMap<>();
 
     public MapFragment() {
         // Required empty public constructor
@@ -92,7 +92,7 @@ public class MapFragment extends Fragment {
                     else
                         newPin = new Pin(getContext(), poi, R.drawable.booth_small_icon);
                     pinList.add(newPin);
-                    pinHm.put(poi.getPosition(), newPin);
+                    pinHm.put(poi, newPin);
                 }
                 imageView.addPinList(pinList);
             }
@@ -128,6 +128,7 @@ public class MapFragment extends Fragment {
             public void onAdded(Friend friend) {
                 //friendList.add(item);
                 //sortViewList();
+                Log.i("add: ", "friend " + friend.getName() + " at " + friend.getNearestLocation());
                 Pin friendAtPin = pinHm.get(friend.getNearestLocation());
                 if (friendAtPin!=null) {
                     friendAtPin.addFriend(friend);
@@ -215,7 +216,7 @@ public class MapFragment extends Fragment {
                 return false;
             }
         });
-        imageView.setOnLongClickListener(new View.OnLongClickListener() {
+/*        imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 if (view.getId() == imageView.getId()) {
@@ -223,17 +224,17 @@ public class MapFragment extends Fragment {
                     Log.d("EditPlanFragment","Scale "+imageView.getScale());
                     imageView.addPin(new Pin(getContext(), new PointF(lastKnownX,lastKnownY),R.drawable.map_marker,"marked"));
 
-/*                    imageViewF.post(new Runnable(){
+*//*                    imageViewF.post(new Runnable(){
                         public void run(){
                             imageViewF.getRootView().postInvalidate();
                         }
-                    });*/
+                    });*//*
 
                     return true;
                 }
                 return false;
             }
-        });
+        });*/
 
     }
 
