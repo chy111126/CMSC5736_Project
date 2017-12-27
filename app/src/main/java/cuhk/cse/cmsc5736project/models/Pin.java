@@ -33,6 +33,7 @@ public class Pin {
     private static double maxDistance = 3;
     private ColorMatrixColorFilter colorFilter;
     private ColorMatrix colorMatrix;
+    private boolean showPin = false;
 
     private List<Friend> friendList = new ArrayList<>();
 
@@ -93,8 +94,20 @@ public class Pin {
         return colorFilter;
     }
 
+    public ColorMatrix getColorMatrix(){
+        return colorMatrix;
+    }
+
     public void setColorFilter(ColorMatrixColorFilter colorFilter) {
         this.colorFilter = colorFilter;
+    }
+
+    public boolean isShowPin() {
+        return showPin;
+    }
+
+    public void setShowPin(boolean showPin) {
+        this.showPin = showPin;
     }
 
     public String getDistanceDescription(){
