@@ -165,7 +165,8 @@ public class MapFragment extends Fragment {
     }
 
     void updateFriendList(){
-        for (Map.Entry<Friend, Pin> entry : friendHm.entrySet()) {
+        Map<Friend, Pin> tempHm = new HashMap<>(friendHm);
+        for (Map.Entry<Friend, Pin> entry : tempHm.entrySet()) {
             Friend friend = entry.getKey();
             Pin pin = entry.getValue();
             Pin friendAtPin = pinHm.get(friend.getNearestLocation());
