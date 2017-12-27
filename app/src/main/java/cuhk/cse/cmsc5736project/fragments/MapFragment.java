@@ -31,6 +31,7 @@ import cuhk.cse.cmsc5736project.interfaces.OnPOIResultListener;
 import cuhk.cse.cmsc5736project.models.Friend;
 import cuhk.cse.cmsc5736project.models.POI;
 import cuhk.cse.cmsc5736project.models.Pin;
+import cuhk.cse.cmsc5736project.views.FriendListDialog;
 import cuhk.cse.cmsc5736project.views.PinView;
 
 import static com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.SCALE_TYPE_CENTER_CROP;
@@ -49,6 +50,7 @@ public class MapFragment extends Fragment {
     float lastKnownY;
     LocationManager locationManager;
 
+    //POI poifortest;
     private Map<Friend, Pin> friendHm = new HashMap<>();
 
     //List<Pin> pinList = new ArrayList<Pin>();
@@ -83,6 +85,7 @@ public class MapFragment extends Fragment {
         locationManager = LocationManager.getInstance();
         locationManager.getPOIDefinitions(getContext(), new OnPOIResultListener(){
             public void onRetrieved(List< POI > poiList){
+                //poifortest = poiList.get(0);
                 List<Pin> pinList = new ArrayList<Pin>() ;
                 for(POI poi: poiList) {
                     //PointF pinPosition = poi.getPosition();
@@ -113,7 +116,7 @@ public class MapFragment extends Fragment {
                 //TODO: handle friend list
                 for (Friend friend: friendList) {
                     Log.i("init: ", "friend " + friend.getName() + " at " + friend.getNearestLocation());
-                    Pin friendAtPin = pinHm.get(friend.getNearestLocation());//new PointF(1008.75f, 995.209f));
+                    Pin friendAtPin = pinHm.get(friend.getNearestLocation());
                     if (friendAtPin!=null) {
                         Log.i("init: ", "add friend " + friend.getName() + " to " + friendAtPin.getDescription());
                         friendAtPin.addFriend(friend);
@@ -213,28 +216,73 @@ public class MapFragment extends Fragment {
                     //Log.i("image view: ", "onTouch: " + lastKnownX + ", " + lastKnownY);
                     //imageViewF.addPin(new Pin(MapActivity.this, new PointF(lastKnownX,lastKnownY),R.drawable.map_marker,"marked"));
                 }
+                if (view.getId()== imageView.getId() && motionEvent.getAction() == MotionEvent.ACTION_UP){
+
+
+                    //Log.i("image view: ", "onTouch: " + lastKnownX + ", " + lastKnownY);
+                    //imageViewF.addPin(new Pin(MapActivity.this, new PointF(lastKnownX,lastKnownY),R.drawable.map_marker,"marked"));
+                }
                 return false;
             }
         });
-/*        imageView.setOnLongClickListener(new View.OnLongClickListener() {
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (view.getId() == imageView.getId()) {
+                    Pin markedPin = imageView.checkClickedPos(new PointF(lastKnownX, lastKnownY));;
+                    //if (markedPin!=null)
+                    imageView.setMarkedPin(markedPin);
+                    imageView.post(new Runnable(){
+                        public void run(){
+                            imageView.invalidate();
+                        }
+                    });
+                }
+            }
+        });
+        imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 if (view.getId() == imageView.getId()) {
-                    Toast.makeText(getContext(), "Marked "+lastKnownX+" "+lastKnownY, Toast.LENGTH_SHORT).show();
-                    Log.d("EditPlanFragment","Scale "+imageView.getScale());
-                    imageView.addPin(new Pin(getContext(), new PointF(lastKnownX,lastKnownY),R.drawable.map_marker,"marked"));
+                    Pin markedPin = imageView.checkClickedPos(new PointF(lastKnownX, lastKnownY));;
+                    if (markedPin!=null) {
+                        imageView.setMarkedPin(markedPin);
+                        if (markedPin.getFriendList() != null) {
+                            List<Friend> friendsAtPin = markedPin.getFriendList();
+                            StringBuilder message = new StringBuilder();
+                            if (friendsAtPin.size()<=0) message.append("Sorry, no friends here!");
+                            else {
+                                int friendCount = 0;
+                                for (Friend friend : friendsAtPin) {
+                                    message.append(friend.getName() + "\n");
+                                    friendCount++;
+                                    if (friendCount>=20) {
+                                        message.append("and more...");
+                                        break;
+                                    }
+                                }
+                            }
 
-*//*                    imageViewF.post(new Runnable(){
-                        public void run(){
-                            imageViewF.getRootView().postInvalidate();
+                            FriendListDialog cdd = new FriendListDialog(MapFragment.this.getActivity(), message.toString());
+                            //cdd.setMessage(message.toString());
+                            cdd.show();
                         }
-                    });*//*
+                    }
+/*                    Toast.makeText(getContext(), "Marked "+lastKnownX+" "+lastKnownY, Toast.LENGTH_SHORT).show();
+                    Log.d("EditPlanFragment","Scale "+imageView.getScale());
+                    imageView.addPin(new Pin(getContext(), new PointF(lastKnownX,lastKnownY),R.drawable.map_marker,"marked"));*/
+
+                   imageView.post(new Runnable(){
+                        public void run(){
+                            imageView.invalidate();
+                        }
+                    });
 
                     return true;
                 }
                 return false;
             }
-        });*/
+        });
 
     }
 

@@ -1,30 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@android:color/white"
     android:orientation="vertical" >
 
-    <include layout="@layout/item_poi"/>
-
     <TextView
-        android:id="@+id/txt_dia"
+        android:id="@+id/txt_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="left"
         android:layout_margin="10dp"
-        android:text="Do you realy want to exit ?"
+        android:text="Friends at this place...... "
         android:textColor="@android:color/black"
         android:textSize="15dp"
         android:textStyle="bold"/>
 
     <TextView
-        android:id="@+id/txt_dia"
+        android:id="@+id/txt_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="10dp"
-        android:text="Do you realy want to exit ?"
+        android:text="Friend A"
         android:textColor="@android:color/black"
         android:textSize="15dp"
         android:textStyle="bold"/>

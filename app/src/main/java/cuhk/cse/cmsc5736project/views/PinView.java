@@ -28,7 +28,7 @@ import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.models.Friend;
 import cuhk.cse.cmsc5736project.models.Pin;
 
-public class PinView extends SubsamplingScaleImageView implements View.OnTouchListener, View.OnClickListener {
+public class PinView extends SubsamplingScaleImageView {//implements View.OnTouchListener, View.OnClickListener {
 
     private static final float textXOffset = -70;
     private static final float textYMargin = 40;
@@ -245,7 +245,7 @@ public class PinView extends SubsamplingScaleImageView implements View.OnTouchLi
 
     }
 
-    @Override
+/*    @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         return false;
     }
@@ -259,6 +259,8 @@ public class PinView extends SubsamplingScaleImageView implements View.OnTouchLi
             //imageViewF.addPin(new Pin(MapActivity.this, new PointF(lastKnownX,lastKnownY),R.drawable.map_marker,"marked"));
         }
         if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (markedPin!=null) markedPin.setShowPin(false);
+            markedPin = null;
             final float upX = event.getX();
             final float upY = event.getY();
             AsyncTask.execute(new Runnable() {
@@ -271,7 +273,6 @@ public class PinView extends SubsamplingScaleImageView implements View.OnTouchLi
                         Pin pinUp = checkClickedPos(upPos);
                         if (pinUp == pinDown){
                             pinUp.setShowPin(true);
-                            if (markedPin!=null) markedPin.setShowPin(false);
                             markedPin = pinUp;
                         }
                     }
@@ -281,17 +282,9 @@ public class PinView extends SubsamplingScaleImageView implements View.OnTouchLi
         }
         super.onTouchEvent(event);
         return true;
-    }
+    }*/
 
-    @Override
-    public void onClick(View view) {
-        PointF clickedPos = new PointF();
-        sourceToViewCoord(new PointF(lastKnownX, lastKnownY), clickedPos);
-        Toast.makeText(getContext(), "Clicked "+lastKnownX+" "+lastKnownY, Toast.LENGTH_SHORT).show();
-        checkClickedPos(clickedPos);
-    }
-
-    Pin checkClickedPos(PointF clickedPosAtSource){
+    public Pin checkClickedPos(PointF clickedPosAtSource){
         PointF clickedPos = new PointF();
         viewToSourceCoord(clickedPosAtSource, clickedPos);
         for (Pin pin: pinList){
@@ -314,5 +307,11 @@ public class PinView extends SubsamplingScaleImageView implements View.OnTouchLi
 
     public Pin getMarkedPin(){
         return markedPin;
+    }
+
+    public void setMarkedPin(Pin markedPin){
+        if (this.markedPin!=null) this.markedPin.setShowPin(false);
+        this.markedPin = markedPin;
+        if(markedPin!=null) markedPin.setShowPin(true);
     }
 }
