@@ -1,5 +1,7 @@
 package cuhk.cse.cmsc5736project.models;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -76,10 +78,12 @@ public class Friend implements Serializable {
         double friendY = getNearestLocation().getBeacon().getPos_y();
         double dist = Math.sqrt(Math.pow(friendX - x, 2) + Math.pow(friendY - y, 2));
 
+        Log.i("getProxToCurrentUser", ""+dist);
+
         // TODO: Determine threshold for proximity
-        if(dist <= 10) {
+        if(dist <= 150) {
             return PROXIMITY_VERY_CLOSE;
-        } else if(dist <= 30) {
+        } else if(dist <= 400) {
             return PROXIMITY_CLOSE;
         } else {
             return PROXIMITY_FAR;
