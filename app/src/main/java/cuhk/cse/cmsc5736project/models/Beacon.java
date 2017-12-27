@@ -82,6 +82,8 @@ public class Beacon implements Serializable
     public double getDistance() {
         // Get distance using RSSI power
         double theDist = calDistance(this.rssi);
+        // Round to nearest 0.5m
+        theDist = Math.round(theDist * 2) / 2.0;
         return theDist;
     }
 
