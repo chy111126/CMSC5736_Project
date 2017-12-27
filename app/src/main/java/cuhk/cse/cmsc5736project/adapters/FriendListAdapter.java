@@ -108,9 +108,12 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
                     }
                 }
 
-                if(f1.getLastUpdatedDate().getTime() < f2.getLastUpdatedDate().getTime() ) {
+                int f1Prox = f1.getProximityToCurrentUserPos(LocationManager.getInstance().userPos.x, LocationManager.getInstance().userPos.y);
+                int f2Prox = f2.getProximityToCurrentUserPos(LocationManager.getInstance().userPos.x, LocationManager.getInstance().userPos.y);
+
+                if(f1Prox > f2Prox ) {
                     return 1;
-                } else if(f1.getLastUpdatedDate().getTime() > f2.getLastUpdatedDate().getTime() ){
+                } else if(f1Prox < f2Prox ){
                     return -1;
                 } else {
                     if(f1.getName().compareTo(f2.getName()) != 0) {
