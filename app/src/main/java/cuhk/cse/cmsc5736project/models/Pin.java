@@ -64,7 +64,8 @@ public class Pin {
         if (poi!=null){
             setDescription(poi.getName());
             if(poi.getBeacon()!=null) {
-                setDistance(poi.getBeacon().getProximity());
+                setDistance(poi.getBeacon().getDistance());
+                maxDistance = 5;
                 if (getDistance() > maxDistance) maxDistance = getDistance();
             }
         }
@@ -119,7 +120,7 @@ public class Pin {
     }
 
     public double getDistance() {
-        return ((poi==null||poi.getBeacon()==null)? distance: poi.getBeacon().getProximity());
+        return ((poi==null||poi.getBeacon()==null)? distance: poi.getBeacon().getDistance());
     }
 
     public void setDistance(double distance) {
@@ -131,13 +132,13 @@ public class Pin {
     }
 
     public void setScale() {
-        Log.i("Pin View", "Setting scale for distance " + this.distance + " for " + getDescription() + " with max dist " + maxDistance);
+        Log.i("Pin View", "Setting scale for " + getDescription() + " with dist=" + getDistance());
         if (this.distance>=0) {
             if (maxDistance > 0) {
                 float oldScale = this.scale;
-                this.scale = (float) ((1 - (this.distance/maxDistance))) ;
+                this.scale = (float) ((1 - (getDistance()/maxDistance))) ;
                 Log.i("Pin View", "Setted scale for distance " + this.distance + " as " + getScale());
-                this.scale = Math.min(Math.max(this.scale, 0.5f),1.0f);
+                this.scale = Math.min(Math.max(this.scale, 0.1f),1.0f);
                 int w = (int)(pin.getWidth() / oldScale * this.scale);
                 int h = (int)(pin.getHeight() / oldScale * this.scale);
                 //if (w>0 && h>0) pin = Bitmap.createScaledBitmap(pin, (int) w, (int) h, true);

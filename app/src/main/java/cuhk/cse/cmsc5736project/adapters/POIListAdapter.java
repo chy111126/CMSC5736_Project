@@ -131,7 +131,7 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
             holder.txtRSSI.setText("---");
         } else {
             //holder.txtRSSI.setText(" " + item.getBeacon().getRSSI());
-            holder.txtRSSI.setText(" " + df.format(item.getBeacon().getDistance()) + "/" + item.getBeacon().getRSSI());
+            holder.txtRSSI.setText(" " + item.getBeacon().getRSSI());
         }
         holder.toggleBookmark.setChecked(item.isBookmarked());
 

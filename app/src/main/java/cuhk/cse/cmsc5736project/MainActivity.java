@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                        setupViewPager();
 
                        // Select initial page
-                       int initialPage = 1;
+                       int initialPage = 0;
                        selectPage(initialPage);
                        bottomNavigation.setCurrentItem(initialPage);
 
