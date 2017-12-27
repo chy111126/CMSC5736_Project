@@ -33,6 +33,7 @@ public class PinView extends SubsamplingScaleImageView implements View.OnTouchLi
     private static final float textXOffset = -70;
     private static final float textYMargin = 40;
     private static final float textYPadding = 20;
+    private static final float poiRadius = 48;
 
 
     private final Paint iconPaint;
@@ -294,7 +295,7 @@ public class PinView extends SubsamplingScaleImageView implements View.OnTouchLi
         PointF clickedPos = new PointF();
         viewToSourceCoord(clickedPosAtSource, clickedPos);
         for (Pin pin: pinList){
-            float radius = 48 / getScale();
+            float radius = poiRadius / getScale();
             PointF pinPos = pin.getPin();
             if(pointsNear(clickedPos,pinPos,radius)){
 //                pin.setShowPin(true);
