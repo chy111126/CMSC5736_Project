@@ -113,7 +113,7 @@ public class MapFragment extends Fragment {
                 //TODO: handle friend list
                 for (Friend friend: friendList) {
                     Log.i("init: ", "friend " + friend.getName() + " at " + friend.getNearestLocation());
-                    Pin friendAtPin = pinHm.get(friend.getNearestLocation()); // for testing new PointF(1008.75f, 995.209f));
+                    Pin friendAtPin = pinHm.get(new PointF(1008.75f, 995.209f));
                     if (friendAtPin!=null) {
                         Log.i("init: ", "add friend " + friend.getName() + " to " + friendAtPin.getDescription());
                         friendAtPin.addFriend(friend);

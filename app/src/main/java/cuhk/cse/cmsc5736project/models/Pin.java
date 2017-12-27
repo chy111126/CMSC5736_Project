@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
@@ -31,7 +32,8 @@ public class Pin {
     private float scale = 1;
     private double distance = -1;
     private static double maxDistance = 3;
-    private ColorMatrixColorFilter colorFilter;
+
+    private final Paint iconPaint;
     private ColorMatrix colorMatrix;
     private boolean showPin = false;
 
@@ -45,7 +47,9 @@ public class Pin {
         this.drawable = drawable;
         this.colorMatrix = new ColorMatrix();
         this.colorMatrix.setSaturation(0);
-        this.colorFilter = new ColorMatrixColorFilter(colorMatrix);
+        //this.colorFilter = new ColorMatrixColorFilter(colorMatrix);
+        this.iconPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        refreshIconPaintFilter();
         initialise(context);
     }
 
@@ -90,16 +94,8 @@ public class Pin {
         this.description = description;
     }
 
-    public ColorMatrixColorFilter getColorFilter() {
-        return colorFilter;
-    }
-
     public ColorMatrix getColorMatrix(){
         return colorMatrix;
-    }
-
-    public void setColorFilter(ColorMatrixColorFilter colorFilter) {
-        this.colorFilter = colorFilter;
     }
 
     public boolean isShowPin() {
@@ -108,6 +104,14 @@ public class Pin {
 
     public void setShowPin(boolean showPin) {
         this.showPin = showPin;
+    }
+
+    public Paint getIconPaint() {
+        return iconPaint;
+    }
+
+    public void refreshIconPaintFilter(){
+        this.iconPaint.setColorFilter(new ColorMatrixColorFilter(this.getColorMatrix()));
     }
 
     public String getDistanceDescription(){
@@ -127,17 +131,18 @@ public class Pin {
     }
 
     public void setScale() {
-        Log.i("Pin View", "Setting scale for distance " + distance + " for " + getDescription() + " with max dist " + maxDistance);
-        if (distance>=0) {
+        Log.i("Pin View", "Setting scale for distance " + this.distance + " for " + getDescription() + " with max dist " + maxDistance);
+        if (this.distance>=0) {
             if (maxDistance > 0) {
-                float oldScale = scale;
-                this.scale = (float) ((1 - (distance/maxDistance))) ;
-                Log.i("Pin View", "Setted scale for distance " + distance + " as " + getScale());
+                float oldScale = this.scale;
+                this.scale = (float) ((1 - (this.distance/maxDistance))) ;
+                Log.i("Pin View", "Setted scale for distance " + this.distance + " as " + getScale());
                 this.scale = Math.min(Math.max(this.scale, 0.5f),1.0f);
-                int w = (int)(pin.getWidth() / oldScale * scale);
-                int h = (int)(pin.getHeight() / oldScale * scale);
+                int w = (int)(pin.getWidth() / oldScale * this.scale);
+                int h = (int)(pin.getHeight() / oldScale * this.scale);
                 //if (w>0 && h>0) pin = Bitmap.createScaledBitmap(pin, (int) w, (int) h, true);
-                colorMatrix.setSaturation(getScale());
+                this.colorMatrix.setSaturation(this.scale);
+                refreshIconPaintFilter();
             }
             //setDescription("~" + getDistance() + "m");
         }
