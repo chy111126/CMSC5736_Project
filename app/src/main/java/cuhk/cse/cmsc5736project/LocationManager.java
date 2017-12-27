@@ -88,6 +88,7 @@ public class LocationManager {
     public static PointF userPos = new PointF(0, 0);
     public static String userName = "test-user";
     public static String userMAC = "Not-init-BLE-yet";
+    public static int updateFreq = 3;
 
     // BLE service and states
     private BluetoothManager btManager;
@@ -113,6 +114,13 @@ public class LocationManager {
         return name;
     }
 
+    static public int getUpdateFrequency(Context context) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        String freq = settings.getString("pref_update_frequency", "3");
+        Log.i("getUpdateFrequency", "Freq=" + freq);
+        return Integer.parseInt(freq);
+    }
+
     static public String getUserMAC(Context context) {
         return android.provider.Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
     }
@@ -126,6 +134,7 @@ public class LocationManager {
         //set default user data
         userName = this.getUserName(context);
         userMAC = this.getUserMAC(context);
+        updateFreq = this.getUpdateFrequency(context);
     }
 
     // LocationManager service
@@ -161,7 +170,7 @@ public class LocationManager {
         }
 
         // start friend poller
-        final PeriodicExecutor friendPoller = new PeriodicExecutor(3000);
+        final PeriodicExecutor friendPoller = new PeriodicExecutor(updateFreq);
         friendPoller.execute(new Runnable() {
             @Override
             public void run() {
@@ -273,7 +282,7 @@ public class LocationManager {
 
                 // If threshold passed, trigger POI change listener
                 Date nowDate = new Date();
-                int scanning_threshold = 1;
+                int scanning_threshold = updateFreq;
                 if (lastScanningDate == null || (nowDate.getTime() - lastScanningDate.getTime()) / 1000 > scanning_threshold) {
                     //LocationManager.this.updatePOIDefintion();
                     if(poiChangedListener != null) {
