@@ -81,6 +81,9 @@ public class Beacon implements Serializable
 
     public double getDistance() {
         // Get distance using RSSI power
+        if(this.rssi < -90) {
+            return 5;
+        }
         double theDist = calDistance(this.rssi);
         // Round to nearest 0.5m
         theDist = Math.round(theDist * 2) / 2.0;
@@ -90,15 +93,22 @@ public class Beacon implements Serializable
     public double calDistance(double power)
     {
         // Somehow it does not work, use interpolation for the purpose
-        if(power < four_m_rssi) {
+        // Use positive values for better working
+        power = Math.abs(power);
+        four_m_rssi = Math.abs(four_m_rssi);
+        two_m_rssi = Math.abs(two_m_rssi);
+        one_m_rssi = Math.abs(one_m_rssi);
+        half_m_rssi = Math.abs(half_m_rssi);
+
+        if(power >= four_m_rssi) {
             return 4.0d;
-        } else if(four_m_rssi < power && power < two_m_rssi) {
-            double interValue = (4 - 2) * (four_m_rssi - power) / (four_m_rssi - two_m_rssi) + 1;
+        } else if(four_m_rssi > power && power > two_m_rssi) {
+            double interValue = (4 - 2) * (four_m_rssi - power) / (four_m_rssi - two_m_rssi) + 2;
             return interValue;
-        } else if(two_m_rssi < power && power < one_m_rssi) {
+        } else if(two_m_rssi > power && power > one_m_rssi) {
             double interValue = (2 - 1) * (two_m_rssi - power) / (two_m_rssi - one_m_rssi) + 1;
             return interValue;
-        } else if(one_m_rssi < power && power < half_m_rssi) {
+        } else if(one_m_rssi > power && power > half_m_rssi) {
             double interValue = (1 - 0.5) * (one_m_rssi - power) / (one_m_rssi - half_m_rssi) + 0.5;
             return interValue;
         } else {

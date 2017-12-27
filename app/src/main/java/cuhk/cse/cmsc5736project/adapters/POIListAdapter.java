@@ -107,9 +107,14 @@ public class POIListAdapter extends RecyclerView.Adapter<POIListAdapter.ItemVH> 
             public int compare(POI f1, POI f2) {
                 if(f1.getBeacon().getRSSI() < f2.getBeacon().getRSSI()) {
                     return 1;
-                } else {
+                } else if(f1.getBeacon().getRSSI() > f2.getBeacon().getRSSI()){
                     return -1;
+                } else {
+                    if(f1.getName().compareTo(f2.getName()) != 0) {
+                        return f1.getName().compareTo(f2.getName());
+                    }
                 }
+                return 0;
             }
         });
     }

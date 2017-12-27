@@ -96,18 +96,29 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
             @Override
             public int compare(Friend f1, Friend f2) {
                 // No last-update logic
-                if(f1.getLastUpdatedDate() == null) {
+                if(f1.getLastUpdatedDate() != null && f2.getLastUpdatedDate() == null) {
                     return 1;
                 }
-                if(f2.getLastUpdatedDate() == null) {
+                if(f1.getLastUpdatedDate() == null && f2.getLastUpdatedDate() != null) {
                     return -1;
+                }
+                if(f1.getLastUpdatedDate() == null && f2.getLastUpdatedDate() == null) {
+                    if(f1.getName().compareTo(f2.getName()) != 0) {
+                        return f1.getName().compareTo(f2.getName());
+                    }
                 }
 
                 if(f1.getLastUpdatedDate().getTime() < f2.getLastUpdatedDate().getTime() ) {
                     return 1;
-                } else {
+                } else if(f1.getLastUpdatedDate().getTime() > f2.getLastUpdatedDate().getTime() ){
                     return -1;
+                } else {
+                    if(f1.getName().compareTo(f2.getName()) != 0) {
+                        return f1.getName().compareTo(f2.getName());
+                    }
                 }
+
+                return 0;
             }
         });
     }
