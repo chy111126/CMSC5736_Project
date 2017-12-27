@@ -86,7 +86,11 @@ public class MapFragment extends Fragment {
                 List<Pin> pinList = new ArrayList<Pin>() ;
                 for(POI poi: poiList) {
                     //PointF pinPosition = poi.getPosition();
-                    Pin newPin = new Pin(getContext(), poi, R.drawable.map_marker_icon);
+                    Pin newPin = null;
+                    if (poi.getName().contains("Toilet"))
+                        newPin = new Pin(getContext(), poi, R.drawable.toilet_small_icon);
+                    else
+                        newPin = new Pin(getContext(), poi, R.drawable.booth_small_icon);
                     pinList.add(newPin);
                     pinHm.put(poi.getPosition(), newPin);
                 }
