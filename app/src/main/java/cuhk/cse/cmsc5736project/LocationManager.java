@@ -170,7 +170,7 @@ public class LocationManager {
         }
 
         // start friend poller
-        final PeriodicExecutor friendPoller = new PeriodicExecutor(updateFreq);
+        final PeriodicExecutor friendPoller = new PeriodicExecutor(updateFreq * 2000);
         friendPoller.execute(new Runnable() {
             @Override
             public void run() {
@@ -282,7 +282,7 @@ public class LocationManager {
 
                 // If threshold passed, trigger POI change listener
                 Date nowDate = new Date();
-                int scanning_threshold = updateFreq;
+                int scanning_threshold = updateFreq / 2;
                 if (lastScanningDate == null || (nowDate.getTime() - lastScanningDate.getTime()) / 1000 > scanning_threshold) {
                     //LocationManager.this.updatePOIDefintion();
                     if(poiChangedListener != null) {
@@ -391,7 +391,7 @@ public class LocationManager {
                         uuid_major_minor = uuid_major_minor.toUpperCase();
                         // Put objects to accessing array/Hashmap
                         poiHM.put(uuid_major_minor, poi);
-                        Log.i("LocationManager", "initPOIDefinitions:uuid_major_minor" + poi.toString());
+                        Log.i("LocationManager", "initPOIDefinitions:uuid_major_minor" + uuid_major_minor);
                         Log.i("LocationManager", "initPOIDefinitions:pos_x" + poi.getBeacon().getPos_x());
                         Log.i("LocationManager", "initPOIDefinitions:pos_y" + poi.getBeacon().getPos_y());
 

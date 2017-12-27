@@ -80,11 +80,10 @@ public class Utility {
             String name = jsonObj.getString("name");
 
             POI poi = null;
-            if(jsonObj.has("near_POI_ID")) {
-                String nearPOIID = Integer.toString(jsonObj.getInt("near_POI_ID"));
-                String nearPOIName = jsonObj.getString("near_POI_name");
+            if(jsonObj.has("near_POI_UUID")) {
                 String nearPOIUUID = jsonObj.getString("near_POI_UUID");
-                String nearPOIDescription = jsonObj.getString("near_POI_description");
+                nearPOIUUID = nearPOIUUID.toUpperCase();
+                Log.i("Utility", "nearPOIUUID="+nearPOIUUID);
 
                 if(poiHM.get(nearPOIUUID) != null) {
                     //poi = new POI(nearPOIID, nearPOIName, nearPOIDescription);
