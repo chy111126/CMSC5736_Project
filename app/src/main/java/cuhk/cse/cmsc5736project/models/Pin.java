@@ -3,6 +3,8 @@ package cuhk.cse.cmsc5736project.models;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
@@ -29,6 +31,8 @@ public class Pin {
     private float scale = 1;
     private double distance = -1;
     private static double maxDistance = 3;
+    private ColorMatrixColorFilter colorFilter;
+    private ColorMatrix colorMatrix;
 
     private List<Friend> friendList = new ArrayList<>();
 
@@ -38,6 +42,9 @@ public class Pin {
 
         this.position = position;
         this.drawable = drawable;
+        this.colorMatrix = new ColorMatrix();
+        this.colorMatrix.setSaturation(0);
+        this.colorFilter = new ColorMatrixColorFilter(colorMatrix);
         initialise(context);
     }
 
@@ -82,6 +89,17 @@ public class Pin {
         this.description = description;
     }
 
+    public ColorMatrixColorFilter getColorFilter() {
+        return colorFilter;
+    }
+
+    public void setColorFilter(ColorMatrixColorFilter colorFilter) {
+        this.colorFilter = colorFilter;
+    }
+
+    public String getDistanceDescription(){
+        return ("~" + getDistance() + "m");
+    }
 
     public double getDistance() {
         return ((poi==null||poi.getBeacon()==null)? distance: poi.getBeacon().getProximity());
@@ -100,10 +118,13 @@ public class Pin {
         if (distance>=0) {
             if (maxDistance > 0) {
                 float oldScale = scale;
-                this.scale = (float) ((1 - 0.5f * (distance/maxDistance))) ;
+                this.scale = (float) ((1 - (distance/maxDistance))) ;
                 Log.i("Pin View", "Setted scale for distance " + distance + " as " + getScale());
                 this.scale = Math.min(Math.max(this.scale, 0.5f),1.0f);
-                pin = Bitmap.createScaledBitmap(pin, (int) (pin.getWidth() / oldScale * scale), (int) (pin.getHeight() / oldScale * scale), true);
+                int w = (int)(pin.getWidth() / oldScale * scale);
+                int h = (int)(pin.getHeight() / oldScale * scale);
+                //if (w>0 && h>0) pin = Bitmap.createScaledBitmap(pin, (int) w, (int) h, true);
+                colorMatrix.setSaturation(getScale());
             }
             //setDescription("~" + getDistance() + "m");
         }
