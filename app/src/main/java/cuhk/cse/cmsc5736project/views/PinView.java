@@ -11,8 +11,13 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.icu.util.Freezable;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Toast;
 
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
@@ -23,7 +28,7 @@ import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.models.Friend;
 import cuhk.cse.cmsc5736project.models.Pin;
 
-public class PinView extends SubsamplingScaleImageView {
+public class PinView extends SubsamplingScaleImageView implements View.OnTouchListener, View.OnClickListener {
 
     private static final float textXOffset = -70;
     private static final float textYMargin = 40;
@@ -39,11 +44,15 @@ public class PinView extends SubsamplingScaleImageView {
     private final Paint markerTextPaint;
     //private final float friendmHeight;
 
-    private Bitmap markerBitmap;
     private final PointF vPin = new PointF();
     //private PointF sPin;
     //private Bitmap pin;
+    private Bitmap markerBitmap;
     private List<Pin> pinList = new ArrayList<Pin>();
+    private Pin markedPin;
+
+    float lastKnownX;
+    float lastKnownY;
 
     public PinView(Context context) {
         this(context, null);
@@ -157,7 +166,7 @@ public class PinView extends SubsamplingScaleImageView {
         float h = (density/420f) * pin.getHeight();
         pin = Bitmap.createScaledBitmap(pin, (int)w, (int)h, true);*/
 
-        pinList.get(0).setShowPin(true);
+        //pinList.get(0).setShowPin(true);
 
         for (Pin pin:pinList){
             pin.setScale();
@@ -225,9 +234,9 @@ public class PinView extends SubsamplingScaleImageView {
                     float vXMarker = vPin.x - (markerBitmap.getWidth() / 2);
                     float vYMarker = vPin.y - (markerBitmap.getHeight());
                     canvas.drawBitmap(markerBitmap, vXMarker, vYMarker, markerPaint);
-                    float vXText = vPin.x;
-                    float vYText = vYMarker;
-                    canvas.drawText(pin.getDistanceDescription(), vXText, vYText, markerTextPaint);
+                    //float vXText = vPin.x;
+                    //float vYText = vYMarker;
+                    //canvas.drawText(pin.getDistanceDescription(), vXText, vYText, markerTextPaint);
                 }
                 //Log.i("pin view", "onDraw: " + vX + ", " + vY + ", " + pin.getPin().x + ", " + pin.getPin().y + ", " + getScale());
             }
@@ -235,4 +244,74 @@ public class PinView extends SubsamplingScaleImageView {
 
     }
 
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        return false;
+    }
+    @Override
+    public boolean onTouchEvent(@NonNull MotionEvent event) {
+        //Log.i("pin view: ", "onTouch: " + event.getAction());
+        if (event.getAction() == MotionEvent.ACTION_DOWN){
+            lastKnownX= event.getX();
+            lastKnownY= event.getY();
+            //Log.i("pin view: ", "onTouch: " + lastKnownX + ", " + lastKnownY);
+            //imageViewF.addPin(new Pin(MapActivity.this, new PointF(lastKnownX,lastKnownY),R.drawable.map_marker,"marked"));
+        }
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            final float upX = event.getX();
+            final float upY = event.getY();
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Pin pinDown = checkClickedPos(new PointF(lastKnownX, lastKnownY));
+
+                    if (pinDown!=null) {
+                        PointF upPos = new PointF(upX, upY);
+                        Pin pinUp = checkClickedPos(upPos);
+                        if (pinUp == pinDown){
+                            pinUp.setShowPin(true);
+                            if (markedPin!=null) markedPin.setShowPin(false);
+                            markedPin = pinUp;
+                        }
+                    }
+                }
+            });
+            invalidate();
+        }
+        super.onTouchEvent(event);
+        return true;
+    }
+
+    @Override
+    public void onClick(View view) {
+        PointF clickedPos = new PointF();
+        sourceToViewCoord(new PointF(lastKnownX, lastKnownY), clickedPos);
+        Toast.makeText(getContext(), "Clicked "+lastKnownX+" "+lastKnownY, Toast.LENGTH_SHORT).show();
+        checkClickedPos(clickedPos);
+    }
+
+    Pin checkClickedPos(PointF clickedPosAtSource){
+        PointF clickedPos = new PointF();
+        viewToSourceCoord(clickedPosAtSource, clickedPos);
+        for (Pin pin: pinList){
+            float radius = 48 / getScale();
+            PointF pinPos = pin.getPin();
+            if(pointsNear(clickedPos,pinPos,radius)){
+//                pin.setShowPin(true);
+//                if (markedPin!=null) markedPin.setShowPin(false);
+//                markedPin = pin;
+                return pin;
+            }
+        }
+        return null;
+    }
+
+    boolean pointsNear(PointF clickedPos, PointF pinPos, float radius){
+        //Log.i("pin view: ", "pointsNear: " + clickedPos.x + ", " + clickedPos.y + ", " + pinPos.x + ", " + pinPos.y + ", " + radius);
+        return (Math.pow((clickedPos.x - pinPos.x),2f) + Math.pow((clickedPos.y - pinPos.y),2f)) < Math.pow(radius,2f);
+    }
+
+    public Pin getMarkedPin(){
+        return markedPin;
+    }
 }
