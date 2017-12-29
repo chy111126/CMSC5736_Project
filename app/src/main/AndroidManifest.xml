@@ -25,15 +25,12 @@
         </activity>
         <activity android:name=".BeaconActivity"></activity>
         <activity android:name=".BeaconSetupActivity"></activity>
-        <activity android:name=".AddFriendActivity"></activity>
         <activity
             android:name=".SettingsPrefActivity"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".AddNewFriendActivity"
             android:theme="@style/AppTheme" />
-        <activity android:name=".MapActivity">
-        </activity>
     </application>
 
 </manifest>

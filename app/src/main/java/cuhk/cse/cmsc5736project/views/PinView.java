@@ -215,20 +215,6 @@ public class PinView extends SubsamplingScaleImageView {//implements View.OnTouc
                     canvas.drawText(friendText, vXText, vYText, friendStrokePaint);
                     canvas.drawText(friendText, vXText, vYText, friendmPaint);
                 }
-/*                List<Friend> friendList = pin.getFriendList();
-                if (friendList != null) {
-                    paint.setTextAlign(Paint.Align.LEFT);
-                    paint.setTextSize(pin.getTextSize() * 0.75f);
-                    Rect bounds = new Rect();
-                    paint.getTextBounds("a", 0, 1, bounds);
-                    int textHeight = bounds.height();
-                    // print 3 friends maximum
-                    for (int i = 0; i < 3 && i < friendList.size(); i++) {
-                        float vXText = vPin.x + pin.getBitmap().getWidth() + textXOffset;
-                        float vYText = vPin.y - pin.getBitmap().getHeight() + ((textHeight + textYMargin) * (i+1));
-                        canvas.drawText(friendList.get(i).getName(), vXText, vYText, paint);
-                    }
-                }*/
 
                 //print marker
                 if (pin.isShowPin()){
@@ -244,45 +230,6 @@ public class PinView extends SubsamplingScaleImageView {//implements View.OnTouc
         }
 
     }
-
-/*    @Override
-    public boolean onTouch(View view, MotionEvent motionEvent) {
-        return false;
-    }
-    @Override
-    public boolean onTouchEvent(@NonNull MotionEvent event) {
-        //Log.i("pin view: ", "onTouch: " + event.getAction());
-        if (event.getAction() == MotionEvent.ACTION_DOWN){
-            lastKnownX= event.getX();
-            lastKnownY= event.getY();
-            //Log.i("pin view: ", "onTouch: " + lastKnownX + ", " + lastKnownY);
-            //imageViewF.addPin(new Pin(MapActivity.this, new PointF(lastKnownX,lastKnownY),R.drawable.map_marker,"marked"));
-        }
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            if (markedPin!=null) markedPin.setShowPin(false);
-            markedPin = null;
-            final float upX = event.getX();
-            final float upY = event.getY();
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Pin pinDown = checkClickedPos(new PointF(lastKnownX, lastKnownY));
-
-                    if (pinDown!=null) {
-                        PointF upPos = new PointF(upX, upY);
-                        Pin pinUp = checkClickedPos(upPos);
-                        if (pinUp == pinDown){
-                            pinUp.setShowPin(true);
-                            markedPin = pinUp;
-                        }
-                    }
-                }
-            });
-            invalidate();
-        }
-        super.onTouchEvent(event);
-        return true;
-    }*/
 
     public Pin checkClickedPos(PointF clickedPosAtSource){
         PointF clickedPos = new PointF();

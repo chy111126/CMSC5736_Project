@@ -70,10 +70,10 @@ public class BeaconSetupActivity extends AppCompatActivity implements AsyncRespo
         btLeScanne = btAdapter.getBluetoothLeScanner();
 
 
-        textView_id=findViewById(R.id.textview_becon_setup_id);
-        textView_major=findViewById(R.id.textview_becon_setup_major);
-        textView_minor=findViewById(R.id.textview_becon_setup_minor);
-        textView_rssi=findViewById(R.id.textview_becon_setup_rssi);
+        textView_id=(TextView)findViewById(R.id.textview_becon_setup_id);
+        textView_major=(TextView)findViewById(R.id.textview_becon_setup_major);
+        textView_minor=(TextView)findViewById(R.id.textview_becon_setup_minor);
+        textView_rssi=(TextView)findViewById(R.id.textview_becon_setup_rssi);
 
         Intent intent = getIntent();
 
@@ -103,19 +103,19 @@ public class BeaconSetupActivity extends AppCompatActivity implements AsyncRespo
         TextView textView;
         switch (v.getId()) {
             case R.id.btn_half_meter_calibrate:
-                textView = findViewById(R.id.textview_half_meter_power);
+                textView = (TextView)findViewById(R.id.textview_half_meter_power);
                 textView.setText(textView_rssi.getText());
                 break;
             case R.id.btn_one_meter_calibrate:
-                textView = findViewById(R.id.textview_one_meter_power);
+                textView = (TextView)findViewById(R.id.textview_one_meter_power);
                 textView.setText(textView_rssi.getText());
                 break;
             case R.id.btn_two_meter_calibrate:
-                textView = findViewById(R.id.textview_two_meter_power);
+                textView = (TextView)findViewById(R.id.textview_two_meter_power);
                 textView.setText(textView_rssi.getText());
                 break;
             case R.id.btn_four_meter_calibrate:
-                textView = findViewById(R.id.textview_four_meter_power);
+                textView = (TextView)findViewById(R.id.textview_four_meter_power);
                 textView.setText(textView_rssi.getText());
                 break;
             case R.id.btn_cancel:
@@ -123,13 +123,13 @@ public class BeaconSetupActivity extends AppCompatActivity implements AsyncRespo
                 break;
             case R.id.btn_save:
                 curState = SAVEDATA;
-                textView = findViewById(R.id.textview_half_meter_power);
+                textView = (TextView)findViewById(R.id.textview_half_meter_power);
                 int n1 = Integer.valueOf(textView.getText().toString());
-                textView = findViewById(R.id.textview_one_meter_power);
+                textView = (TextView)findViewById(R.id.textview_one_meter_power);
                 int n2 = Integer.valueOf(textView.getText().toString());
-                textView = findViewById(R.id.textview_two_meter_power);
+                textView = (TextView)findViewById(R.id.textview_two_meter_power);
                 int n3 = Integer.valueOf(textView.getText().toString());
-                textView = findViewById(R.id.textview_four_meter_power);
+                textView = (TextView)findViewById(R.id.textview_four_meter_power);
                 int n4 = Integer.valueOf(textView.getText().toString());
                 textView = (EditText)findViewById(R.id.textview_location_x);
                 float px = Float.valueOf(textView.getText().toString());
@@ -271,13 +271,13 @@ public class BeaconSetupActivity extends AppCompatActivity implements AsyncRespo
                     textView.setText(mainObject.getString("position_x"));
                     textView = (EditText)findViewById(R.id.textview_location_y);
                     textView.setText(mainObject.getString("position_y"));
-                    textView = findViewById(R.id.textview_half_meter_power);
+                    textView = (TextView)findViewById(R.id.textview_half_meter_power);
                     textView.setText(mainObject.getString("rssi_half_m_signal"));
-                    textView = findViewById(R.id.textview_one_meter_power);
+                    textView = (TextView)findViewById(R.id.textview_one_meter_power);
                     textView.setText(mainObject.getString("rssi_one_m_signal"));
-                    textView = findViewById(R.id.textview_two_meter_power);
+                    textView = (TextView)findViewById(R.id.textview_two_meter_power);
                     textView.setText(mainObject.getString("rssi_two_m_signal"));
-                    textView = findViewById(R.id.textview_four_meter_power);
+                    textView = (TextView)findViewById(R.id.textview_four_meter_power);
                     textView.setText(mainObject.getString("rssi_four_m_signal"));
                 } catch (JSONException e) {
                     e.printStackTrace();

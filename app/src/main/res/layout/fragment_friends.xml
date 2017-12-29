@@ -26,7 +26,6 @@
         android:layout_marginEnd="11dp"
         android:clickable="true"
         android:focusable="true"
-        android:keyboardNavigationCluster="false"
         android:src="@drawable/ic_content_add"
         app:backgroundTint="@color/color_tab_3_accent" />
 

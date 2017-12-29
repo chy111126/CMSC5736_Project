@@ -2,7 +2,6 @@ package cuhk.cse.cmsc5736project.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
-import org.w3c.dom.Text;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -25,7 +22,6 @@ import cuhk.cse.cmsc5736project.R;
 import cuhk.cse.cmsc5736project.interfaces.OnPOIListChangeListener;
 import cuhk.cse.cmsc5736project.interfaces.OnPOIResultListener;
 import cuhk.cse.cmsc5736project.models.Beacon;
-import cuhk.cse.cmsc5736project.models.Dessert;
 import cuhk.cse.cmsc5736project.models.POI;
 
 /**

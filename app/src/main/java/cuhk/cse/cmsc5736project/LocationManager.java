@@ -52,8 +52,6 @@ public class LocationManager {
 
     private Date lastScanningDate;
 
-    //private List<Beacon> scanBeacon = new ArrayList<Beacon>();
-
     // ----- POI -----
     private static HashMap<String, POI> poiHM = new HashMap<>();
     private OnPOIListChangeListener poiChangedMapFragmentListener = null;
@@ -96,9 +94,6 @@ public class LocationManager {
     private BluetoothLeScanner btLeScanne;
     private boolean isScanning = false;
     private Handler scanHandler = new Handler();
-
-    // Friend location poller
-    PeriodicExecutor friendPoller;
 
     // Constructor
     public static LocationManager getInstance() {
@@ -156,12 +151,6 @@ public class LocationManager {
             Toast.makeText(context, "This device does not support Bluetooth!", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        // init/update user server data
-        //updateUserData(context,null );
-
-        //init/update RSSI-distance model
-        //RSSIModel.getInstance().updateModel(context);
 
         //start beacon scan
         if (!isScanning) {
@@ -248,26 +237,6 @@ public class LocationManager {
                         hexString.substring(20, 32);
                 final int major = (scanRecord[startByte + 20] & 0xff) * 0x100 + (scanRecord[startByte + 21] & 0xff);
                 final int minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
-
-                /*
-                Beacon beacon = new Beacon();
-                beacon.setUUID(uuid);
-                beacon.setMajor(major);
-                beacon.setMinor(minor);
-                beacon.setRSSI(result.getRssi());
-
-                boolean isUpdated = false;
-                for (Beacon beaconItem : scanBeacon) {
-                    if (beacon.isSameBeacon(beaconItem)) {
-                        beaconItem.setRSSI(beacon.getRSSI());
-                        isUpdated = true;
-                        break;
-                    }
-                }
-                if (!isUpdated) {
-                    scanBeacon.add(beacon);
-                }
-                */
 
                 // Check beacon entry in POI Hashmap
                 String uuid_major_minor = uuid + "_" + Integer.toString(major) + "_" + Integer.toString(minor);
@@ -372,7 +341,6 @@ public class LocationManager {
     // ----- POI methods -----
     public void initPOIDefinitions(Context context, final OnPOIResultListener initListener) {
         // Get POI definitions from server, and materialize for client upgrades to each approximation
-        // ~= RSSIModel.updateModel method
         HashMap postData = new HashMap();
         PostResponseAsyncTask task = new PostResponseAsyncTask(context, postData, new AsyncResponse() {
             @Override
@@ -408,7 +376,7 @@ public class LocationManager {
     }
 
     public void getPOIDefinitions(Context context, final OnPOIResultListener initListener) {
-        // Already initialized. returning old list
+        // Should be already initialized when called. returning old list
         initListener.onRetrieved(LocationManager.this.getPOIList());
     }
 
@@ -682,55 +650,6 @@ public class LocationManager {
     public void getSimulatedPOIDefinitions(Context context, final OnPOIResultListener initListener) {
         poiHM = new HashMap<>();
         // Get POI definitions from server, and materialize for client upgrades to each approximation
-        // ~= RSSIModel.updateModel method
-        /*
-        String poiResult = "{\n" +
-                "  \"beacons\": [\n" +
-                "    {\n" +
-                "      \"uuid_major_minor\": \"E3A513C7-EAB1-4988-AA99-C2C5145437E2_1_5891\",\n" +
-                "      \"uuid\": \"E3A513C7-EAB1-4988-AA99-C2C5145437E2\",\n" +
-                "      \"major\": \"1\",\n" +
-                "      \"minor\": \"5891\",\n" +
-                "      \"position_x\": \"5\",\n" +
-                "      \"position_y\": \"60\",\n" +
-                "      \"rssi_half_m_signal\": \"-60\",\n" +
-                "      \"rssi_one_m_signal\": \"-79\",\n" +
-                "      \"rssi_two_m_signal\": \"-89\",\n" +
-                "      \"rssi_four_m_signal\": \"-93\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"uuid_major_minor\": \"B5B182C7-EAB1-4988-AA99-B5C1517008D9_1_63496\",\n" +
-                "      \"uuid\": \"B5B182C7-EAB1-4988-AA99-B5C1517008D9\",\n" +
-                "      \"major\": \"1\",\n" +
-                "      \"minor\": \"63496\",\n" +
-                "      \"position_x\": \"85\",\n" +
-                "      \"position_y\": \"60\",\n" +
-                "      \"rssi_half_m_signal\": \"-68\",\n" +
-                "      \"rssi_one_m_signal\": \"-69\",\n" +
-                "      \"rssi_two_m_signal\": \"-66\",\n" +
-                "      \"rssi_four_m_signal\": \"-66\"\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
-        try {
-            JSONObject resultJson = new JSONObject(poiResult);
-            JSONArray beaconsArr = resultJson.getJSONArray("beacons");
-            for (int i = 0; i < beaconsArr.length(); i++) {
-                // Transform raw result to object
-                JSONObject row = beaconsArr.getJSONObject(i);
-                Beacon beacon = Utility.createBeaconFromJsonObject(row);
-                String uuid = beacon.getUUID();
-                POI poi = new POI(uuid, "POI " + i, "Description!");
-                poi.setBeacon(beacon);
-                poi.setPosition(beacon.getPos_x(), beacon.getPos_y());
-
-                // Put objects to accessing array/Hashmap
-                poiHM.put(uuid, poi);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        */
 
         for(int i=0; i < 5; i++) {
             Beacon beacon = new Beacon();

@@ -13,7 +13,6 @@ public class Friend implements Serializable {
 
     private String name;
     private String mac;
-    private String description;
     private POI nearestLocation;
     private Date lastUpdatedDate;
 
@@ -31,14 +30,6 @@ public class Friend implements Serializable {
     }
     public void setLastUpdated(Date lastUpdatedDate) {
         this.lastUpdatedDate = lastUpdatedDate;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public boolean isSame(Friend f) {
@@ -80,7 +71,7 @@ public class Friend implements Serializable {
 
         Log.i("getProxToCurrentUser", ""+dist);
 
-        // TODO: Determine threshold for proximity
+        // Determine threshold for proximity
         if(dist <= 150) {
             return PROXIMITY_VERY_CLOSE;
         } else if(dist <= 400) {

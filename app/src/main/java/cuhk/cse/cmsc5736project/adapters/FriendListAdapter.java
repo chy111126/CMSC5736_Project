@@ -44,9 +44,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.It
         this.onFriendSelectedListener = onFriendSelectedListener;
 
 
-
         if (isAddNewFriend) {
-            //populateSampleData();
             LocationManager.getInstance().getFriendDefinitions(context, new OnFriendResultListener() {
                 @Override
                 public void onRetrieved(List<Friend> friendList) {

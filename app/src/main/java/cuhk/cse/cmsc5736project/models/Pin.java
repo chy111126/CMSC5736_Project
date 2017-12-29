@@ -47,7 +47,6 @@ public class Pin {
         this.drawable = drawable;
         this.colorMatrix = new ColorMatrix();
         this.colorMatrix.setSaturation(0);
-        //this.colorFilter = new ColorMatrixColorFilter(colorMatrix);
         this.iconPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         refreshIconPaintFilter();
         initialise(context);
@@ -163,9 +162,6 @@ public class Pin {
         float w = (density/420f) * pin.getWidth();
         float h = (density/420f) * pin.getHeight();
         pin = Bitmap.createScaledBitmap(pin, (int)w, (int)h, true);
-
-        //position.x += 70;
-        //position.y += 500;
 
     }
 

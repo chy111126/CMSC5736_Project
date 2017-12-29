@@ -92,7 +92,10 @@ public class Beacon implements Serializable
 
     public double calDistance(double power)
     {
-        // Somehow it does not work, use interpolation for the purpose
+        //return Math.pow((one_meter_power/power),(1/path_loss_exponent));
+
+
+        // The formula does not work as expected, use interpolation for the purpose
         // Use positive values for better working
         power = Math.abs(power);
         four_m_rssi = Math.abs(four_m_rssi);
@@ -114,7 +117,6 @@ public class Beacon implements Serializable
         } else {
             return 0.5d;
         }
-        //return Math.pow((one_meter_power/power),(1/path_loss_exponent));
     }
 
 

@@ -22,6 +22,10 @@ import cuhk.cse.cmsc5736project.MainActivity;
 
 public class RSSIModel implements AsyncResponse {
 
+    /*
+    RSSIModel for beacon setup activity
+     */
+
     private static HashMap<String,Beacon> beaconHM = new HashMap<>();
     private static RSSIModel instance;
 
@@ -40,14 +44,6 @@ public class RSSIModel implements AsyncResponse {
         task.execute(LocationManager.ROOT_URL+"/get_all_beacon_data.php");
 
         return true;
-    }
-
-    public double getDistFromRSSIModel(Beacon beacon, double rssi)
-    {
-        // TODO: RSSI update should be done in LocationManager method; and trigger Beacon.getDistance() method in POIListAdapter to get latest RSSI values
-        String uuid_major_minor = beacon.getUUID() + "_" + Integer.toString(beacon.getMajor())+ "_" + Integer.toString(beacon.getMinor());
-        Beacon rssiModelBeacon = beaconHM.get(uuid_major_minor);
-        return rssiModelBeacon.calDistance(rssi);
     }
 
     @Override

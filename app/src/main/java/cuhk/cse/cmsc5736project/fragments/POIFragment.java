@@ -64,13 +64,4 @@ public class POIFragment extends Fragment {
         return rootView;
     }
 
-    public void checkIfArriveBookmarkedLocation() {
-        // Get POI list
-        List<POI> poiList = LocationManager.getInstance().getPOIList();
-
-        // TODO: Sort POI list by RSSI value
-        // TODO: Check if first POI of list if bookmarked
-        // TODO: If yes, remove bookmark state, and update UI via adapter.notifyDataSetChanged();
-    }
-
 }
