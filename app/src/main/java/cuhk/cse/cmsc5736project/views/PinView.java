@@ -114,12 +114,6 @@ public class PinView extends SubsamplingScaleImageView {//implements View.OnTouc
         //this.sPin = new PointF(10 + 70,0 + 500);
 
         for (Pin pin : pinList) {
-            // modify pin location before adding
-//            PointF tarPin = new PointF();
-
-//            viewToSourceCoord(pin.getPin(), tarPin);
-//            Log.i("pin view", "changing pin: " + pin.getPin().x + ", " + pin.getPin().y + ", " + tarPin.x + ", " + tarPin.y + ", " + getScale());
-//            pin.setPin(tarPin);
             this.pinList.add(pin);
         }
         //this.pinList.addAll(pinList);
@@ -140,34 +134,7 @@ public class PinView extends SubsamplingScaleImageView {//implements View.OnTouc
         refreshPins();
     }
 
-/*    void toPinViewCoord(Pin pin){
-        pin.setPin(viewToSourceCoord(pin.getPin()));
-        //return pin;
-    }*/
-
-/*    PointF viewToSourceCoord(PointF sPos){
-        PointF afterTrans = new PointF();
-        PointF translate = new PointF();
-        PointF targetPin = new PointF();
-        float scale = getScale();
-        sourceToViewCoord(sPos, afterTrans);
-        float sx = sPos.x;
-        float sy = sPos.y;
-        translate.set(afterTrans.x - sx * scale, afterTrans.y - sy * scale);
-        targetPin.set((sx - translate.x), (sy - translate.y));
-        if (scale!=0f) targetPin.set(targetPin.x/scale, targetPin.y/scale);
-
-        return targetPin;
-    }*/
-
     public void refreshPins() {
-/*        float density = getResources().getDisplayMetrics().densityDpi;
-        pin = BitmapFactory.decodeResource(this.getResources(), R.drawable.map_marker);
-        float w = (density/420f) * pin.getWidth();
-        float h = (density/420f) * pin.getHeight();
-        pin = Bitmap.createScaledBitmap(pin, (int)w, (int)h, true);*/
-
-        //pinList.get(0).setShowPin(true);
 
         for (Pin pin:pinList){
             pin.setScale();

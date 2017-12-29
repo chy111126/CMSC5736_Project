@@ -17,8 +17,7 @@ import cuhk.cse.cmsc5736project.R;
 
 public class FriendListDialog extends Dialog implements
         View.OnClickListener {
-    //public Activity c;
-    //public Dialog d;
+
     private Button ok;
     private TextView txtView;
     private String message;
